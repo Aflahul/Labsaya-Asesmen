@@ -72,9 +72,13 @@ CSV mengekspor rekap sesuai filter kelas/peserta dengan kolom Indonesia, UTF-8 B
 
 Leaderboard inti hanya memuat peserta yang menyelesaikan 16 misi inti, menggunakan rata-rata nilai terbaru. Nilai sama memperoleh peringkat sama. Hanya nama samaran/peringkat/nilai ditampilkan; tidak ada nama asli atau nomor absen. Pengayaan ditampilkan dalam rapor dan tidak memengaruhi peringkat inti.
 
-## Distribusi dan pengujian
+## Deployment Vercel dan pengujian
 
-Hasil akhir ZIP berisi build game/aset lokal, kode API, migrasi Neon, panduan guru, petunjuk peserta, laporan pengujian, dan lisensi dependensi. Pengguna akhir tidak perlu build. Integrasi akun terpusat memerlukan deployment dan koneksi Neon di konfigurasi server; jangan memasukkan kredensial ke ZIP, frontend, log atau chat. Periksa konfigurasi tersedia sebelum meminta kredensial. Distribusi offline dan pengalaman hosted dibedakan jelas.
+Keputusan pengguna terbaru: ZIP tidak wajib, aplikasi akan di-deploy ke Vercel. Hasil akhir adalah repositori siap deployment, build frontend statis, API Vercel Functions pada origin yang sama, migrasi Neon, panduan guru/peserta, laporan pengujian, dan panduan deployment. Vite menghasilkan frontend; Fastify dipakai sebagai aplikasi HTTP yang dapat diuji lokal dan dibungkus handler Vercel Functions berbasis Node.js. Koneksi Neon menggunakan pooled connection string dan pool kecil yang digunakan ulang per instance; jangan menyimpan state akun/sesi dalam memori fungsi atau filesystem sementara.
+
+Kredensial database hanya di environment server Vercel. Database preview/test dipisahkan dari production. Migrasi dijalankan secara eksplisit oleh operator terhadap target yang dipilih, bukan otomatis setiap build preview. Service worker dengan cache aset berversi diperlukan untuk membuka kembali game tanpa jaringan setelah kunjungan/login pertama; jangan cache respons autentikasi atau data rapor lewat cache HTTP bersama. Hapus cache privat peserta saat logout; progres belum tersinkron memerlukan peringatan sebelum penghapusan. Leaderboard dan API identitas memakai kebijakan cache yang mencegah kebocoran data. Tidak menjanjikan permainan sebelum kunjungan pertama tanpa internet atau login baru offline.
+
+Dokumentasi menjelaskan konfigurasi Neon/Vercel dan prosedur membuat akun guru secara aman. Deployment nyata memerlukan otorisasi pengguna dan akses proyek yang tersedia; instruksi menyatakan rencana pengguna melakukan deployment, bukan izin otomatis mempublikasikan aplikasi. Tidak memasukkan kredensial ke frontend, source, log atau chat. File lokal dan peluncur Windows bukan target distribusi MVP.
 
 Pengujian wajib sebelum penyerahan:
 
@@ -84,6 +88,6 @@ Pengujian wajib sebelum penyerahan:
 4. Neon/API: registrasi duplikat, login peserta/guru, logout, akses tanpa sesi, isolasi akun, manipulasi peran, sinkronisasi retry/konflik, skor server, dan leaderboard tanpa identitas asli.
 5. Dashboard/filter/ekspor, metrik terhadap sumber sesi, nilai belum lengkap, kegagalan penyimpanan dan jaringan, CSRF, serta SQL parameterized.
 6. Desktop/tablet/ponsel, keyboard tiap mekanisme, reduced motion, kualitas rendah, audio/mute, serta aset tanpa jaringan.
-7. Build aktual dan jalur distribusi yang dijanjikan. Hasil file lokal, server lokal dan hosted dicatat terpisah. Tes Linux tidak membuktikan Windows atau semua browser; laporkan batasan aktual.
+7. Build Vercel, routing frontend/API same-origin, handler serverless, database pooled, serta service worker/update cache. Uji preview HTTPS jika akses tersedia; hasil lokal tidak membuktikan deployment Vercel berhasil. Laporkan browser dan lingkungan yang benar-benar diuji.
 
-Jangan menyerahkan ZIP sebagai selesai bila misi atau pemeriksaan wajib belum berfungsi. Sasaran 60 FPS harus diukur; jangan mengklaim tanpa bukti perangkat. Tidak ada tombol dekoratif atau fitur akan-segera-tersedia menggantikan kebutuhan inti.
+Jangan menyatakan aplikasi siap deployment bila misi atau pemeriksaan wajib belum berfungsi. Sasaran 60 FPS harus diukur; jangan mengklaim tanpa bukti perangkat. Tidak ada tombol dekoratif atau fitur akan-segera-tersedia menggantikan kebutuhan inti.

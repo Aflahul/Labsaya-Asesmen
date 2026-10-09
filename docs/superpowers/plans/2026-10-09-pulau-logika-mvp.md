@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Menghasilkan game asesmen dengan 16 misi inti, dua misi pengayaan, akun peserta, penyimpanan Neon, leaderboard dan dashboard guru, serta ZIP distribusi yang telah diuji.
+**Goal:** Menghasilkan game asesmen dengan 16 misi inti, dua misi pengayaan, akun peserta, penyimpanan Neon, leaderboard dan dashboard guru, serta repositori siap deployment Vercel yang telah diuji.
 
-**Architecture:** Satu repositori berisi frontend Phaser/HTML dan API Node.js same-origin. Evaluator, penilaian, dan kontrak data dibagi sebagai modul yang dipakai frontend dan server. Neon PostgreSQL menyimpan sesi dan tindakan; cache browser menyediakan pengerjaan offline setelah login.
+**Architecture:** Satu repositori berisi frontend Phaser/HTML statis dan API Node.js same-origin melalui Vercel Functions. Evaluator, penilaian, dan kontrak data dibagi sebagai modul yang dipakai frontend dan server. Neon PostgreSQL menyimpan sesi dan tindakan; cache browser menyediakan pengerjaan offline setelah login.
 
 **Tech Stack:** Node.js 24 LTS, JavaScript ESM, Phaser 3, Vite, Fastify, `pg`, PostgreSQL Neon, Vitest, Playwright. Password guru menggunakan `node:crypto` scrypt. Versi dependensi dikunci melalui package-lock.json; pilih rilis stabil kompatibel saat instalasi.
 
@@ -17,7 +17,7 @@
 - Nilai inti hanya dihitung setelah 16 misi inti tuntas; pengayaan terpisah.
 - Bobot tetap 40% ketepatan, 25% waktu, 20% percobaan, 15% petunjuk.
 - Aset runtime lokal, tidak ada API grafis/audio eksternal; akun dan sinkronisasi membutuhkan internet.
-- Backend memeriksa sesi/peran; koneksi Neon tidak masuk frontend, ZIP publik, atau log.
+- Backend memeriksa sesi/peran; koneksi Neon tidak masuk frontend, source publik, atau log.
 - Nilai terbaru, terbaik, dan kumulatif berbeda; waktu perjalanan/tab tersembunyi tidak dinilai.
 - Gunakan checkout yang tersedia; cloud task sudah terisolasi, tanpa membuat worktree.
 - Jangan deploy, mempublikasikan leaderboard nyata, atau memasukkan data peserta nyata selama pengembangan.
@@ -132,25 +132,28 @@ ID misi `p01m01`…`p09m02`; versi katalog awal `1`. Definisikan semua nilai JSO
 - [ ] Implementasikan dashboard identitas/filter/progres/kompetensi/detail sesi/event dan status last-sync. Export CSV UTF-8 BOM dan neutralisasi prefiks formula `= + - @` setelah whitespace; JSON menyertakan schemaVersion. Kalibrasi guru melalui `PUT /api/teacher/scoring-config`, gunakan multiplier Task 3 hanya untuk sesi baru; uji snapshot lama tidak berubah.
 - [ ] Implementasikan login guru, tabel responsif, rincian per misi, laporan konfirmasi guru, backup JSON/import tervalidasi dengan konfirmasi penggantian, dan hapus cache lokal dengan konfirmasi. Uji import payload milik akun lain ditolak dan data lama tidak berubah jika validasi gagal. Jalankan tests dan commit `feat: add teacher assessment dashboard and reports`.
 
-### Task 9: Integrasi akhir, dokumentasi dan ZIP
+### Task 9: Integrasi akhir, Vercel dan dokumentasi
 
-**Files:** Create `scripts/{package,serve-local}.js`, `PANDUAN_GURU.md`, `PETUNJUK.txt`, `HASIL_UJI.md`, `DEPLOYMENT.md`, `THIRD_PARTY_NOTICES.md`, `tests/browser/offline.spec.js`; update scripts build/test pada `package.json`.
+**Files:** Create `api/index.js`, `vercel.json`, `src/client/sw.js`, `scripts/serve-local.js`, `PANDUAN_GURU.md`, `PETUNJUK.md`, `HASIL_UJI.md`, `DEPLOYMENT.md`, `THIRD_PARTY_NOTICES.md`, `tests/api/vercel-handler.test.js`, `tests/browser/offline.spec.js`; update build/test scripts di `package.json` dan `.env.example`.
 
-**Interfaces:** Produces `npm run build`, `npm start` (API + distribusi pada origin sama), `npm run package` → `artifacts/Pulau-Logika-MVP.zip`. ZIP berisi `app/` build lokal, `server/` source/API+manifest+lockfile, `migrations/`, scripts setup, dan dokumen; tidak menyertakan `.env`, kredensial, node_modules, atau data peserta.
+**Interfaces:** Produces `npm run build` → `dist/`, `npm start` untuk API/frontend lokal same-origin, dan handler default `api/index.js(req,res)` untuk Vercel Node.js Function. Gunakan satu app Fastify yang diinisialisasi sekali dan di-ready sebelum meneruskan request, tanpa `listen()` di handler serverless. `vercel.json` menggunakan build `npm run build`, output `dist`, routing `/api/*` ke function tanpa fallback HTML, dan frontend routes ke index. Pin runtime Node kompatibel Vercel dan versi local yang dipakai.
 
-- [ ] Tulis tes built app mengambil seluruh aset lokal, koneksi diputus setelah login tetap dapat mengerjakan cached task, status unsynced jelas dan sync pulih, export tetap tersedia. Tambahkan verifikasi daftar ZIP menolak file secret dan memuat semua dokumen/build/migrasi.
-- [ ] Konfigurasikan build frontend dengan relative base dan bundle klasik jika mendukung pengalaman file lokal yang dijanjikan. `npm start` menyajikan UI/API dari satu origin; dokumentasikan Node hanya diperlukan operator server, bukan murid hosted. Jika file:// tidak berfungsi, laporkan dan gunakan mode server lokal tanpa menjanjikan klik ganda.
-- [ ] Jalankan `npm ci`, `npm run test:unit`, `npm run test:api`, `npm run build`, `npm run test:browser`, serta `npm run package`. API suite memakai TEST_DATABASE_URL terpisah; kalau Neon development belum terhubung, jangan mengklaim integrasi nyata lulus dan jangan menyatakan produk final siap.
-- [ ] Periksa login, pendaftaran, migrasi dan satu penyelesaian sesi nyata di Neon development, dashboard serta leaderboard. Jangan deploy publik tanpa instruksi pengguna; koneksi dan deployment harus disediakan melalui konfigurasi aman, bukan chat. Jika prasyarat belum tersedia, selesaikan tes lokal dan laporkan operasi tepat yang tertunda.
-- [ ] Lengkapi panduan pemetaan 18 misi/indikator, rumus, batas autentikasi nama, offline evidence, waktu, replay, laporan, ekspor, backup, kalibrasi dan instalasi/deployment. Isi HASIL_UJI dari hasil aktual, counts/commands/browser/platform, tidak dari ekspektasi rencana.
-- [ ] Verifikasi ZIP diekstrak dan startup sesuai petunjuk pada folder baru, aset lokal dan tidak ada secret. Jalankan `git diff --check`, tinjau scope terhadap spec dan catat keterbatasan aktual; commit `chore: package tested MVP and user documentation`.
+- [ ] Tulis tes handler `/api/me` tanpa sesi → 401 JSON, unknown `/api/*` → 404 JSON bukan index.html, request frontend mendapat app, error tidak memuat kredensial. Tulis browser test offline setelah kunjungan/login pertama, reload membuka cache app, pengerjaan menghasilkan pending, jaringan kembali melakukan sync tanpa duplikasi.
+- [ ] Tambahkan tes cache: service worker hanya menyimpan aset lokal build berversi, bukan `/api/*`; logout mengisolasi cache akun; update worker tidak memutus sesi aktif; status offline tidak dianggap server sudah menyimpan nilai. Jalankan tes tersebut sebelum implementasi dan pastikan gagal karena handler/cache belum ada.
+- [ ] Implementasikan handler Vercel dan konfigurasi routing. Neon memakai pooled URL dengan `pg.Pool` maksimal 2 koneksi per instance, TLS verification aktif, tanpa state penting dalam memori function. Pengujian API tetap memakai adapter yang sama dengan app lokal. Tidak menjalankan migrasi secara otomatis di build.
+- [ ] Implementasikan service worker dengan cache aset manifest build lokal, versioning dan pemberitahuan update yang menunggu peserta keluar dari tugas sebelum aktivasi. Jangan cache respons login/rapor/leaderboard; API memakai `Cache-Control: no-store`. Simpan progres privat melalui store Task 5; logout memberi peringatan untuk pending dan membersihkan cache privat setelah konfirmasi.
+- [ ] Jalankan `npm ci`, `npm run test:unit`, `npm run test:api`, `npm run build`, `npm run test:browser`. Uji melalui server distribusi nyata, bukan hanya dev Vite. Gunakan PostgreSQL test terpisah. Jika koneksi Neon belum tersedia, catat integrasi nyata belum terverifikasi.
+- [ ] Dokumentasikan import Git repository ke Vercel, framework Vite/build/output, Node runtime, environment `DATABASE_URL`, pemisahan database Preview/Production, migrasi eksplisit, prosedur create-teacher dengan input password tersembunyi, dan preview smoke test. Jangan memasukkan password/connection string dalam commit atau meminta nilainya lewat chat.
+- [ ] Jika pengguna memberi akses dan otorisasi deployment, jalankan preview Vercel, lalu uji login/migrasi development/sync/dashboard/leaderboard/HTTPS cookies/cache menggunakan data sintetis. Tanpa itu, selesaikan kesiapan lokal dan panduan; jangan mengklaim deployment berhasil. Deploy production tidak termasuk otorisasi saat ini.
+- [ ] Lengkapi panduan pemetaan 18 misi/indikator, rumus, batas autentikasi nama, offline evidence, waktu, replay, laporan, ekspor, backup, kalibrasi dan batas akses guru. HASIL_UJI mencatat counts/commands/browser/platform dan batas aktual. Tidak ada ZIP atau peluncur Windows wajib.
+- [ ] Jalankan `git diff --check`, periksa dist/source tidak mengandung secret, tinjau spec dan laporan aktual; commit `chore: prepare tested Vercel deployment and documentation`.
 
 ## Urutan dan kesiapan eksekusi
 
-Tasks 1–3 mendasari semua bagian. Task 4 menyediakan autentikasi; Task 5 membutuhkan 2–4. Task 6 memakai katalog; Task 7 menyatukan 1–6. Task 8 memerlukan progres dan auth; Task 9 memerlukan semua deliverable. Jangan membangun 12 pulau/36 misi versi lama.
+Tasks 1–3 mendasari semua bagian. Task 4 menyediakan autentikasi; Task 5 membutuhkan 2–4. Task 6 memakai katalog; Task 7 menyatukan 1–6. Task 8 memerlukan progres dan auth; Task 9 memerlukan semua deliverable. Target distribusi adalah Vercel; ZIP tidak wajib. Jangan membangun 12 pulau/36 misi versi lama.
 
 Sebelum koneksi nyata: periksa nama binding dan status konfigurasi, jangan mencetak nilai; tentukan proyek Neon development/test dan target hosting yang tersedia. Prasyarat eksternal ini tidak menghalangi evaluator, visual, laporan dan API dengan database test lokal jika runtime tersedia. Persistensi Neon dan deployment hanya dinyatakan terverifikasi setelah operasi aktual berhasil.
 
 ## Hasil self-review rencana
 
-Seluruh cakupan spec dipetakan: 18 misi Tasks 1/2/7; dunia/audio Task 6; penilaian/timer Task 3; akun/Neon Tasks 4/5; guru/rapor/export/kalibrasi Task 8; offline Tasks 5/7/9; dokumentasi/ZIP Task 9. Kontrak nama serta session/progress sama antar-task. Lima risiko Review Focus memiliki tes pada task pemilik. Tidak ada source aplikasi dibuat atau dependensi diinstal selama penyusunan rencana.
+Seluruh cakupan spec dipetakan: 18 misi Tasks 1/2/7; dunia/audio Task 6; penilaian/timer Task 3; akun/Neon Tasks 4/5; guru/rapor/export/kalibrasi Task 8; offline Tasks 5/7/9; dokumentasi/Vercel/service worker Task 9. Kontrak nama serta session/progress sama antar-task. Lima risiko Review Focus memiliki tes pada task pemilik. Tidak ada source aplikasi dibuat atau dependensi diinstal selama penyusunan rencana.
