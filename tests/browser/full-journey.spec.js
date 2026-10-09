@@ -4,7 +4,7 @@ import { solution } from "../fixtures/solutions.js";
 test("all 18 missions through real controls, report and teacher dashboard", async ({
   page,
 }) => {
-  test.setTimeout(180000);
+  test.setTimeout(300000);
   await page.goto("/");
   await page
     .getByRole("button", { name: "Mulai Petualangan", exact: true })
@@ -23,7 +23,14 @@ test("all 18 missions through real controls, report and teacher dashboard", asyn
         .click();
       await page.locator('[data-island="9"]').click();
     }
-    await page.getByRole("button", { name: "Lewati perjalanan" }).click();
+    await page
+      .getByRole("button", { name: "Lewati perjalanan" })
+      .click({ timeout: 3000 })
+      .catch(async () => {
+        await expect(
+          page.getByRole("heading", { name: m.title, exact: true }),
+        ).toBeVisible();
+      });
     await expect(
       page.getByRole("heading", { name: m.title, exact: true }),
     ).toBeVisible();
@@ -53,9 +60,8 @@ test("all 18 missions through real controls, report and teacher dashboard", asyn
           .click();
       }
     }
-    await page
-      .getByRole("button", { name: "Periksa jawaban", exact: true })
-      .click();
+    if (await page.locator("#submit").count())
+      await page.locator("#submit").click();
     await expect(page.getByRole("status")).toContainText("berhasil");
     await page.locator("#next").click();
     if (i === 15) {

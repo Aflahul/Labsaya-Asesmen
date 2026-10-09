@@ -70,6 +70,42 @@ test("real PostgreSQL SQL validates transaction rollback and JSON evidence", asy
   });
   expect(done.statusCode).toBe(200);
   expect(done.json().data.session.score).toBe(100);
+  const retry = await app.inject({
+    method: "POST",
+    url: `/api/sessions/${id}/events`,
+    headers,
+    payload: { events },
+  });
+  expect(retry.statusCode).toBe(200);
+  const reordered = events.map((e) => ({
+    payload: e.payload,
+    activeMs: e.activeMs,
+    type: e.type,
+    seq: e.seq,
+    sessionId: e.sessionId,
+    id: e.id,
+  }));
+  expect(
+    (
+      await app.inject({
+        method: "POST",
+        url: `/api/sessions/${id}/events`,
+        headers,
+        payload: { events: reordered },
+      })
+    ).statusCode,
+  ).toBe(200);
+  const changed = [{ ...events[0], payload: { op: "toggle", index: 99 } }];
+  expect(
+    (
+      await app.inject({
+        method: "POST",
+        url: `/api/sessions/${id}/events`,
+        headers,
+        payload: { events: changed },
+      })
+    ).statusCode,
+  ).toBe(409);
   await app.close();
   await sql.close();
 }, 30000);

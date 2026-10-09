@@ -49,3 +49,7 @@ Ketepatan K ditampilkan terpisah. Peserta yang berhasil dengan bantuan dan korek
 Gunakan untuk asesmen formatif bersama observasi guru. Jawaban teks bebas, alasan mendalam, kolaborasi, demonstrasi perangkat nyata, serta materi di luar delapan kompetensi inti belum dinilai. Nama asli + alias bukan faktor rahasia, sehingga identitas peserta tidak dapat dijamin seperti autentikasi password. Data offline/waktu klien dapat dimanipulasi meskipun server menghitung ulang rumus dan memeriksa tindakan. Jangan menggunakannya sebagai satu-satunya dasar penilaian berisiko tinggi.
 
 Dashboard hanya melihat data tersinkron; meminta peserta memeriksa status sinkronisasi membantu mencegah interpretasi data parsial. Pengelolaan guru saat ini satu instalasi sekolah; tidak ada multisekolah, edit nilai, hapus akun, atau reset peserta melalui dashboard.
+
+Jika satu sesi dimainkan bersamaan di dua perangkat dan tindakannya berbeda, versi server menjadi progres aktif; bukti lokal yang berbeda tetap dicadangkan sebagai konflik di ekspor JSON dan status konflik ditampilkan. Bukti konflik tidak diam-diam dicampur menjadi nilai. Peserta dapat melanjutkan keadaan server atau memainkan ulang, dan guru dapat memeriksa cadangan konflik. Dianjurkan satu perangkat aktif per akun pada satu waktu.
+
+Menekan **Jalankan tes program** atau **Uji diagram** adalah percobaan penilaian: hasil salah membekukan akurasi pertama dan mencatat kesalahan; hasil benar menyelesaikan tugas langsung. Pemeriksaan ulang setelah sukses tidak menambah percobaan.

@@ -5,6 +5,8 @@ import { summarizeProgress, unlocked } from "../shared/progress.js";
 import { buildReport, toCsv, exportJson } from "../shared/reports.js";
 import { createProgressStore } from "./storage.js";
 import { syncProgress } from "./sync.js";
+import { validateImport } from "./import.js";
+import { canonicalJson } from "../shared/contracts.js";
 import { createActiveTimer } from "./timer.js";
 import { createWorld } from "./world/WorldScene.js";
 import { createAudio } from "./audio.js";
@@ -29,7 +31,9 @@ let auth = null,
   teacherRows = [],
   reportProgress = null,
   reportIdentity = null,
-  travelVersion = 0;
+  travelVersion = 0,
+  cacheWarning = "",
+  displayedFingerprint = "";
 const $ = (s) => document.querySelector(s);
 const seconds = (ms) => {
   const n = Math.floor(ms / 1000);
@@ -94,6 +98,18 @@ async function sync() {
       },
     });
     save();
+    if (
+      route === "mission" &&
+      current() &&
+      fingerprint(current()) !== displayedFingerprint
+    ) {
+      if (current().status === "complete") timer.pause();
+      else if (current().activeMs > timer.readMs()) {
+        timer.set(current().activeMs);
+        if (!document.hidden) timer.start();
+      }
+      renderMission();
+    }
   } catch (e) {
     syncStatus =
       e.status === 401
@@ -153,7 +169,7 @@ function pause() {
   }
 }
 function shell(content) {
-  app.innerHTML = `<header><button class="brand" data-nav="home"><span class="brand-mark">✧</span><span>Pulau Logika<small>EKSPEDISI MENARA AWAN</small></span></button><nav>${auth?.role === "participant" ? '<button class="navbtn" data-nav="map">Peta dunia</button><button class="navbtn" data-nav="report">Rapor saya</button>' : ""}${auth?.role === "teacher" ? '<button class="navbtn" data-nav="teacher">Halaman guru</button>' : ""}<button class="navbtn" data-nav="leaderboard">Leaderboard</button><button class="navbtn" data-nav="${auth?.role === "teacher" ? "teacher" : "teacher-login"}">Guru</button><button class="small ghost" id="mute" aria-label="${audio.muted ? "Aktifkan suara" : "Matikan suara"}">${audio.muted ? "♪ Off" : "♪ On"}</button><button class="small ghost" data-nav="settings" aria-label="Pengaturan">⚙</button>${auth ? '<button class="small ghost" id="logout">Keluar</button>' : ""}</nav></header><main>${content}</main><footer class="footer">ASESMEN INFORMATIKA · FASE E <span style="float:right" data-sync>${esc(syncStatus)}</span></footer>`;
+  app.innerHTML = `<header><button class="brand" data-nav="home"><span class="brand-mark">✧</span><span>Pulau Logika<small>EKSPEDISI MENARA AWAN</small></span></button><nav>${auth?.role === "participant" ? '<button class="navbtn" data-nav="map">Peta dunia</button><button class="navbtn" data-nav="report">Rapor saya</button>' : ""}${auth?.role === "teacher" ? '<button class="navbtn" data-nav="teacher">Halaman guru</button>' : ""}<button class="navbtn" data-nav="leaderboard">Leaderboard</button><button class="navbtn" data-nav="${auth?.role === "teacher" ? "teacher" : "teacher-login"}">Guru</button><button class="small ghost" id="mute" aria-label="${audio.muted ? "Aktifkan suara" : "Matikan suara"}">${audio.muted ? "♪ Off" : "♪ On"}</button><button class="small ghost" data-nav="settings" aria-label="Pengaturan">⚙</button>${auth ? '<button class="small ghost" id="logout">Keluar</button>' : ""}</nav></header><main>${cacheWarning ? `<p class="panel error" role="alert">${esc(cacheWarning)}</p>` : ""}${content}</main><footer class="footer">ASESMEN INFORMATIKA · FASE E <span style="float:right" data-sync>${esc(syncStatus)}</span></footer>`;
 }
 function home() {
   world.reset();
@@ -177,6 +193,7 @@ async function activate(data) {
       progress = store.load();
     } catch (e) {
       progress = { participantId: auth.user.id, sessions: [] };
+      cacheWarning = e.message;
       showError(e.message);
     }
     await sync();
@@ -241,9 +258,21 @@ function openMission(m, replay = false) {
   renderMission();
   scheduleSync();
 }
+function fingerprint(s) {
+  return canonicalJson({
+    state: s.state,
+    status: s.status,
+    attempts: s.attempts,
+    errors: s.errors,
+    resets: s.resets,
+    hints: s.hints,
+    score: s.score,
+  });
+}
 function renderMission() {
   const s = current();
   if (!s) return;
+  displayedFingerprint = fingerprint(s);
   const m = getMission(s.missionId),
     summary = summarizeProgress(progress),
     done = s.status === "complete";
@@ -261,7 +290,7 @@ function report(p = progress, identity = auth?.user) {
   reportIdentity = identity;
   const r = buildReport(p);
   shell(
-    `<section class="panel"><div class="topline"><div><div class="eyebrow">Bukti belajar · Rapor ekspedisi</div><h2 style="margin-top:12px">${esc(identity?.realName || identity?.real_name || "Penjelajah")}</h2><p>${esc(identity?.className || identity?.class_name || "")} · ${esc(identity?.alias || "")} · absen ${esc(identity?.attendance || "")}</p></div><button class="ghost" data-nav="${auth?.role === "teacher" ? "teacher" : "map"}">← Kembali</button></div><div class="summary-grid"><div class="summary-card"><small>Misi inti selesai</small><strong>${r.completed}/16</strong></div><div class="summary-card"><small>Nilai inti terbaru</small><strong>${r.score ?? "Belum lengkap"}</strong></div><div class="summary-card"><small>Ketepatan (K)</small><strong>${r.accuracy ?? "—"}</strong></div><div class="summary-card"><small>Total waktu aktif</small><strong>${seconds(r.totals.activeMs)}</strong></div></div><div class="competencies">${r.competencies.map((c, i) => `<div class="competency">${esc(c.name)}${i === 8 ? " (pengayaan)" : ""}<strong>${c.score ?? "Belum lengkap"}</strong></div>`).join("")}</div><p class="notice">Nilai terbaru digunakan untuk rekap dan leaderboard. Pengayaan terpisah dari nilai inti. Ketepatan dibaca bersama jejak tindakan; kecepatan bukan bukti tunggal penguasaan.</p><div class="actions"><button id="csv">Ekspor CSV</button><button id="json">Ekspor JSON lengkap</button>${auth?.role === "participant" ? '<button id="import-json" class="ghost">Pulihkan JSON</button><input id="json-file" type="file" accept="application/json" hidden>' : ""}</div><h3 style="margin-top:30px">Rincian per misi</h3>${table(r.rows)}<h3 style="margin-top:30px">Riwayat sesi dan bukti tindakan</h3><p class="notice">Total ${r.totals.attempts} pemeriksaan · ${r.totals.errors} kesalahan · ${r.totals.resets} ulang · ${r.totals.hints} petunjuk. Metrik ini kumulatif, bukan metrik sesi terbaik.</p>${p.sessions.map((s) => `<details><summary class="notice">${esc(getMission(s.missionId).title)} · ${s.status === "complete" ? `Nilai ${s.score}` : "Belum selesai"} · ${seconds(s.activeMs)} · ${s.errors} kesalahan · ${s.source === "offline" ? "bukti offline" : "bukti perangkat"}${r.bestByMission[s.missionId]?.id === s.id ? " · terbaik" : ""}</summary><pre class="trace">${esc(JSON.stringify({ sessionId: s.id, firstAccuracy: s.firstAccuracy, components: s.components, answer: s.state, events: s.events }, null, 2))}</pre></details>`).join("")}<p class="notice">${r.rows.filter((x) => x.Status !== "Selesai").length} misi belum memiliki bukti penyelesaian. Tugas dengan bantuan/kesalahan berulang layak dikonfirmasi kembali melalui asesmen kinerja guru. Alasan bebas dan keterampilan pada perangkat nyata belum dinilai otomatis.</p></section>`,
+    `<section class="panel"><div class="topline"><div><div class="eyebrow">Bukti belajar · Rapor ekspedisi</div><h2 style="margin-top:12px">${esc(identity?.realName || identity?.real_name || "Penjelajah")}</h2><p>${esc(identity?.className || identity?.class_name || "")} · ${esc(identity?.alias || "")} · absen ${esc(identity?.attendance || "")}</p></div><button class="ghost" data-nav="${auth?.role === "teacher" ? "teacher" : "map"}">← Kembali</button></div><div class="summary-grid"><div class="summary-card"><small>Misi inti selesai</small><strong>${r.completed}/16</strong></div><div class="summary-card"><small>Nilai inti terbaru</small><strong>${r.score ?? "Belum lengkap"}</strong></div><div class="summary-card"><small>Ketepatan (K)</small><strong>${r.accuracy ?? "—"}</strong></div><div class="summary-card"><small>Total waktu aktif</small><strong>${seconds(r.totals.activeMs)}</strong></div></div><div class="competencies">${r.competencies.map((c, i) => `<div class="competency">${esc(c.name)}${i === 8 ? " (pengayaan)" : ""}<strong>${c.score ?? "Belum lengkap"}</strong></div>`).join("")}</div><p class="notice">Nilai terbaru digunakan untuk rekap dan leaderboard. Pengayaan terpisah dari nilai inti. Ketepatan dibaca bersama jejak tindakan; kecepatan bukan bukti tunggal penguasaan.</p><div class="actions"><button id="csv">Ekspor CSV</button><button id="json">Ekspor JSON lengkap</button>${auth?.role === "participant" ? '<button id="import-json" class="ghost">Pulihkan JSON</button><input id="json-file" type="file" accept="application/json" hidden>' : ""}</div><h3 style="margin-top:30px">Rincian per misi</h3>${table(r.rows)}<h3 style="margin-top:30px">Riwayat sesi dan bukti tindakan</h3>${p.conflicts?.length ? `<p class="error">${p.conflicts.length} konflik perangkat dicadangkan. Ekspor JSON untuk bukti lokal yang belum menjadi nilai server; lanjutkan dari keadaan server atau mainkan ulang.</p>` : ""}<p class="notice">Total ${r.totals.attempts} pemeriksaan · ${r.totals.errors} kesalahan · ${r.totals.resets} ulang · ${r.totals.hints} petunjuk. Metrik ini kumulatif, bukan metrik sesi terbaik.</p>${p.sessions.map((s) => `<details><summary class="notice">${esc(getMission(s.missionId).title)} · ${s.status === "complete" ? `Nilai ${s.score}` : "Belum selesai"} · ${seconds(s.activeMs)} · ${s.errors} kesalahan · ${s.source === "offline" ? "bukti offline" : "bukti perangkat"}${r.bestByMission[s.missionId]?.id === s.id ? " · terbaik" : ""}</summary><pre class="trace">${esc(JSON.stringify({ sessionId: s.id, firstAccuracy: s.firstAccuracy, components: s.components, answer: s.state, events: s.events }, null, 2))}</pre></details>`).join("")}<p class="notice">${r.rows.filter((x) => x.Status !== "Selesai").length} misi belum memiliki bukti penyelesaian. Tugas dengan bantuan/kesalahan berulang layak dikonfirmasi kembali melalui asesmen kinerja guru. Alasan bebas dan keterampilan pada perangkat nyata belum dinilai otomatis.</p></section>`,
   );
 }
 async function teacher() {
@@ -317,7 +346,7 @@ async function leaderboard() {
 }
 function settings() {
   shell(
-    `<section class="panel auth-panel"><div class="eyebrow">Kenyamanan bermain</div><h2 style="margin-top:12px">Pengaturan</h2><div class="group-row"><label for="motion">Kurangi gerakan</label><input id="motion" type="checkbox" style="width:auto" ${localStorage.getItem("pulau:motion") === "true" || matchMedia("(prefers-reduced-motion: reduce)").matches ? "checked" : ""}></div><div class="group-row"><label for="quality">Kualitas efek</label><select id="quality"><option value="normal">Normal</option><option value="low" ${localStorage.getItem("pulau:quality") === "low" ? "selected" : ""}>Rendah</option></select></div><p class="notice">Pengaturan visual dan audio tidak mengubah skor atau waktu asesmen.</p><div class="actions"><button data-nav="home">Kembali</button>${auth?.role === "participant" ? '<button id="clear-local" class="ghost">Hapus cache akun ini</button>' : ""}</div></section>`,
+    `<section class="panel auth-panel"><div class="eyebrow">Kenyamanan bermain</div><h2 style="margin-top:12px">Pengaturan</h2><div class="group-row"><label for="motion">Kurangi gerakan</label><input id="motion" type="checkbox" style="width:auto" ${localStorage.getItem("pulau:motion") === "true" || matchMedia("(prefers-reduced-motion: reduce)").matches ? "checked" : ""}></div><div class="group-row"><label for="quality">Kualitas efek</label><select id="quality"><option value="normal">Normal</option><option value="low" ${localStorage.getItem("pulau:quality") === "low" ? "selected" : ""}>Rendah</option></select></div><p class="notice">Pengaturan visual dan audio tidak mengubah skor atau waktu asesmen.</p><div class="actions"><button data-nav="home">Kembali</button>${auth?.role === "participant" ? '<button id="download-raw" class="ghost">Unduh cache asli</button><button id="clear-local" class="ghost">Hapus cache akun ini</button>' : ""}</div></section>`,
   );
 }
 function navigate(next) {
@@ -487,6 +516,9 @@ app.addEventListener("click", async (e) => {
         $("#error").textContent =
           "Patokan waktu untuk sesi baru telah disimpan.";
         break;
+      case "download-raw":
+        download("cache-lokal-asli.txt", store.raw() || "", "text/plain");
+        break;
       case "clear-local":
         if (
           confirm(
@@ -494,6 +526,7 @@ app.addEventListener("click", async (e) => {
           )
         ) {
           store.clear();
+          cacheWarning = "";
           progress = { participantId: auth.user.id, sessions: [] };
           await sync();
           navigate("home");
@@ -522,6 +555,13 @@ app.addEventListener("click", async (e) => {
     }
   } catch (err) {
     showError(err.message);
+  } finally {
+    if (
+      route === "mission" &&
+      current()?.status === "active" &&
+      !document.hidden
+    )
+      timer.start();
   }
 });
 app.addEventListener("change", async (e) => {
@@ -552,28 +592,15 @@ app.addEventListener("change", async (e) => {
     if (el.id === "json-file") {
       const text = await el.files[0].text();
       const p = JSON.parse(text);
-      if (
-        p.schemaVersion !== 1 ||
-        p.participantId !== auth.user.id ||
-        !Array.isArray(p.sessions) ||
-        p.sessions.length > 1000
-      )
-        throw Error("Cadangan tidak cocok dengan akun ini");
-      for (const s of p.sessions) {
-        getMission(s.missionId);
-        if (
-          s.participantId !== auth.user.id ||
-          !Array.isArray(s.events) ||
-          typeof s.id !== "string"
-        )
-          throw Error("Sesi cadangan tidak valid");
-      }
+      const restored = validateImport(p, auth.user.id);
       if (
         confirm(
           "Ganti progres lokal dari cadangan ini? Data server akan tetap dipertahankan saat sinkronisasi.",
         )
       ) {
-        progress = p;
+        store.allowReplace();
+        cacheWarning = "";
+        progress = restored;
         save();
         await sync();
         report();

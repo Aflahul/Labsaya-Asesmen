@@ -4,6 +4,7 @@
 
 Repositori GitHub berisi kode aplikasi, proyek Vercel, proyek Neon development/production, Node.js 24 untuk operator, serta akses pengelola. ZIP tidak diperlukan. Deployment belum dilakukan oleh sesi pengembangan ini.
 
+0. Pastikan commit aplikasi sudah berada di repositori GitHub yang akan di-import. Pada lingkungan pengembangan ini kode disimpan di branch lokal `work`; push ke branch deployment yang Anda pilih melalui Git. Jika repositori masih kosong dan Anda memilih `main`, perintah tanpa force adalah `git push origin HEAD:main`. Jika ditolak karena remote berubah, integrasikan perubahan remote terlebih dahulu; jangan force-push.
 1. Buat database Neon untuk environment yang dituju. Salin **pooled connection string** lewat Neon dashboard dan simpan langsung di environment server Vercel sebagai `DATABASE_URL`. Jangan menggunakan awalan `VITE_` karena variabel tersebut dapat masuk frontend. Pertahankan pengaturan TLS yang diberikan Neon, termasuk verifikasi; jangan menambahkan `rejectUnauthorized=false`.
 2. Gunakan database/branch Neon terpisah untuk Preview dan Production. Database pengujian jangan berisi identitas peserta nyata.
 3. Di mesin operator, salin `.env.example` menjadi `.env`, masukkan koneksi development/production yang dipilih secara sadar, lalu jalankan `npm ci` dan `npm run db:migrate`. Script mencatat migrasi yang telah diterapkan sehingga pengulangan tidak menerapkan ulang. Migrasi **tidak dijalankan otomatis saat build preview**.

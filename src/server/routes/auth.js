@@ -60,7 +60,13 @@ export async function authRoutes(app) {
   app.post("/api/teacher/login", limited, async (req, reply) => {
     const b = req.body || {},
       username = requiredText(b.username),
-      password = requiredText(b.password, 200);
+      password = b.password;
+    if (
+      typeof password !== "string" ||
+      !password.length ||
+      password.length > 200
+    )
+      fail(400, "Kata sandi tidak valid");
     const { rows } = await app.db.query(
       "SELECT * FROM teachers WHERE username=$1",
       [normalize(username)],

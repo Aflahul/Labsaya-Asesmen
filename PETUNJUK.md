@@ -13,3 +13,5 @@
 Nama samaran terlihat di leaderboard. Nama asli dan nomor absen hanya tampil di rapor privat dan halaman guru. Jangan menggunakan nama samaran akun pribadi lain. Siapa pun yang mengetahui kedua nama bisa masuk ke akun Anda.
 
 Offline hanya tersedia sesudah aplikasi dan akun pernah dimuat online pada perangkat itu. Pendaftaran/login baru, leaderboard, halaman guru dan sinkronisasi tetap memerlukan internet.
+
+Jika cache rusak, penulisan berhenti agar data asli tidak hilang. Buka Pengaturan → **Unduh cache asli** untuk menyelamatkan berkas sebelum menghapus cache atau memulihkan JSON. Hindari memainkan sesi yang sama pada dua perangkat sekaligus. Konflik tetap dicadangkan dalam ekspor JSON, sementara permainan melanjutkan keadaan yang sudah diterima server.

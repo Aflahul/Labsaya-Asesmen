@@ -34,3 +34,25 @@ test("registration normalized alias and private teacher routes", async () => {
   ).toBe(401);
   await app.close();
 });
+test("teacher password bytes preserved", async () => {
+  const { passwordHash } = await import("../../src/server/auth.js");
+  const app = await setup();
+  for (const [i, password] of [
+    " leading pass",
+    "two  spaces",
+    "trail pass ",
+    "e\u0301 password",
+  ].entries()) {
+    await app.db.query(
+      "INSERT INTO teachers(id,username,password_hash) VALUES($1,$2,$3)",
+      ["t" + i, "g" + i, passwordHash(password)],
+    );
+    const r = await app.inject({
+      method: "POST",
+      url: "/api/teacher/login",
+      payload: { username: "g" + i, password },
+    });
+    expect(r.statusCode).toBe(200);
+  }
+  await app.close();
+});

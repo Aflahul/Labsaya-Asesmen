@@ -4,7 +4,14 @@ export function summarizeProgress({ sessions = [] }) {
     bestByMission = {};
   for (const s of sessions) {
     if (s.status !== "complete") continue;
-    latestByMission[s.missionId] = s;
+    const previous = latestByMission[s.missionId];
+    const stamp = (x) => x.completedAt || x.startedAt || "";
+    if (
+      !previous ||
+      stamp(s) > stamp(previous) ||
+      (stamp(s) === stamp(previous) && (!stamp(s) || s.id > previous.id))
+    )
+      latestByMission[s.missionId] = s;
     if (
       !bestByMission[s.missionId] ||
       s.score > bestByMission[s.missionId].score

@@ -58,7 +58,8 @@ export function reduceSession(old, e, m) {
       s.feedback = r.errors.join(" ");
       if (
         ["robot", "cpu", "bubble"].includes(m.kind) &&
-        !s.stepAccuracyFrozen
+        !s.stepAccuracyFrozen &&
+        s.firstAccuracy === null
       ) {
         s.firstAccuracy = clamp(
           (100 * s.correctSteps) / Math.max(1, m.canonicalSteps),
@@ -74,7 +75,10 @@ export function reduceSession(old, e, m) {
     s.resets++;
     s.state = initialState(m);
   }
-  if (["submit", "run"].includes(e.type)) {
+  if (
+    ["submit", "run"].includes(e.type) ||
+    (e.type === "action" && e.payload.op === "test")
+  ) {
     s.attempts++;
     const r = evaluate(m, s.state);
     if (s.firstAccuracy === null) s.firstAccuracy = r.accuracy;

@@ -106,3 +106,53 @@ test("first step accuracy cannot exceed 100 and best session remains independent
   expect(r.totals.attempts).toBe(5);
   expect(r.bestByMission[m.id].attempts).toBe(1);
 });
+test("failed submit freezes accuracy before later simulator mistake", async () => {
+  const { newSession, reduceSession } =
+    await import("../../src/shared/assessment.js");
+  const m = MISSIONS[7];
+  let s = newSession(m, "p");
+  s = reduceSession(
+    s,
+    { id: "a", seq: 1, type: "submit", payload: {}, activeMs: 0 },
+    m,
+  );
+  expect(s.firstAccuracy).toBe(0);
+  s.correctSteps = 3;
+  s = reduceSession(
+    s,
+    {
+      id: "b",
+      seq: 2,
+      type: "action",
+      payload: { op: "direction", value: "Kanan" },
+      activeMs: 100,
+    },
+    m,
+  );
+  expect(s.firstAccuracy).toBe(0);
+});
+test("failed program run counts and freezes first accuracy", async () => {
+  const { newSession, reduceSession } =
+    await import("../../src/shared/assessment.js");
+  const { solution } = await import("../fixtures/solutions.js");
+  const m = MISSIONS[10];
+  let s = newSession(m, "p");
+  let n = 0;
+  const send = (type, payload = {}) => {
+    s = reduceSession(
+      s,
+      { id: String(++n), seq: n, type, payload, activeMs: 1000 },
+      m,
+    );
+  };
+  send("action", { op: "test" });
+  expect(s.attempts).toBe(1);
+  expect(s.errors).toBe(1);
+  const first = s.firstAccuracy;
+  for (const a of solution(m)) send("action", a);
+  expect(s.status).toBe("complete");
+  expect(s.attempts).toBe(2);
+  expect(s.firstAccuracy).toBe(first);
+  send("submit");
+  expect(s.attempts).toBe(2);
+});

@@ -1,7 +1,7 @@
 import { getMission } from "../../shared/missions.js";
 import { newSession, reduceSession } from "../../shared/assessment.js";
 import { summarizeProgress, unlocked } from "../../shared/progress.js";
-import { validateEvent } from "../../shared/contracts.js";
+import { validateEvent, canonicalJson } from "../../shared/contracts.js";
 import { fail } from "../auth.js";
 export async function loadProgress(db, id) {
   const { rows } = await db.query(
@@ -67,6 +67,7 @@ export async function progressRoutes(app) {
         fail(403, "Sesi bukan milik Anda");
       let s = rows[0].document;
       const m = getMission(s.missionId);
+      let changed = false;
       for (const e of events) {
         try {
           validateEvent(e);
@@ -76,7 +77,7 @@ export async function progressRoutes(app) {
         if (e.sessionId !== s.id) fail(400, "ID sesi tidak cocok");
         const duplicate = s.events.find((x) => x.id === e.id);
         if (duplicate) {
-          if (JSON.stringify(duplicate) !== JSON.stringify(e))
+          if (canonicalJson(duplicate) !== canonicalJson(e))
             fail(409, "Isi event duplikat berbeda");
           continue;
         }
@@ -88,11 +89,13 @@ export async function progressRoutes(app) {
         )
           fail(409, "Urutan/waktu event tidak valid");
         s = reduceSession(s, e, m);
+        changed = true;
       }
-      await client.query(
-        "UPDATE mission_sessions SET document=$1,updated_at=$2 WHERE id=$3",
-        [JSON.stringify(s), new Date(), s.id],
-      );
+      if (changed)
+        await client.query(
+          "UPDATE mission_sessions SET document=$1,updated_at=$2 WHERE id=$3",
+          [JSON.stringify(s), new Date(), s.id],
+        );
       await client.query("COMMIT");
       return { data: { session: s, accepted: events.map((e) => e.id) } };
     } catch (e) {
