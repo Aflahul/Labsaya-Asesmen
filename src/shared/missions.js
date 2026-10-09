@@ -1,579 +1,433 @@
 export const MISSIONS = [
   {
-    "id": "p01m01",
-    "island": 1,
-    "islandName": "Pecahan",
-    "kind": "selection",
-    "enrichment": false,
-    "competency": "Dekomposisi",
-    "indicators": [
-      "CT.DEC.1"
-    ],
-    "title": "Bongkar Misi Pameran",
-    "narrative": "Sistem Pulau Pecahan terputus. Bongkar Misi Pameran akan memulihkan jalur energi menuju Menara Awan.",
-    "instructions": "Pilih pekerjaan yang perlu dipecahkan agar pameran digital berjalan.",
-    "elements": 5,
-    "rules": {
-      "items": [
+    id: "p01m01",
+    island: 1,
+    islandName: "Pecahan",
+    kind: "selection",
+    enrichment: false,
+    competency: "Dekomposisi",
+    indicators: ["CT.DEC.1"],
+    title: "Bongkar Misi Pameran",
+    narrative:
+      "Sistem Pulau Pecahan terputus. Bongkar Misi Pameran akan memulihkan jalur energi menuju Menara Awan.",
+    instructions:
+      "Pilih pekerjaan yang perlu dipecahkan agar pameran digital berjalan.",
+    elements: 5,
+    rules: {
+      items: [
         "Siapkan karya",
         "Atur tamu",
         "Uji proyektor",
         "Warna sepatu penjaga",
-        "Jadwal acara"
+        "Jadwal acara",
       ],
-      "answer": [
-        0,
-        1,
-        2,
-        4
-      ]
+      answer: [0, 1, 2, 4],
     },
-    "hints": [
+    hints: [
       "Perhatikan tujuan dan informasi yang benar-benar diperlukan.",
-      "Pilih hanya informasi atau pekerjaan yang berhubungan dengan tujuan."
+      "Pilih hanya informasi atau pekerjaan yang berhubungan dengan tujuan.",
     ],
-    "canonicalSteps": 4,
-    "missionVersion": 1
+    canonicalSteps: 4,
+    missionVersion: 1,
   },
   {
-    "id": "p01m02",
-    "island": 1,
-    "islandName": "Pecahan",
-    "kind": "grouping",
-    "enrichment": false,
-    "competency": "Dekomposisi",
-    "indicators": [
-      "CT.DEC.2"
-    ],
-    "title": "Aliran Air",
-    "narrative": "Sistem Pulau Pecahan terputus. Aliran Air akan memulihkan jalur energi menuju Menara Awan.",
-    "instructions": "Kelompokkan pekerjaan untuk memperbaiki saluran air.",
-    "elements": 6,
-    "rules": {
-      "items": [
+    id: "p01m02",
+    island: 1,
+    islandName: "Pecahan",
+    kind: "grouping",
+    enrichment: false,
+    competency: "Dekomposisi",
+    indicators: ["CT.DEC.2"],
+    title: "Aliran Air",
+    narrative:
+      "Sistem Pulau Pecahan terputus. Aliran Air akan memulihkan jalur energi menuju Menara Awan.",
+    instructions: "Kelompokkan pekerjaan untuk memperbaiki saluran air.",
+    elements: 6,
+    rules: {
+      items: [
         "Temukan kebocoran",
         "Catat tekanan",
         "Ganti pipa",
         "Tutup sambungan",
         "Uji aliran",
-        "Periksa kebocoran ulang"
+        "Periksa kebocoran ulang",
       ],
-      "groups": [
-        "Diagnosis",
-        "Perbaikan",
-        "Pengujian"
-      ],
-      "answer": [
-        0,
-        0,
-        1,
-        1,
-        2,
-        2
-      ]
+      groups: ["Diagnosis", "Perbaikan", "Pengujian"],
+      answer: [0, 0, 1, 1, 2, 2],
     },
-    "hints": [
+    hints: [
       "Perhatikan tujuan dan informasi yang benar-benar diperlukan.",
-      "Cocokkan fungsi setiap objek dengan kategori, bukan tampilannya."
+      "Cocokkan fungsi setiap objek dengan kategori, bukan tampilannya.",
     ],
-    "canonicalSteps": 6,
-    "missionVersion": 1
+    canonicalSteps: 6,
+    missionVersion: 1,
   },
   {
-    "id": "p02m01",
-    "island": 2,
-    "islandName": "Ritme",
-    "kind": "pattern",
-    "enrichment": false,
-    "competency": "Pengenalan pola",
-    "indicators": [
-      "CT.PAT.1"
-    ],
-    "title": "Gerbang Tiga Simbol",
-    "narrative": "Sistem Pulau Ritme terputus. Gerbang Tiga Simbol akan memulihkan jalur energi menuju Menara Awan.",
-    "instructions": "Lengkapi pola bulan, bintang, matahari yang berulang.",
-    "elements": 3,
-    "rules": {
-      "prefix": [
-        "Bulan",
-        "Bintang",
-        "Matahari",
-        "Bulan",
-        "Bintang",
-        "Matahari"
-      ],
-      "options": [
-        "Bulan",
-        "Bintang",
-        "Matahari"
-      ],
-      "answer": [
-        "Bulan",
-        "Bintang",
-        "Matahari"
-      ]
+    id: "p02m01",
+    island: 2,
+    islandName: "Ritme",
+    kind: "pattern",
+    enrichment: false,
+    competency: "Pengenalan pola",
+    indicators: ["CT.PAT.1"],
+    title: "Gerbang Tiga Simbol",
+    narrative:
+      "Sistem Pulau Ritme terputus. Gerbang Tiga Simbol akan memulihkan jalur energi menuju Menara Awan.",
+    instructions: "Lengkapi pola bulan, bintang, matahari yang berulang.",
+    elements: 3,
+    rules: {
+      prefix: ["Bulan", "Bintang", "Matahari", "Bulan", "Bintang", "Matahari"],
+      options: ["Bulan", "Bintang", "Matahari"],
+      answer: ["Bulan", "Bintang", "Matahari"],
     },
-    "hints": [
+    hints: [
       "Perhatikan tujuan dan informasi yang benar-benar diperlukan.",
-      "Temukan satu kelompok yang berulang, lalu lanjutkan urutannya."
+      "Temukan satu kelompok yang berulang, lalu lanjutkan urutannya.",
     ],
-    "canonicalSteps": 3,
-    "missionVersion": 1
+    canonicalSteps: 3,
+    missionVersion: 1,
   },
   {
-    "id": "p02m02",
-    "island": 2,
-    "islandName": "Ritme",
-    "kind": "pattern",
-    "enrichment": false,
-    "competency": "Pengenalan pola",
-    "indicators": [
-      "CT.PAT.2"
-    ],
-    "title": "Sinyal Mercusuar",
-    "narrative": "Sistem Pulau Ritme terputus. Sinyal Mercusuar akan memulihkan jalur energi menuju Menara Awan.",
-    "instructions": "Lanjutkan kelompok sinyal pendek, pendek, panjang.",
-    "elements": 3,
-    "rules": {
-      "prefix": [
-        "Pendek",
-        "Pendek",
-        "Panjang",
-        "Pendek",
-        "Pendek",
-        "Panjang"
-      ],
-      "options": [
-        "Pendek",
-        "Panjang"
-      ],
-      "answer": [
-        "Pendek",
-        "Pendek",
-        "Panjang"
-      ]
+    id: "p02m02",
+    island: 2,
+    islandName: "Ritme",
+    kind: "pattern",
+    enrichment: false,
+    competency: "Pengenalan pola",
+    indicators: ["CT.PAT.2"],
+    title: "Sinyal Mercusuar",
+    narrative:
+      "Sistem Pulau Ritme terputus. Sinyal Mercusuar akan memulihkan jalur energi menuju Menara Awan.",
+    instructions: "Lanjutkan kelompok sinyal pendek, pendek, panjang.",
+    elements: 3,
+    rules: {
+      prefix: ["Pendek", "Pendek", "Panjang", "Pendek", "Pendek", "Panjang"],
+      options: ["Pendek", "Panjang"],
+      answer: ["Pendek", "Pendek", "Panjang"],
     },
-    "hints": [
+    hints: [
       "Perhatikan tujuan dan informasi yang benar-benar diperlukan.",
-      "Temukan satu kelompok yang berulang, lalu lanjutkan urutannya."
+      "Temukan satu kelompok yang berulang, lalu lanjutkan urutannya.",
     ],
-    "canonicalSteps": 3,
-    "missionVersion": 1
+    canonicalSteps: 3,
+    missionVersion: 1,
   },
   {
-    "id": "p03m01",
-    "island": 3,
-    "islandName": "Kabut",
-    "kind": "selection",
-    "enrichment": false,
-    "competency": "Abstraksi",
-    "indicators": [
-      "CT.ABS.1"
-    ],
-    "title": "Peta Drone Penolong",
-    "narrative": "Sistem Pulau Kabut terputus. Peta Drone Penolong akan memulihkan jalur energi menuju Menara Awan.",
-    "instructions": "Pilih informasi yang memengaruhi penerbangan drone yang aman.",
-    "elements": 6,
-    "rules": {
-      "items": [
+    id: "p03m01",
+    island: 3,
+    islandName: "Kabut",
+    kind: "selection",
+    enrichment: false,
+    competency: "Abstraksi",
+    indicators: ["CT.ABS.1"],
+    title: "Peta Drone Penolong",
+    narrative:
+      "Sistem Pulau Kabut terputus. Peta Drone Penolong akan memulihkan jalur energi menuju Menara Awan.",
+    instructions:
+      "Pilih informasi yang memengaruhi penerbangan drone yang aman.",
+    elements: 6,
+    rules: {
+      items: [
         "Kecepatan angin",
         "Sisa baterai",
         "Lokasi penghalang",
         "Warna rumah",
         "Nama jalan favorit",
-        "Jarak tujuan"
+        "Jarak tujuan",
       ],
-      "answer": [
-        0,
-        1,
-        2,
-        5
-      ]
+      answer: [0, 1, 2, 5],
     },
-    "hints": [
+    hints: [
       "Perhatikan tujuan dan informasi yang benar-benar diperlukan.",
-      "Pilih hanya informasi atau pekerjaan yang berhubungan dengan tujuan."
+      "Pilih hanya informasi atau pekerjaan yang berhubungan dengan tujuan.",
     ],
-    "canonicalSteps": 4,
-    "missionVersion": 1
+    canonicalSteps: 4,
+    missionVersion: 1,
   },
   {
-    "id": "p03m02",
-    "island": 3,
-    "islandName": "Kabut",
-    "kind": "selection",
-    "enrichment": false,
-    "competency": "Abstraksi",
-    "indicators": [
-      "CT.ABS.2"
-    ],
-    "title": "Bekal Perahu Langit",
-    "narrative": "Sistem Pulau Kabut terputus. Bekal Perahu Langit akan memulihkan jalur energi menuju Menara Awan.",
-    "instructions": "Pilih informasi penting untuk merencanakan muatan dan perjalanan.",
-    "elements": 6,
-    "rules": {
-      "items": [
+    id: "p03m02",
+    island: 3,
+    islandName: "Kabut",
+    kind: "selection",
+    enrichment: false,
+    competency: "Abstraksi",
+    indicators: ["CT.ABS.2"],
+    title: "Bekal Perahu Langit",
+    narrative:
+      "Sistem Pulau Kabut terputus. Bekal Perahu Langit akan memulihkan jalur energi menuju Menara Awan.",
+    instructions:
+      "Pilih informasi penting untuk merencanakan muatan dan perjalanan.",
+    elements: 6,
+    rules: {
+      items: [
         "Kapasitas muatan",
         "Berat barang",
         "Jarak tujuan",
         "Warna peti",
         "Ukuran stiker",
-        "Persediaan energi"
+        "Persediaan energi",
       ],
-      "answer": [
-        0,
-        1,
-        2,
-        5
-      ]
+      answer: [0, 1, 2, 5],
     },
-    "hints": [
+    hints: [
       "Perhatikan tujuan dan informasi yang benar-benar diperlukan.",
-      "Pilih hanya informasi atau pekerjaan yang berhubungan dengan tujuan."
+      "Pilih hanya informasi atau pekerjaan yang berhubungan dengan tujuan.",
     ],
-    "canonicalSteps": 4,
-    "missionVersion": 1
+    canonicalSteps: 4,
+    missionVersion: 1,
   },
   {
-    "id": "p04m01",
-    "island": 4,
-    "islandName": "Puncak",
-    "kind": "ordering",
-    "enrichment": false,
-    "competency": "Algoritma",
-    "indicators": [
-      "CT.ALG.1"
-    ],
-    "title": "Portal Karya",
-    "narrative": "Sistem Pulau Puncak terputus. Portal Karya akan memulihkan jalur energi menuju Menara Awan.",
-    "instructions": "Susun langkah agar karya berhasil diunggah dan diperiksa.",
-    "elements": 4,
-    "rules": {
-      "items": [
+    id: "p04m01",
+    island: 4,
+    islandName: "Puncak",
+    kind: "ordering",
+    enrichment: false,
+    competency: "Algoritma",
+    indicators: ["CT.ALG.1"],
+    title: "Portal Karya",
+    narrative:
+      "Sistem Pulau Puncak terputus. Portal Karya akan memulihkan jalur energi menuju Menara Awan.",
+    instructions: "Susun langkah agar karya berhasil diunggah dan diperiksa.",
+    elements: 4,
+    rules: {
+      items: [
         "Pilih berkas",
         "Masuk portal",
         "Periksa hasil unggahan",
-        "Tekan unggah"
+        "Tekan unggah",
       ],
-      "answer": [
-        1,
-        0,
-        3,
-        2
-      ]
+      answer: [1, 0, 3, 2],
     },
-    "hints": [
+    hints: [
       "Perhatikan tujuan dan informasi yang benar-benar diperlukan.",
-      "Cari langkah yang harus terjadi sebelum langkah lain."
+      "Cari langkah yang harus terjadi sebelum langkah lain.",
     ],
-    "canonicalSteps": 4,
-    "missionVersion": 1
+    canonicalSteps: 4,
+    missionVersion: 1,
   },
   {
-    "id": "p04m02",
-    "island": 4,
-    "islandName": "Puncak",
-    "kind": "robot",
-    "enrichment": false,
-    "competency": "Algoritma",
-    "indicators": [
-      "CT.ALG.2"
-    ],
-    "title": "Robot Penjaga",
-    "narrative": "Sistem Pulau Puncak terputus. Robot Penjaga akan memulihkan jalur energi menuju Menara Awan.",
-    "instructions": "Susun arah robot dari kiri atas menuju portal kanan bawah. Hindari batu.",
-    "elements": 6,
-    "rules": {
-      "size": 4,
-      "start": [
-        0,
-        0
+    id: "p04m02",
+    island: 4,
+    islandName: "Puncak",
+    kind: "robot",
+    enrichment: false,
+    competency: "Algoritma",
+    indicators: ["CT.ALG.2"],
+    title: "Robot Penjaga",
+    narrative:
+      "Sistem Pulau Puncak terputus. Robot Penjaga akan memulihkan jalur energi menuju Menara Awan.",
+    instructions:
+      "Susun arah robot dari kiri atas menuju portal kanan bawah. Hindari batu.",
+    elements: 6,
+    rules: {
+      size: 4,
+      start: [0, 0],
+      goal: [3, 3],
+      walls: [
+        [1, 0],
+        [1, 1],
+        [2, 2],
       ],
-      "goal": [
-        3,
-        3
-      ],
-      "walls": [
-        [
-          1,
-          0
-        ],
-        [
-          1,
-          1
-        ],
-        [
-          2,
-          2
-        ]
-      ],
-      "answer": [
-        "Bawah",
-        "Bawah",
-        "Kanan",
-        "Bawah",
-        "Kanan",
-        "Kanan"
-      ]
+      answer: ["Bawah", "Bawah", "Kanan", "Bawah", "Kanan", "Kanan"],
     },
-    "hints": [
+    hints: [
       "Perhatikan tujuan dan informasi yang benar-benar diperlukan.",
-      "Gunakan jalur di tepi bawah untuk menghindari batu."
+      "Gunakan jalur di tepi bawah untuk menghindari batu.",
     ],
-    "canonicalSteps": 6,
-    "missionVersion": 1
+    canonicalSteps: 6,
+    missionVersion: 1,
   },
   {
-    "id": "p05m01",
-    "island": 5,
-    "islandName": "Alur",
-    "kind": "flowchart",
-    "enrichment": false,
-    "competency": "Flowchart",
-    "indicators": [
-      "FC.1"
-    ],
-    "title": "Rakit Gerbang Alur",
-    "narrative": "Sistem Pulau Alur terputus. Rakit Gerbang Alur akan memulihkan jalur energi menuju Menara Awan.",
-    "instructions": "Susun alur input n, keputusan n ≥ 10, keluaran, dan akhir. Pilih simbol tepat.",
-    "elements": 5,
-    "rules": {
-      "items": [
-        "Mulai",
-        "Input n",
-        "n ≥ 10?",
-        "Output sesuai cabang",
-        "Akhir"
-      ],
-      "answer": [
-        0,
-        1,
-        2,
-        3,
-        4
-      ],
-      "symbols": [
+    id: "p05m01",
+    island: 5,
+    islandName: "Alur",
+    kind: "flowchart",
+    enrichment: false,
+    competency: "Flowchart",
+    indicators: ["FC.1"],
+    title: "Rakit Gerbang Alur",
+    narrative:
+      "Sistem Pulau Alur terputus. Rakit Gerbang Alur akan memulihkan jalur energi menuju Menara Awan.",
+    instructions:
+      "Susun alur input n, keputusan n ≥ 10, keluaran, dan akhir. Pilih simbol tepat.",
+    elements: 5,
+    rules: {
+      items: ["Mulai", "Input n", "n ≥ 10?", "Output sesuai cabang", "Akhir"],
+      answer: [0, 1, 2, 3, 4],
+      symbols: [
         "Terminator",
         "Input/output",
         "Decision",
         "Input/output",
-        "Terminator"
+        "Terminator",
       ],
-      "yes": "Besar",
-      "no": "Kecil"
+      yes: "Besar",
+      no: "Kecil",
     },
-    "hints": [
+    hints: [
       "Perhatikan tujuan dan informasi yang benar-benar diperlukan.",
-      "Keputusan memakai belah ketupat; cabang Ya untuk n ≥ 10."
+      "Keputusan memakai belah ketupat; cabang Ya untuk n ≥ 10.",
     ],
-    "canonicalSteps": 5,
-    "missionVersion": 1
+    canonicalSteps: 5,
+    missionVersion: 1,
   },
   {
-    "id": "p05m02",
-    "island": 5,
-    "islandName": "Alur",
-    "kind": "flowchart",
-    "enrichment": false,
-    "competency": "Flowchart",
-    "indicators": [
-      "FC.2"
-    ],
-    "title": "Perbaiki Cabang",
-    "narrative": "Sistem Pulau Alur terputus. Perbaiki Cabang akan memulihkan jalur energi menuju Menara Awan.",
-    "instructions": "Perbaiki flowchart klasifikasi n ≥ 10. Jalankan tes n=5 dan n=12.",
-    "elements": 5,
-    "rules": {
-      "items": [
-        "Input n",
-        "Mulai",
-        "Akhir",
-        "Output sesuai cabang",
-        "n ≥ 10?"
-      ],
-      "answer": [
-        1,
-        0,
-        4,
-        3,
-        2
-      ],
-      "symbols": [
+    id: "p05m02",
+    island: 5,
+    islandName: "Alur",
+    kind: "flowchart",
+    enrichment: false,
+    competency: "Flowchart",
+    indicators: ["FC.2"],
+    title: "Perbaiki Cabang",
+    narrative:
+      "Sistem Pulau Alur terputus. Perbaiki Cabang akan memulihkan jalur energi menuju Menara Awan.",
+    instructions:
+      "Perbaiki flowchart klasifikasi n ≥ 10. Jalankan tes n=5 dan n=12.",
+    elements: 5,
+    rules: {
+      items: ["Input n", "Mulai", "Akhir", "Output sesuai cabang", "n ≥ 10?"],
+      answer: [1, 0, 4, 3, 2],
+      symbols: [
         "Input/output",
         "Terminator",
         "Terminator",
         "Input/output",
-        "Decision"
+        "Decision",
       ],
-      "yes": "Besar",
-      "no": "Kecil"
+      yes: "Besar",
+      no: "Kecil",
     },
-    "hints": [
+    hints: [
       "Perhatikan tujuan dan informasi yang benar-benar diperlukan.",
-      "Keputusan memakai belah ketupat; cabang Ya untuk n ≥ 10."
+      "Keputusan memakai belah ketupat; cabang Ya untuk n ≥ 10.",
     ],
-    "canonicalSteps": 5,
-    "missionVersion": 1
+    canonicalSteps: 5,
+    missionVersion: 1,
   },
   {
-    "id": "p06m01",
-    "island": 6,
-    "islandName": "Mesin",
-    "kind": "pseudocode",
-    "enrichment": false,
-    "competency": "Pseudocode",
-    "indicators": [
-      "PC.1"
-    ],
-    "title": "Rakit Pseudocode",
-    "narrative": "Sistem Pulau Mesin terputus. Rakit Pseudocode akan memulihkan jalur energi menuju Menara Awan.",
-    "instructions": "Susun program INPUT x → y = x × 2 → OUTPUT y dan uji hasil.",
-    "elements": 3,
-    "rules": {
-      "items": [
-        "OUTPUT y",
-        "y = x × 2",
-        "INPUT x"
-      ],
-      "answer": [
-        2,
-        1,
-        0
-      ],
-      "operation": "double",
-      "tests": [
+    id: "p06m01",
+    island: 6,
+    islandName: "Mesin",
+    kind: "pseudocode",
+    enrichment: false,
+    competency: "Pseudocode",
+    indicators: ["PC.1"],
+    title: "Rakit Pseudocode",
+    narrative:
+      "Sistem Pulau Mesin terputus. Rakit Pseudocode akan memulihkan jalur energi menuju Menara Awan.",
+    instructions: "Susun program INPUT x → y = x × 2 → OUTPUT y dan uji hasil.",
+    elements: 3,
+    rules: {
+      items: ["OUTPUT y", "y = x × 2", "INPUT x"],
+      answer: [2, 1, 0],
+      operation: "double",
+      tests: [
         {
-          "input": 3,
-          "output": 6
+          input: 3,
+          output: 6,
         },
         {
-          "input": 7,
-          "output": 14
-        }
-      ]
+          input: 7,
+          output: 14,
+        },
+      ],
     },
-    "hints": [
+    hints: [
       "Perhatikan tujuan dan informasi yang benar-benar diperlukan.",
-      "Input harus tersedia sebelum proses, lalu keluaran."
+      "Input harus tersedia sebelum proses, lalu keluaran.",
     ],
-    "canonicalSteps": 3,
-    "missionVersion": 1
+    canonicalSteps: 3,
+    missionVersion: 1,
   },
   {
-    "id": "p06m02",
-    "island": 6,
-    "islandName": "Mesin",
-    "kind": "pseudocode",
-    "enrichment": false,
-    "competency": "Pseudocode",
-    "indicators": [
-      "PC.2"
-    ],
-    "title": "Perbaiki Program",
-    "narrative": "Sistem Pulau Mesin terputus. Perbaiki Program akan memulihkan jalur energi menuju Menara Awan.",
-    "instructions": "Program harus mengklasifikasi n ≥ 10 sebagai Besar. Susun dan perbaiki batasnya.",
-    "elements": 3,
-    "rules": {
-      "items": [
+    id: "p06m02",
+    island: 6,
+    islandName: "Mesin",
+    kind: "pseudocode",
+    enrichment: false,
+    competency: "Pseudocode",
+    indicators: ["PC.2"],
+    title: "Perbaiki Program",
+    narrative:
+      "Sistem Pulau Mesin terputus. Perbaiki Program akan memulihkan jalur energi menuju Menara Awan.",
+    instructions:
+      "Program harus mengklasifikasi n ≥ 10 sebagai Besar. Susun dan perbaiki batasnya.",
+    elements: 3,
+    rules: {
+      items: [
         "OUTPUT hasil",
         "INPUT n",
-        "IF n ≥ batas THEN hasil = Besar ELSE hasil = Kecil"
+        "IF n ≥ batas THEN hasil = Besar ELSE hasil = Kecil",
       ],
-      "answer": [
-        1,
-        2,
-        0
-      ],
-      "operation": "classify",
-      "boundary": 10,
-      "tests": [
+      answer: [1, 2, 0],
+      operation: "classify",
+      boundary: 10,
+      tests: [
         {
-          "input": 9,
-          "output": "Kecil"
+          input: 9,
+          output: "Kecil",
         },
         {
-          "input": 10,
-          "output": "Besar"
+          input: 10,
+          output: "Besar",
         },
         {
-          "input": 12,
-          "output": "Besar"
-        }
-      ]
+          input: 12,
+          output: "Besar",
+        },
+      ],
     },
-    "hints": [
+    hints: [
       "Perhatikan tujuan dan informasi yang benar-benar diperlukan.",
-      "Input harus tersedia sebelum proses, lalu keluaran."
+      "Input harus tersedia sebelum proses, lalu keluaran.",
     ],
-    "canonicalSteps": 3,
-    "missionVersion": 1
+    canonicalSteps: 3,
+    missionVersion: 1,
   },
   {
-    "id": "p07m01",
-    "island": 7,
-    "islandName": "Sirkuit",
-    "kind": "grouping",
-    "enrichment": false,
-    "competency": "Von Neumann",
-    "indicators": [
-      "VN.1"
-    ],
-    "title": "Pasang Komponen",
-    "narrative": "Sistem Pulau Sirkuit terputus. Pasang Komponen akan memulihkan jalur energi menuju Menara Awan.",
-    "instructions": "Tempatkan komponen ke unit mesin. ALU dan CU berada dalam CPU.",
-    "elements": 6,
-    "rules": {
-      "items": [
-        "Keyboard",
-        "Monitor",
-        "RAM",
-        "ALU",
-        "Control Unit",
-        "Prosesor"
-      ],
-      "groups": [
-        "Input",
-        "Output",
-        "Memori",
-        "CPU"
-      ],
-      "answer": [
-        0,
-        1,
-        2,
-        3,
-        3,
-        3
-      ]
+    id: "p07m01",
+    island: 7,
+    islandName: "Sirkuit",
+    kind: "grouping",
+    enrichment: false,
+    competency: "Von Neumann",
+    indicators: ["VN.1"],
+    title: "Pasang Komponen",
+    narrative:
+      "Sistem Pulau Sirkuit terputus. Pasang Komponen akan memulihkan jalur energi menuju Menara Awan.",
+    instructions:
+      "Tempatkan komponen ke unit mesin. ALU dan CU berada dalam CPU.",
+    elements: 6,
+    rules: {
+      items: ["Keyboard", "Monitor", "RAM", "ALU", "Control Unit", "Prosesor"],
+      groups: ["Input", "Output", "Memori", "CPU"],
+      answer: [0, 1, 2, 3, 3, 3],
     },
-    "hints": [
+    hints: [
       "Perhatikan tujuan dan informasi yang benar-benar diperlukan.",
-      "Cocokkan fungsi setiap objek dengan kategori, bukan tampilannya."
+      "Cocokkan fungsi setiap objek dengan kategori, bukan tampilannya.",
     ],
-    "canonicalSteps": 6,
-    "missionVersion": 1
+    canonicalSteps: 6,
+    missionVersion: 1,
   },
   {
-    "id": "p07m02",
-    "island": 7,
-    "islandName": "Sirkuit",
-    "kind": "cpu",
-    "enrichment": false,
-    "competency": "Von Neumann",
-    "indicators": [
-      "VN.2"
-    ],
-    "title": "Hidupkan CPU",
-    "narrative": "Sistem Pulau Sirkuit terputus. Hidupkan CPU akan memulihkan jalur energi menuju Menara Awan.",
-    "instructions": "Jalankan fetch, decode, execute untuk LOAD 4, ADD 3, OUTPUT.",
-    "elements": 9,
-    "rules": {
-      "program": [
-        "LOAD 4",
-        "ADD 3",
-        "OUTPUT"
-      ],
-      "answer": [
+    id: "p07m02",
+    island: 7,
+    islandName: "Sirkuit",
+    kind: "cpu",
+    enrichment: false,
+    competency: "Von Neumann",
+    indicators: ["VN.2"],
+    title: "Hidupkan CPU",
+    narrative:
+      "Sistem Pulau Sirkuit terputus. Hidupkan CPU akan memulihkan jalur energi menuju Menara Awan.",
+    instructions:
+      "Jalankan fetch, decode, execute untuk LOAD 4, ADD 3, OUTPUT.",
+    elements: 9,
+    rules: {
+      program: ["LOAD 4", "ADD 3", "OUTPUT"],
+      answer: [
         "Fetch",
         "Decode",
         "Execute",
@@ -582,161 +436,122 @@ export const MISSIONS = [
         "Execute",
         "Fetch",
         "Decode",
-        "Execute"
-      ]
+        "Execute",
+      ],
     },
-    "hints": [
+    hints: [
       "Perhatikan tujuan dan informasi yang benar-benar diperlukan.",
-      "Satu instruksi selalu diambil, diterjemahkan, lalu dieksekusi."
+      "Satu instruksi selalu diambil, diterjemahkan, lalu dieksekusi.",
     ],
-    "canonicalSteps": 9,
-    "missionVersion": 1
+    canonicalSteps: 9,
+    missionVersion: 1,
   },
   {
-    "id": "p08m01",
-    "island": 8,
-    "islandName": "Gudang",
-    "kind": "array",
-    "enrichment": false,
-    "competency": "List/array",
-    "indicators": [
-      "ARR.1"
-    ],
-    "title": "Editor List Kargo",
-    "narrative": "Sistem Pulau Gudang terputus. Editor List Kargo akan memulihkan jalur energi menuju Menara Awan.",
-    "instructions": "Ubah indeks 1 menjadi Air, hapus Batu, lalu tambahkan Obat di akhir.",
-    "elements": 3,
-    "rules": {
-      "initial": [
-        "Pangan",
-        "Kayu",
-        "Batu"
-      ],
-      "answer": [
-        "Pangan",
-        "Air",
-        "Obat"
-      ],
-      "operations": [
-        "set",
-        "delete",
-        "append"
-      ]
+    id: "p08m01",
+    island: 8,
+    islandName: "Gudang",
+    kind: "array",
+    enrichment: false,
+    competency: "List/array",
+    indicators: ["ARR.1"],
+    title: "Editor List Kargo",
+    narrative:
+      "Sistem Pulau Gudang terputus. Editor List Kargo akan memulihkan jalur energi menuju Menara Awan.",
+    instructions:
+      "Ubah indeks 1 menjadi Air, hapus Batu, lalu tambahkan Obat di akhir.",
+    elements: 3,
+    rules: {
+      initial: ["Pangan", "Kayu", "Batu"],
+      answer: ["Pangan", "Air", "Obat"],
+      operations: ["set", "delete", "append"],
     },
-    "hints": [
+    hints: [
       "Perhatikan tujuan dan informasi yang benar-benar diperlukan.",
-      "Indeks pertama adalah 0; penghapusan menggeser elemen berikutnya."
+      "Indeks pertama adalah 0; penghapusan menggeser elemen berikutnya.",
     ],
-    "canonicalSteps": 3,
-    "missionVersion": 1
+    canonicalSteps: 3,
+    missionVersion: 1,
   },
   {
-    "id": "p08m02",
-    "island": 8,
-    "islandName": "Gudang",
-    "kind": "array",
-    "enrichment": false,
-    "competency": "List/array",
-    "indicators": [
-      "ARR.2"
-    ],
-    "title": "Alamat Kargo",
-    "narrative": "Sistem Pulau Gudang terputus. Alamat Kargo akan memulihkan jalur energi menuju Menara Awan.",
-    "instructions": "Indeks dimulai dari 0. Ubah indeks 0 menjadi A dan indeks 2 menjadi C; baca indeks 1.",
-    "elements": 3,
-    "rules": {
-      "initial": [
-        "X",
-        "B",
-        "Y"
-      ],
-      "answer": [
-        "A",
-        "B",
-        "C"
-      ],
-      "operations": [
-        "set",
-        "read"
-      ],
-      "readIndex": 1
+    id: "p08m02",
+    island: 8,
+    islandName: "Gudang",
+    kind: "array",
+    enrichment: false,
+    competency: "List/array",
+    indicators: ["ARR.2"],
+    title: "Alamat Kargo",
+    narrative:
+      "Sistem Pulau Gudang terputus. Alamat Kargo akan memulihkan jalur energi menuju Menara Awan.",
+    instructions:
+      "Indeks dimulai dari 0. Ubah indeks 0 menjadi A dan indeks 2 menjadi C; baca indeks 1.",
+    elements: 3,
+    rules: {
+      initial: ["X", "B", "Y"],
+      answer: ["A", "B", "C"],
+      operations: ["set", "read"],
+      readIndex: 1,
     },
-    "hints": [
+    hints: [
       "Perhatikan tujuan dan informasi yang benar-benar diperlukan.",
-      "Indeks pertama adalah 0; penghapusan menggeser elemen berikutnya."
+      "Indeks pertama adalah 0; penghapusan menggeser elemen berikutnya.",
     ],
-    "canonicalSteps": 3,
-    "missionVersion": 1
+    canonicalSteps: 3,
+    missionVersion: 1,
   },
   {
-    "id": "p09m01",
-    "island": 9,
-    "islandName": "Indeks",
-    "kind": "bubble",
-    "enrichment": true,
-    "competency": "Pengurutan",
-    "indicators": [
-      "ENR.SORT.1"
-    ],
-    "title": "Gelembungkan Nomor",
-    "narrative": "Sistem Pulau Indeks terputus. Gelembungkan Nomor akan memulihkan jalur energi menuju Menara Awan.",
-    "instructions": "Bandingkan pasangan bersebelahan. Tukar hanya jika kiri lebih besar.",
-    "elements": 4,
-    "rules": {
-      "initial": [
-        7,
-        2,
-        5,
-        1
-      ],
-      "answer": [
-        1,
-        2,
-        5,
-        7
-      ]
+    id: "p09m01",
+    island: 9,
+    islandName: "Indeks",
+    kind: "bubble",
+    enrichment: true,
+    competency: "Pengurutan",
+    indicators: ["ENR.SORT.1"],
+    title: "Gelembungkan Nomor",
+    narrative:
+      "Sistem Pulau Indeks terputus. Gelembungkan Nomor akan memulihkan jalur energi menuju Menara Awan.",
+    instructions:
+      "Bandingkan pasangan bersebelahan. Tukar hanya jika kiri lebih besar.",
+    elements: 4,
+    rules: {
+      initial: [7, 2, 5, 1],
+      answer: [1, 2, 5, 7],
     },
-    "hints": [
+    hints: [
       "Perhatikan tujuan dan informasi yang benar-benar diperlukan.",
-      "Pasangan pindah dari kiri ke kanan; elemen terbesar naik ke ujung."
+      "Pasangan pindah dari kiri ke kanan; elemen terbesar naik ke ujung.",
     ],
-    "canonicalSteps": 4,
-    "missionVersion": 1
+    canonicalSteps: 6,
+    missionVersion: 1,
   },
   {
-    "id": "p09m02",
-    "island": 9,
-    "islandName": "Indeks",
-    "kind": "bubble",
-    "enrichment": true,
-    "competency": "Pengurutan",
-    "indicators": [
-      "ENR.SORT.2"
-    ],
-    "title": "Urutkan Kargo Baru",
-    "narrative": "Sistem Pulau Indeks terputus. Urutkan Kargo Baru akan memulihkan jalur energi menuju Menara Awan.",
-    "instructions": "Terapkan Bubble Sort dengan melacak setiap pasangan dan lintasan.",
-    "elements": 4,
-    "rules": {
-      "initial": [
-        4,
-        9,
-        3,
-        6
-      ],
-      "answer": [
-        3,
-        4,
-        6,
-        9
-      ]
+    id: "p09m02",
+    island: 9,
+    islandName: "Indeks",
+    kind: "bubble",
+    enrichment: true,
+    competency: "Pengurutan",
+    indicators: ["ENR.SORT.2"],
+    title: "Urutkan Kargo Baru",
+    narrative:
+      "Sistem Pulau Indeks terputus. Urutkan Kargo Baru akan memulihkan jalur energi menuju Menara Awan.",
+    instructions:
+      "Terapkan Bubble Sort dengan melacak setiap pasangan dan lintasan.",
+    elements: 4,
+    rules: {
+      initial: [4, 9, 3, 6],
+      answer: [3, 4, 6, 9],
     },
-    "hints": [
+    hints: [
       "Perhatikan tujuan dan informasi yang benar-benar diperlukan.",
-      "Pasangan pindah dari kiri ke kanan; elemen terbesar naik ke ujung."
+      "Pasangan pindah dari kiri ke kanan; elemen terbesar naik ke ujung.",
     ],
-    "canonicalSteps": 4,
-    "missionVersion": 1
-  }
+    canonicalSteps: 6,
+    missionVersion: 1,
+  },
 ];
-export const getMission = id => { const m=MISSIONS.find(m=>m.id===id); if(!m) throw new Error("Misi tidak ditemukan"); return m; };
+export const getMission = (id) => {
+  const m = MISSIONS.find((m) => m.id === id);
+  if (!m) throw Error("Misi tidak ditemukan");
+  return m;
+};
