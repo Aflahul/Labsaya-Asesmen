@@ -1,16 +1,36 @@
-import { MISSIONS } from "./missions.js";
+import { MISSIONS, getMission } from "./missions.js";
 import { summarizeProgress } from "./progress.js";
 export const buildReport = (progress) => ({
   ...summarizeProgress(progress),
-  rows: MISSIONS.map((m) => {
+  rows: [
+    ...MISSIONS,
+    ...Array.from(
+      new Set(
+        progress.sessions
+          .filter((s) => s.missionVersion === 1)
+          .map((s) => s.missionId),
+      ),
+    ).map(getMission),
+  ].map((m) => {
     const ss = progress.sessions.filter((s) => s.missionId === m.id);
-    const s = ss.filter((s) => s.status === "complete").at(-1) || ss.at(-1);
+    const s =
+      ss
+        .filter((s) => s.status === "complete")
+        .sort((a, b) => b.score - a.score)[0] || ss.at(-1);
     return {
       Misi: m.title,
+      Versi: m.missionVersion,
+      Bloom: m.bloom || "Arsip",
+      AKM: m.akm || "",
       Kompetensi: m.competency,
       Indikator: m.indicators.join(" "),
       Jenis: m.enrichment ? "Pengayaan" : "Inti",
-      Status: s?.status === "complete" ? "Selesai" : "Belum selesai",
+      Status:
+        s?.status === "complete"
+          ? "Selesai"
+          : s?.status === "pending_review"
+            ? "Menunggu penilaian"
+            : "Belum selesai",
       Nilai: s?.score ?? "",
       K: s?.components?.K ?? "",
       W: s?.components?.W ?? "",

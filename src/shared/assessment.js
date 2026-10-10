@@ -1,8 +1,14 @@
+import { initialV2, reduceV2 } from "./v2-evaluator.js";
 import { initialState, applyAction, evaluate } from "./evaluators/index.js";
 const clamp = (x) => Math.max(0, Math.min(100, Math.round(x)));
 export const weightedScore = ({ K, W, P, H }) =>
   Math.round(0.4 * K + 0.25 * W + 0.2 * P + 0.15 * H);
 export function scoreSession(m, c) {
+  if (m.missionVersion === 2)
+    return {
+      K: m.score ?? m.firstAccuracy ?? 0,
+      score: m.score ?? m.firstAccuracy ?? 0,
+    };
   const baseline =
     Math.max(45, 30 + 12 * c.elements) * (c.baselineMultiplier || 1);
   const K = clamp(0.6 * (m.firstAccuracy ?? 0) + 40),
@@ -22,10 +28,10 @@ export function newSession(
     id: crypto.randomUUID(),
     participantId,
     missionId: m.id,
-    missionVersion: 1,
+    missionVersion: m.missionVersion,
     scoringConfig: { ...config, elements: m.elements },
     events: [],
-    state: initialState(m),
+    state: m.missionVersion === 2 ? initialV2(m) : initialState(m),
     firstAccuracy: null,
     attempts: 0,
     errors: 0,
@@ -44,6 +50,7 @@ export function newSession(
   };
 }
 export function reduceSession(old, e, m) {
+  if (m.missionVersion === 2) return reduceV2(old, e, m);
   if (old.events.some((x) => x.id === e.id) || old.status === "complete")
     return old;
   const s = structuredClone(old);

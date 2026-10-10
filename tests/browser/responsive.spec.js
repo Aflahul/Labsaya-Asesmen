@@ -1,16 +1,25 @@
 import { test, expect } from "@playwright/test";
+import { register, enterMission } from "./helpers.js";
+import { MISSIONS } from "../../src/shared/missions.js";
 for (const [name, width, height] of [
   ["desktop", 1440, 900],
   ["tablet", 768, 1024],
   ["phone", 390, 844],
 ])
-  test(`responsive ${name} and reduced motion`, async ({ page }) => {
+  test(`responsive ${name}, actual assets and reduced motion`, async ({
+    page,
+  }) => {
     await page.setViewportSize({ width, height });
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
-    await expect(
-      page.getByRole("button", { name: "Mulai Petualangan", exact: true }),
-    ).toBeVisible();
+    await expect(page.locator(".hero-island")).toBeVisible();
+    await expect
+      .poll(() =>
+        page
+          .locator(".hero-island")
+          .evaluate((e) => e.complete && e.naturalWidth > 0),
+      )
+      .toBe(true);
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
@@ -20,24 +29,12 @@ for (const [name, width, height] of [
       path: `test-results/home-${name}.png`,
       fullPage: true,
     });
-    await page
-      .getByRole("button", { name: "Mulai Petualangan", exact: true })
-      .click();
-    await page.getByLabel("Nama asli").fill("Responsif " + name);
-    await page.getByLabel("Nama samaran").fill(name + Date.now());
-    await page.getByLabel("Kelas / rombel").fill("X");
-    await page.getByLabel("Nomor absen").fill("1");
-    await page.getByRole("button", { name: "Buat akun & mulai" }).click();
-    await expect(
-      page.getByRole("heading", { name: "Bongkar Misi Pameran", exact: true }),
-    ).toBeVisible();
-    const btn = page.getByRole("button", {
-      name: "Siapkan karya",
-      exact: false,
-    });
-    await btn.focus();
+    await register(page, "Responsif " + name);
+    await enterMission(page, MISSIONS[0]);
+    await page.locator("[data-answer=phone]").focus();
+    await page.keyboard.press("s");
     await page.keyboard.press("Enter");
-    await expect(btn).toHaveAttribute("aria-pressed", "true");
+    await expect(page.locator("[data-answer=phone]")).toHaveValue("String");
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
@@ -45,6 +42,26 @@ for (const [name, width, height] of [
     ).toBe(true);
     await page.screenshot({
       path: `test-results/mission-${name}.png`,
+      fullPage: true,
+    });
+    await page.getByRole("button", { name: "Peta dunia", exact: true }).click();
+    await expect(page.locator(".island-card")).toHaveCount(5);
+    await expect
+      .poll(() =>
+        page
+          .locator(".island-art img")
+          .evaluateAll((es) =>
+            es.every((e) => e.complete && e.naturalWidth > 0),
+          ),
+      )
+      .toBe(true);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await page.screenshot({
+      path: `test-results/map-${name}.png`,
       fullPage: true,
     });
   });

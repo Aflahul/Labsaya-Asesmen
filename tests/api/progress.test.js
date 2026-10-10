@@ -19,7 +19,7 @@ test("server recalculates completion and handles duplicate events", async () => 
         method: "POST",
         url: "/api/sessions",
         headers,
-        payload: { id, missionId: "p01m01" },
+        payload: { id, missionId: "v2p01m01" },
       })
     ).statusCode,
   ).toBe(201);
@@ -74,7 +74,7 @@ test("participant cannot read or write another participant session", async () =>
     method: "POST",
     url: "/api/sessions",
     headers: a,
-    payload: { id, missionId: "p01m01" },
+    payload: { id, missionId: "v2p01m01" },
   });
   expect(
     (

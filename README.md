@@ -1,6 +1,6 @@
 # Pulau Logika — Ekspedisi Menara Awan
 
-Game asesmen formatif Informatika Fase E: sembilan pulau, 16 misi inti dan dua misi pengayaan. Frontend Phaser 3/Vite; API Node.js/Fastify di Vercel Functions; PostgreSQL Neon.
+Game asesmen formatif Informatika Fase E: lima pulau, 15 misi inti dan satu bos C6 opsional. Frontend DOM/CSS/Vite dengan aset ilustrasi; API Node.js/Fastify di Vercel Functions; PostgreSQL Neon.
 
 ## Pengembangan
 
@@ -17,3 +17,9 @@ Jalankan `npm start` setelah `npm run build` untuk aplikasi production lokal pad
 - [Deployment Vercel + Neon](DEPLOYMENT.md)
 
 Tidak ada kredensial atau akun guru bawaan di aplikasi production. Login guru dibuat pengelola. Login peserta menggunakan nama asli + nama samaran sesuai kebutuhan pengguna; ini bukan autentikasi dengan rahasia.
+
+## Aset ilustrasi
+
+Sebanyak 26 aset dari folder Drive yang disetujui disimpan sebagai WebP di `public/game-assets/`. `manifest.json` mencatat nama, ukuran, hash sumber, dan folder asal. Ekspor ulang master PNG dengan `python scripts/prepare-game-assets.py PATH_MASTERS` (Pillow diperlukan). Master asli tidak diubah.
+
+Nilai inti tidak memakai penalti waktu/petunjuk. C5/C6 menunggu penilaian guru. ID misi versi lama tetap dikenali agar riwayat dan cadangan tidak rusak.

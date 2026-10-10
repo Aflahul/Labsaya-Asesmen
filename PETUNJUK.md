@@ -1,17 +1,17 @@
-# Petunjuk Penjelajah
+# Petunjuk Penjelajah — Lima Pulau
 
-1. Buka tautan aplikasi yang diberikan guru. Pendaftaran pertama memerlukan internet.
-2. Pilih **Mulai Petualangan**, isi nama asli, nama samaran unik, kelas dan nomor absen. Simpan kedua nama karena login berikutnya menggunakan nama asli + nama samaran.
-3. Ikuti perjalanan ke pulau pertama. Tombol **Lewati perjalanan** mempercepat animasi tanpa mengubah nilai.
-4. Baca tujuan, lalu operasikan objek tugas. Klik/pilih dan tombol tersedia untuk setiap aktivitas; keyboard Tab, Enter, tombol arah pada select dapat digunakan tanpa drag.
-5. Tekan **Periksa jawaban** setelah menyiapkan solusi. Jawaban salah memberi umpan balik; perbaiki dan periksa lagi. **Ulang tugas** mereset objek tetapi tetap mencatat kesalahan/waktu. **Petunjuk** membantu, dan penggunaannya tercatat.
-6. Selesaikan dua misi per pulau untuk membuka pulau berikutnya. Delapan pulau inti memulihkan menara; pulau pengurutan adalah pengayaan opsional.
-7. **Rapor saya** menampilkan hasil dan memungkinkan ekspor CSV/JSON. Ekspor JSON menyimpan bukti rinci sebagai cadangan; **Pulihkan JSON** menerima cadangan milik akun yang sama dan meminta konfirmasi.
-8. Suara dan gerakan bisa dikurangi dari menu pengaturan. Waktu perjalanan dan tab tersembunyi tidak dinilai.
-9. Progres disimpan lokal, lalu disinkron saat online. Pastikan status **Tersinkron ke Neon** sebelum berpindah perangkat. Jika ada pending, ekspor JSON sebelum menghapus cache atau logout.
+1. Pilih **Mulai ekspedisi**, lalu isi nama asli, nama samaran, kelas, dan nomor absen. Gunakan nama yang sama saat masuk kembali.
+2. Pilih pulau di peta. Panel perjalanan menampilkan tiga misinya. Selesaikan tiga misi untuk membuka pulau berikutnya.
+3. Baca **Tujuan misimu**, lalu gunakan pilihan, editor program, atau ruang karya. Semua kontrol dapat digunakan dengan keyboard tanpa menyeret objek.
+4. **Uji solusi** menampilkan hasil tanpa mengakhiri percobaan. Perbaiki solusi, lalu tekan **Kirim jawaban** saat siap. Pengiriman mengakhiri percobaan; **Coba lagi** membuat percobaan baru. Nilai terbaik setiap misi tetap tersimpan.
+5. **Petunjuk**, waktu, pengujian berulang, dan mulai ulang tugas tidak mengurangi nilai. Waktu hanya menjadi catatan proses.
+6. Misi **Pilih Solusi Terbaik** meminta alasan dan bukti. **Kirim karya ke guru** mengunci karya untuk ditinjau. Gunakan **Periksa penilaian guru** untuk memuat hasil. Umpan balik tersedia di rapor.
+7. Setelah seluruh 15 misi dinilai, nilai inti muncul. Jika rata-rata nilai terbaik **lebih dari 95**, portal **Ruang Arsitek** terbuka. Bos ini opsional; hasilnya tidak mengurangi nilai inti atau peringkat.
+8. Buka **Rapor saya** untuk hasil, riwayat, ekspor CSV, atau cadangan JSON. Sesi permainan versi lama tetap ada di riwayat, terpisah dari ekspedisi baru.
+9. Tunggu status **Tersinkron ke Neon** sebelum berpindah perangkat. Saat offline, jawaban tersimpan di perangkat ini. Ekspor cadangan sebelum keluar atau menghapus cache jika masih ada perubahan yang belum tersinkron.
 
-Nama samaran terlihat di leaderboard. Nama asli dan nomor absen hanya tampil di rapor privat dan halaman guru. Jangan menggunakan nama samaran akun pribadi lain. Siapa pun yang mengetahui kedua nama bisa masuk ke akun Anda.
+Suara, kualitas efek, dan gerakan dapat diatur di menu pengaturan. Mode offline baru tersedia setelah aplikasi dan akun pernah dimuat online; pendaftaran, login baru, penilaian guru, dan leaderboard memerlukan internet.
 
-Offline hanya tersedia sesudah aplikasi dan akun pernah dimuat online pada perangkat itu. Pendaftaran/login baru, leaderboard, halaman guru dan sinkronisasi tetap memerlukan internet.
+Nama asli + nama samaran dipakai untuk masuk; keduanya bukan kata sandi. Nama samaran tampil di leaderboard. Jangan memakai nama samaran akun sensitif.
 
-Jika cache rusak, penulisan berhenti agar data asli tidak hilang. Buka Pengaturan → **Unduh cache asli** untuk menyelamatkan berkas sebelum menghapus cache atau memulihkan JSON. Hindari memainkan sesi yang sama pada dua perangkat sekaligus. Konflik tetap dicadangkan dalam ekspor JSON, sementara permainan melanjutkan keadaan yang sudah diterima server.
+Jika data lokal rusak, aplikasi mempertahankan cache asli. Buka Pengaturan → **Unduh cache asli** sebelum mencoba pemulihan. Hindari memainkan sesi yang sama pada dua perangkat bersamaan: versi server menjadi progres aktif, sedangkan bukti lokal yang bertentangan tetap dicadangkan dalam JSON.

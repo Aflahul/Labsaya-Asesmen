@@ -6,3 +6,7 @@ dist/
 .superpowers/
 playwright-report/
 test-results/
+
+# Local worktree dependency symlink and execution scratch
+/node_modules
+/work/

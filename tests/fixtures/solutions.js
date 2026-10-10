@@ -1,5 +1,33 @@
 export function solution(m) {
   const r = m.rules;
+  if (m.missionVersion === 2)
+    return [
+      ...Object.entries(r.answers).map(([key, value]) => ({
+        op: "answer",
+        key,
+        value,
+      })),
+      ...(m.code
+        ? [
+            {
+              op: "answer",
+              key: "code",
+              value:
+                m.kind === "python"
+                  ? m.code.replace("/ 4", "/ len(nilai)")
+                  : m.code.replace("pop(1)", "pop(2)"),
+            },
+          ]
+        : []),
+      ...(m.written
+        ? m.written.map(([key]) => ({
+            op: "answer",
+            key,
+            value:
+              "Solusi B. Bukti lima nilai 80, tiga nilai 80, kosong menampilkan pesan. Rancangan dan pengujian dijelaskan.",
+          }))
+        : []),
+    ];
   switch (m.kind) {
     case "selection":
       return r.answer.map((index) => ({ op: "toggle", index }));

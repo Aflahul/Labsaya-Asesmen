@@ -35,7 +35,7 @@ test("real PostgreSQL SQL validates transaction rollback and JSON evidence", asy
         method: "POST",
         url: "/api/sessions",
         headers,
-        payload: { id, missionId: "p01m01" },
+        payload: { id, missionId: "v2p01m01" },
       })
     ).statusCode,
   ).toBe(201);

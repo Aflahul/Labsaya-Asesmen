@@ -1,55 +1,38 @@
-# Panduan Guru — Pulau Logika MVP
+# Panduan Guru — Ekspedisi Lima Pulau
 
-## Tujuan dan pemetaan
+Asesmen formatif Informatika kelas X/Fase E. Ada 15 misi inti: 10 C3/AKM L2, 4 C4/L3, dan 1 C5/L3. Satu C6/L3 menjadi pengayaan opsional dalam scene tambahan. Label kognitif adalah rancangan instrumen, bukan hasil validasi psikometrik.
 
-Asesmen formatif berbasis tindakan bagi Informatika kelas X SMK Fase E. Pemulihan dunia menjadi konteks masalah, bukan sekadar dekorasi kuis. Ada 16 misi inti dan dua pengayaan. Kode berikut adalah kode bukti **internal aplikasi**, bukan pengganti kode TP kurikulum resmi.
-
-| Pulau | Kompetensi / bukti | Misi |
+| Pulau | Materi yang dihubungkan | Misi dan level |
 |---|---|---|
-| Pecahan | CT.DEC.1–2: cakupan dan pemecahan masalah | Bongkar Misi Pameran; Aliran Air |
-| Ritme | CT.PAT.1–2: pola berulang dan berkelompok | Gerbang Tiga Simbol; Sinyal Mercusuar |
-| Kabut | CT.ABS.1–2: pemilahan informasi esensial | Peta Drone Penolong; Bekal Perahu Langit |
-| Puncak | CT.ALG.1–2: prasyarat langkah dan tracing arah | Portal Karya; Robot Penjaga |
-| Alur | FC.1–2: simbol, urutan dan cabang keputusan | Rakit Gerbang Alur; Perbaiki Cabang |
-| Mesin | PC.1–2: rancangan dan perbaikan berdasarkan tes | Rakit Pseudocode; Perbaiki Program |
-| Sirkuit | VN.1–2: komponen dan fetch/decode/execute | Pasang Komponen; Hidupkan CPU |
-| Gudang | ARR.1–2: operasi dan indeks list/array | Editor List Kargo; Alamat Kargo |
-| Indeks | ENR.SORT.1–2: pengayaan Bubble Sort | Gelembungkan Nomor; Urutkan Kargo Baru |
+| Pelabuhan Data | Pertemuan 4: variabel, tipe data, list | Daftarkan Kargo C3; Atur Rak C3; Siapkan Keberangkatan C3 |
+| Gerbang Alur | Pertemuan 3: flowchart | Bangun Jalur C3; Jalankan Gerbang C3; Perbaiki Batas C4 |
+| Bengkel Logika | Pertemuan 3: pseudocode | Rakit Pengendali C3; Atur Pengiriman C3; Lacak Gangguan C4 |
+| Pusat Mesin | Pertemuan 8: arsitektur Von Neumann | Hubungkan Sistem C3; Jalankan Perhitungan C3; Alamat atau Isi? C4 |
+| Menara Program | Pertemuan 9: Python dan evaluasi solusi | Pulihkan Pengolah Nilai C3; Perbaiki Daftar C4; Pilih Solusi Terbaik C5 |
+| Ruang Arsitek, scene di Menara Program | Integrasi rancangan data, algoritma, dan pengujian | Sistem distribusi bantuan C6, pengayaan |
 
-List/array menggunakan indeks 0. CPU sederhana memproses LOAD 4, ADD 3, OUTPUT; PC, IR, accumulator dan keluaran ditampilkan. Pengurutan memeriksa setiap pasangan sesuai lintasan Bubble Sort. Flowchart memakai konstruksi terbatas dengan urutan, simbol serta cabang Ya/Tidak; bukan editor diagram bebas. Pseudocode memakai interpreter blok terbatas, bukan JavaScript bebas.
+## Nilai inti dan pengayaan
 
-## Penilaian
+- Setiap misi inti berbobot sama. Rapor/leaderboard memakai rata-rata **nilai terbaik** dari 15 misi yang sudah dinilai. Belum lengkap berarti belum ada nilai inti, bukan nol.
+- Misi objektif menggunakan proporsi bukti benar. Analisis C4 berbobot sebab 30, perbaikan 40, dan pengujian 30. Pada Perbaiki Daftar, kode bernilai 40, sebab 30, dan prediksi uji 30.
+- Waktu, petunjuk, kesalahan kontrol, reset, dan jumlah pengujian dicatat tanpa penalti skor. **Uji solusi** tidak mengakhiri percobaan; **Kirim jawaban** mengakhirinya.
+- Bos terbuka hanya setelah 15 misi dinilai dan rata-rata mentah **>95**. Angka tepat 95 tidak cukup. Nilai tampilan dibulatkan dua desimal, tetapi penguncian memakai nilai sebelum pembulatan.
+- Bos opsional. Nilainya terpisah dari nilai inti, kompetensi inti, dan leaderboard, termasuk bila memperoleh 0.
 
-`Nilai = ROUND(0.40*K + 0.25*W + 0.20*P + 0.15*H)`.
+## Menilai C5 dan C6
 
-- `K = CLAMP(ROUND(0.60*akurasiPertama + 40),0,100)` setelah berhasil. Akurasi pemeriksaan pertama tidak berubah setelah koreksi/ulang.
-- `Patokan = MAX(45,30+12*jumlahElemen) × pengaliGuru` detik. Default pengali 1.
-- `W = CLAMP(ROUND(100*(1-MAX(0,waktuAktif-Patokan)/(2*Patokan))),0,100)`.
-- `P = CLAMP(100-25*MAX(0,percobaan-1)-12*ulangManual,0,100)`.
-- `H = CLAMP(100-40*petunjuk,0,100)`.
+Masuk lewat **Guru**, cari peserta, lalu **Buka rapor**. Karya berstatus **Menunggu penilaian** menampilkan jawaban, panduan penilai, dan rubrik. Isi setiap skor serta umpan balik, lalu simpan. Penilaian tidak dilakukan otomatis berdasarkan kata kunci atau panjang teks. Setelah disimpan, peserta dapat memuat hasil melalui tombol pemeriksaan atau membuka ulang aplikasi.
 
-Contoh: K/W/P/H 100/100/100/100 → 100; 100/80/75/60 → 84. Satu petunjuk H=60. Kecepatan bernilai 100 sampai patokan, 0 ketika mencapai tiga kali patokan.
+**C5:** keputusan sesuai kriteria 30; bukti perbandingan tiga pengujian 40; alasan dan pertimbangan 30. Periksa hasil untuk lima nilai, tiga nilai, dan list kosong. Terima pertimbangan alternatif yang akurat dan didukung bukti.
 
-Pada tugas susunan, akurasi pertama adalah proporsi unit yang benar di pemeriksaan pertama. Pada robot/CPU/Bubble Sort, bila terjadi kesalahan langkah sebelum pemeriksaan, gunakan proporsi langkah benar sebelum kesalahan pertama terhadap panjang solusi kanonis (dibatasi 0–100). Setelah dibekukan, akurasi tidak berubah. Jejak ini merupakan pendekatan operasional, bukan instrumen psikometrik tervalidasi.
+**C6:** rancangan data 30; solusi 35; pengujian 25; penjelasan 10. Periksa kasus normal, stok sama dengan permintaan, stok kurang, dan input negatif. Pseudocode yang tepat setara dengan Python yang tepat. Nilai karya, bukan panjang tulisan.
 
-Menyusun objek tidak dihitung sebagai percobaan. Periksa jawaban menghitung satu percobaan; kesalahan operasi domain tetap dicatat. Reset papan menambah ulang manual tanpa menghapus waktu, kesalahan, atau akurasi pertama. Replay setelah selesai membuat sesi baru. Timer berjalan ketika tugas dapat dioperasikan dan tab terlihat; animasi/dialog yang memblokir tugas tidak dihitung. Checkpoint lokal berkala dapat kehilangan paling banyak interval terakhir bila proses browser dihentikan paksa.
+Penilaian yang tersimpan tidak dapat diedit melalui UI saat ini. Peserta dapat membuat percobaan baru setelah karya dinilai. Semua percobaan dan umpan balik tetap menjadi bukti; nilai terbaik dipakai dalam rekap.
 
-## Membaca hasil dan halaman guru
+## Interpretasi dan batas
 
-Masuk lewat **Guru** menggunakan username/password pengelola. Dashboard menampilkan peserta, filter kelas/nama/ketuntasan, progres dan nilai. Buka rapor peserta untuk detail 18 misi, komponen skor, waktu, percobaan, kesalahan, ulang, petunjuk, keadaan akhir dan jejak tindakan.
+Misi menggunakan konfigurasi terstruktur, pratinjau rak/diagram/RAM, dan interpreter Python terbatas untuk list satu dimensi, assignment, sum, len, append, pop, print, serta aritmetika. Interpreter bukan Python lengkap; tidak mendukung import, perulangan, atau akses sistem. Karya C6 dinilai guru dan tidak dieksekusi oleh interpreter.
 
-Nilai inti = rata-rata sederhana nilai terbaru 16 misi, hanya muncul setelah seluruh inti selesai. Kompetensi = rata-rata dua misi; bila belum lengkap, tampil belum lengkap. Pengayaan tidak memengaruhi nilai inti atau leaderboard. Nilai sama mendapat peringkat sama. Nilai terbaik ditandai pada sesi asal; metrik kumulatif seluruh sesi tidak dicampur sebagai metrik sesi terbaik.
+Gunakan bersama observasi guru. Pengulangan dan bantuan merupakan bagian pembelajaran; nilai terbaik menggambarkan capaian setelah latihan, bukan pengukuran tanpa bantuan. Pemilihan jenis data dan unit mesin memakai pilihan terstruktur, sehingga bukti kinerja perlu dilengkapi praktik langsung bila diperlukan.
 
-Ketepatan K ditampilkan terpisah. Peserta yang berhasil dengan bantuan dan koreksi masih mempunyai bukti penyelesaian; kebutuhan penguatan dibaca melalui riwayat. Hindari label tidak mampu/cerdas/lemah berdasarkan satu skor atau kecepatan. Misi belum selesai berarti bukti belum lengkap, bukan nilai nol.
-
-**Ekspor rekap CSV** mengikuti filter dashboard. Rapor peserta menyediakan CSV per misi dan JSON seluruh sesi/tindakan. CSV menggunakan UTF-8 BOM dan perlindungan formula spreadsheet. JSON berisi identitas pribadi; simpan sesuai kebijakan sekolah dan bagikan hanya kepada pihak berwenang. Ekspor tidak mengubah progres. Kalibrasi pengali waktu 0,5–3 pada dashboard hanya berlaku untuk sesi baru dan tidak mengubah riwayat.
-
-## Batas dan rekomendasi
-
-Gunakan untuk asesmen formatif bersama observasi guru. Jawaban teks bebas, alasan mendalam, kolaborasi, demonstrasi perangkat nyata, serta materi di luar delapan kompetensi inti belum dinilai. Nama asli + alias bukan faktor rahasia, sehingga identitas peserta tidak dapat dijamin seperti autentikasi password. Data offline/waktu klien dapat dimanipulasi meskipun server menghitung ulang rumus dan memeriksa tindakan. Jangan menggunakannya sebagai satu-satunya dasar penilaian berisiko tinggi.
-
-Dashboard hanya melihat data tersinkron; meminta peserta memeriksa status sinkronisasi membantu mencegah interpretasi data parsial. Pengelolaan guru saat ini satu instalasi sekolah; tidak ada multisekolah, edit nilai, hapus akun, atau reset peserta melalui dashboard.
-
-Jika satu sesi dimainkan bersamaan di dua perangkat dan tindakannya berbeda, versi server menjadi progres aktif; bukti lokal yang berbeda tetap dicadangkan sebagai konflik di ekspor JSON dan status konflik ditampilkan. Bukti konflik tidak diam-diam dicampur menjadi nilai. Peserta dapat melanjutkan keadaan server atau memainkan ulang, dan guru dapat memeriksa cadangan konflik. Dianjurkan satu perangkat aktif per akun pada satu waktu.
-
-Menekan **Jalankan tes program** atau **Uji diagram** adalah percobaan penilaian: hasil salah membekukan akurasi pertama dan mencatat kesalahan; hasil benar menyelesaikan tugas langsung. Pemeriksaan ulang setelah sukses tidak menambah percobaan.
+Dashboard hanya memuat data tersinkron. Identitas nama + alias bukan autentikasi dengan rahasia. Versi lama tetap dipertahankan dengan ID/rumus lama, tidak dihitung sebagai penyelesaian versi lima pulau. Kalibrasi waktu hanya berlaku pada sesi baru **versi lama**. Lihat [panduan versi lama](docs/legacy/PANDUAN_GURU_V1.md) bila memeriksa arsip.

@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-const load = () => import("../../src/shared/missions.js");
+const load = () => import("../../src/shared/legacy/missions.js");
 test("catalog has 16 core and 2 enrichment missions", async () => {
   const { MISSIONS } = await load();
   expect(MISSIONS).toHaveLength(18);

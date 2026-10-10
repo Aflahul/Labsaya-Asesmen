@@ -19,6 +19,15 @@ export async function syncProgress({ progress, api, onStatus = () => {} }) {
       });
       continue;
     }
+    if (local.draftAnswers && server.status !== "active") {
+      progress.conflicts ??= [];
+      progress.conflicts.push({
+        recordedAt: new Date().toISOString(),
+        reason: "Draf lokal saat sesi sudah dikirim di perangkat lain",
+        session: structuredClone(local),
+      });
+      delete local.draftAnswers;
+    }
     const common = Math.min(local.events.length, server.events.length);
     const prefix = Array.from(
       { length: common },
@@ -39,6 +48,7 @@ export async function syncProgress({ progress, api, onStatus = () => {} }) {
           reason: "Tindakan berbeda pada sesi yang sama di perangkat lain",
           session: structuredClone(local),
         });
+      delete local.draftAnswers;
       adopt(local, server);
       continue;
     }
@@ -81,7 +91,11 @@ export async function syncProgress({ progress, api, onStatus = () => {} }) {
       ? "Konflik perangkat — bukti lokal dicadangkan di JSON"
       : pending
         ? "Belum tersinkron — ada tindakan baru"
-        : "Tersinkron ke Neon",
+        : progress.sessions.some(
+              (s) => s.draftAnswers && Object.keys(s.draftAnswers).length,
+            )
+          ? "Draf tersimpan di perangkat ini — selesai mengetik untuk sinkronisasi"
+          : "Tersinkron ke Neon",
   );
   return progress;
 }
