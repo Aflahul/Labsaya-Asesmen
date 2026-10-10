@@ -63,3 +63,15 @@ Perbaikan diterapkan pada cabang UX setelah audit: panduan Nara khusus untuk sem
 Panel misi menggunakan latar gelap dengan opacity 78% dan blur ringan; kolom jawaban tetap pekat. Animasi masuk pulau 3 detik, antarpulau 4,2 detik, antarmisi 0,9 detik, bos 2,2 detik; semuanya bisa dilewati. Setelah animasi, pengarahan tetap tampil sampai murid memilih Mulai misi saat siap. Pengurangan gerak tetap menampilkan pengarahan tanpa menunggu animasi. Waktu asesmen baru berjalan setelah misi dibuka.
 
 Ukuran teks pendukung beranda ditingkatkan, pendaftaran diberi konteks dan contoh absen, serta penjelasan akses akun dipindah sebelum tombol. Beranda tetap memakai satu pulau sebagai ilustrasi pembuka; kelima pulau terlihat pada peta. Penguatan validitas konstruk C3/C4 dan pengujian langsung bersama murid tetap merupakan tindak lanjut pedagogis, bukan klaim bahwa label level sudah tervalidasi.
+
+## Koreksi interaksi — 11 Oktober 2026 (WIB)
+
+Arahan Nara dipindahkan keluar dari panel soal menjadi toast mengambang. Murid membaca percakapan bertahap (tujuan, langkah, catatan), dapat menutupnya, lalu membuka kembali lewat tombol Nara. Petunjuk dan hasil pengujian juga menggunakan toast tersebut; tidak ada batas waktu baca otomatis. Avatar bergerak ringan, mengikuti pengaturan reduced motion. Kolom jawaban tidak kehilangan nilainya saat toast dibuka/ditutup.
+
+Memilih ilustrasi atau label pulau menampilkan tombol Masuk pulau di pulau itu sendiri. Tombol menuju misi pertama yang belum selesai, atau misi pertama untuk mengulang bila semua sudah selesai. Pulau terkunci menampilkan syarat pembukaannya di lokasi yang sama. Pemilihan tidak lagi menggulir ke panel samping; daftar misi lama tetap tersedia sebagai pilihan langsung. Animasi mengambang diterapkan pada gambar, bukan area klik.
+
+Masuk pulau dari peta hanya memakai pendekatan pulau selama 3 detik, tanpa kapal. Perjalanan antarpulau terdiri dari kapal melintas 2,2 detik, lalu pulau mendekat 2 detik. Kedua lapisan tidak ditampilkan bersamaan. Melewati atau membatalkan perjalanan membersihkan timer kedua fase. Pengarahan sebelum misi tetap menunggu tindakan murid.
+
+### Label tombol singkat
+
+Tombol aksi memakai satu kata: Daftar, Masuk, Mulai, Coba, Kirim, Lanjut, Ulang, Bersihkan, Nara, Panduan, Catatan, Mengerti, Peta, Rapor, Buka, Periksa, Rekap, Cadangan, Pulihkan, Unduh, Segarkan, Simpan. Nama pulau/identitas game maksimal dua kata; judul misi dan progres ditempatkan di luar tombol. Instruksi Nara mengikuti label Coba/Kirim yang terlihat. Keterangan fungsi unduhan ditulis di teks pendamping, bukan jargon pada tombol. Nama aksesibel dapat lebih deskriptif untuk pembaca layar tanpa memperpanjang label visual.

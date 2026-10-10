@@ -126,7 +126,7 @@ export const GUIDANCE = {
     [
       "Baca kode awal dan temukan perhitungan yang perlu diperbaiki.",
       "Ubah kode di editor. Pertahankan nama daftar nilai dan tampilkan satu hasil dengan print.",
-      "Tekan Uji solusi, baca hasil tiap pengujian, lalu perbaiki sebelum mengirim.",
+      "Tekan Coba, baca hasil tiap pengujian, lalu perbaiki sebelum mengirim.",
     ],
     "Penguji memakai beberapa daftar berisi lima nilai. Program harus menghitung dari daftar yang diberikan, bukan mencetak angka jawaban tetap.",
     "Rata-rata membandingkan jumlah seluruh nilai dengan banyaknya nilai. Cocokkan pembagi dengan data yang digunakan.",

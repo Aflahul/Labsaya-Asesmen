@@ -10,7 +10,9 @@ test("Nara briefing waits for the learner, controls keep focus, mission and isla
   await expect(page.locator("#begin-mission")).toBeVisible();
   await expect(page.locator("#submit")).toHaveCount(0);
   await page.locator("#begin-mission").click();
-  await expect(page.locator(".nara-guide")).toContainText("Langkahmu");
+  await page.locator("#nara-next").click();
+  await expect(page.locator("#nara-toast")).toContainText("Langkahmu");
+  await page.locator("#nara-close").click();
   await page.locator("[data-answer=phone]").focus();
   await page.locator("[data-answer=phone]").selectOption("String");
   await expect(page.locator("[data-answer=phone]")).toBeFocused();
@@ -30,7 +32,7 @@ test("Nara briefing waits for the learner, controls keep focus, mission and isla
 });
 test("leaving arrival cancels pending mission opening", async ({ page }) => {
   await register(page);
-  await page.getByRole("button", { name: "Peta dunia", exact: true }).click();
+  await page.getByRole("button", { name: "Peta", exact: true }).click();
   await expect(page.locator(".map-stage")).toBeVisible();
   await expect(page.locator("#begin-mission")).toHaveCount(0);
   await expect(page.locator("#submit")).toHaveCount(0);

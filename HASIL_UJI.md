@@ -37,3 +37,11 @@ Ini bukti lokal, belum smoke test deployment Vercel atau database Neon nyata. Be
 - Pengarahan menunggu tombol Mulai misi saat siap. Transisi masuk pulau, antarpulau, dan antarmisi berbeda; meninggalkan transisi membatalkan pembukaan misi.
 - Validasi: 64 tes unit/API; 9 tes browser production termasuk perjalanan lengkap, penilaian guru, nilai bos terpisah, offline, serta desktop/tablet/ponsel dan reduced motion.
 - Build production berhasil. Screenshot ponsel diperiksa untuk keterbacaan Nara serta transparansi panel. Uji langsung bersama murid belum dilakukan.
+
+## Toast Nara dan navigasi pulau — 11 Oktober 2026 (WIB)
+
+- 64 tes unit/API lulus; build produksi berhasil.
+- 12 tes browser produksi lulus, termasuk 3 tes baru: toast di luar panel dan jawaban tetap tersimpan setelah buka/tutup; tombol masuk langsung pada pulau tanpa auto-scroll; kapal dan pendekatan pulau tampil dalam fase terpisah.
+- Tampilan toast dan tombol pulau pada ponsel diperiksa dari screenshot.
+- Suite awal tertahan pada pendaftaran tablet setelah banyak akun uji dibuat dalam satu menit. Helper tes kini mengikuti header Retry-After pada respons 429, lalu mencoba sekali lagi; batas pendaftaran produksi tetap sama. Suite lengkap sesudah perbaikan lulus.
+- Setelah penyederhanaan label tombol: 64 tes unit/API dan seluruh 12 tes browser lulus lagi. Pemeriksaan label memastikan maksimal dua kata pada tombol beranda, pendaftaran, peta, dan seluruh misi. Build akhir berhasil; screenshot peta ponsel dengan tombol Masuk diperiksa.

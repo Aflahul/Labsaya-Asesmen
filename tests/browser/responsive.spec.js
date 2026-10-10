@@ -44,7 +44,7 @@ for (const [name, width, height] of [
       path: `test-results/mission-${name}.png`,
       fullPage: true,
     });
-    await page.getByRole("button", { name: "Peta dunia", exact: true }).click();
+    await page.getByRole("button", { name: "Peta", exact: true }).click();
     await expect(page.locator(".island-card")).toHaveCount(5);
     await expect
       .poll(() =>

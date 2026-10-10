@@ -1092,3 +1092,241 @@ body[data-route="mission"] .side-panel {
     gap: 12px;
   }
 }
+
+/* Nara speaks outside the assessment panel, at the learner's pace. */
+.nara-toast,
+.nara-launcher {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 30;
+}
+.nara-toast {
+  width: 355px;
+  max-width: calc(100vw - 24px);
+  padding: 16px;
+  border: 1px solid #e5c585;
+  border-radius: 22px 22px 6px 22px;
+  background: #102f40;
+  color: #f0f6ee;
+  box-shadow: 0 15px 50px #031c39a0;
+}
+.nara-toast-header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.nara-toast-header img {
+  width: 66px;
+  height: 66px;
+  object-fit: contain;
+  animation: nara-hover 3.5s ease-in-out infinite;
+}
+.nara-toast-header strong {
+  color: #f4d494;
+  font-size: 19px;
+}
+.nara-toast-header small {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+}
+.nara-toast-header button {
+  margin-left: auto;
+  font-size: 25px;
+  padding: 0 12px;
+}
+.nara-toast-message {
+  font-size: 16px;
+  line-height: 1.65;
+  max-height: min(32dvh, 260px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin: 8px 0 14px;
+}
+.nara-toast-message p {
+  margin: 0;
+  color: inherit;
+}
+.nara-toast-message ol {
+  padding-left: 23px;
+  margin: 8px 0;
+}
+.nara-toast-message li {
+  margin-bottom: 8px;
+}
+.nara-toast-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.nara-launcher {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 16px 7px 5px;
+  border-radius: 40px;
+  background: #123d4a;
+  border-color: #e5c585;
+  box-shadow: 0 8px 26px #041b2b80;
+}
+.nara-launcher img {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+}
+@keyframes nara-hover {
+  50% {
+    transform: translateY(-4px) rotate(3deg);
+  }
+}
+.constellation .island-card.selected {
+  z-index: 5;
+}
+.island-entry {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(235px, 100%);
+  padding: 10px;
+  border: 1px solid #efd291;
+  border-radius: 14px;
+  background: #102f40;
+  box-shadow: 0 12px 25px #092234a0;
+  text-align: center;
+}
+.island-entry button {
+  width: 100%;
+  padding: 10px 7px;
+}
+.island-entry small {
+  display: block;
+  font-size: 12px;
+  line-height: 1.5;
+  margin-top: 7px;
+  color: #e9efe7;
+}
+.island-entry p {
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+}
+/* Ship departs first. Only then does the destination approach the camera. */
+.travelling .travel-ship {
+  display: none;
+}
+.travelling[data-transition="island"][data-phase="sail"] .travel-ship {
+  display: block;
+  animation: sail-clear 2.2s ease-in-out both;
+}
+.travelling[data-transition="island"][data-phase="sail"] .arrival-island {
+  display: none;
+}
+.travelling[data-phase="approach"] .arrival-island {
+  display: block;
+  animation: approach-island 2s ease-in-out both;
+}
+.travelling[data-transition="enter"][data-phase="approach"] .arrival-island {
+  animation-duration: 3s;
+}
+@keyframes sail-clear {
+  from {
+    left: -35%;
+    opacity: 0;
+    transform: translateY(0);
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  to {
+    left: 110%;
+    opacity: 0;
+    transform: translateY(-35px);
+  }
+}
+@media (max-width: 540px) {
+  .nara-toast,
+  .nara-launcher {
+    right: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+  }
+  .nara-toast {
+    padding: 12px;
+    width: calc(100vw - 24px);
+  }
+  .nara-toast-header img {
+    width: 48px;
+    height: 48px;
+  }
+  .nara-toast-message {
+    max-height: 26dvh;
+  }
+  body[data-route="mission"].nara-is-open main {
+    padding-bottom: calc(46dvh + 60px);
+  }
+  body[data-route="mission"]:not(.nara-is-open) main {
+    padding-bottom: 100px;
+  }
+  .island-entry {
+    width: 100%;
+  }
+}
+
+/* Keep the click target still while the illustration floats. */
+.island-art {
+  animation: none;
+}
+.island-art img {
+  animation: float 7s ease-in-out infinite;
+}
+.island-card.locked .island-art img {
+  animation: none;
+}
+/* Reserve room for entry buttons on the bottom row of islands. */
+.constellation {
+  min-height: 670px;
+}
+@media (max-width: 540px) {
+  .constellation {
+    min-height: 900px;
+  }
+}
+/* Titles explain the destination; action buttons stay short. */
+.island-name {
+  display: block;
+  width: 100%;
+  background: transparent !important;
+  border: 0;
+  box-shadow: none;
+  padding: 4px 2px;
+  color: #f2f4e9;
+  font:
+    400 18px Georgia,
+    serif;
+}
+.mission-choice {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+.mission-choice strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.mission-choice small {
+  display: block;
+  margin-top: 4px;
+}
+.mission-list .mission-choice button {
+  width: auto;
+  padding: 10px 14px;
+}

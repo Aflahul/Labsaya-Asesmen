@@ -16,9 +16,7 @@ test("production assets and answer draft reload offline, then synchronize", asyn
   await page.waitForFunction(() => navigator.serviceWorker.controller !== null);
   await context.setOffline(true);
   await page.reload();
-  await page
-    .getByRole("button", { name: "Lanjutkan ekspedisi", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Lanjut", exact: true }).click();
   await expect
     .poll(() =>
       page
