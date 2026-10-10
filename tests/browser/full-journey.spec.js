@@ -40,9 +40,7 @@ test("15 core missions, real teacher review, optional boss and unchanged main gr
       expect(size.draft).toHaveLength(3300);
       expect(size.events).toBeLessThan(30);
       await page.reload();
-      await page
-        .getByRole("button", { name: "Lanjutkan ekspedisi", exact: true })
-        .click();
+      await page.getByRole("button", { name: "Lanjut", exact: true }).click();
       await page.locator(`[data-mission="${m.id}"]`).click();
       await enterMission(page, m);
       await expect(page.locator("[data-answer=evidence]")).toHaveValue(
@@ -63,7 +61,7 @@ test("15 core missions, real teacher review, optional boss and unchanged main gr
     await expect(page.locator(".badge")).toContainText("Dinilai");
     await page.locator("#next").click();
   }
-  await page.getByRole("button", { name: "Peta dunia", exact: true }).click();
+  await page.getByRole("button", { name: "Peta", exact: true }).click();
   await expect(page.locator('[data-mission="' + BOSS.id + '"]')).toHaveCount(0);
   await expect(page.locator("[data-sync]").first()).toContainText(
     "Tersinkron",
@@ -79,7 +77,7 @@ test("15 core missions, real teacher review, optional boss and unchanged main gr
     .fill("test-password-only");
   await teacher.getByRole("button", { name: "Masuk", exact: true }).click();
   await teacher.getByPlaceholder("Nama asli / samaran").fill(alias);
-  await teacher.getByRole("button", { name: "Buka rapor" }).click();
+  await teacher.getByRole("button", { name: "Buka" }).click();
   const review = teacher.locator(".review-form");
   await expect(review).toBeVisible();
   for (const [key, , max] of CORE_MISSIONS.at(-1).rubric)
@@ -87,13 +85,11 @@ test("15 core missions, real teacher review, optional boss and unchanged main gr
   await review
     .locator("[name=comment]")
     .fill("Perbandingan data normal, ukuran berubah, dan kosong tepat.");
-  await review.getByRole("button", { name: "Simpan penilaian" }).click();
+  await review.getByRole("button", { name: "Simpan" }).click();
   await expect(review).toHaveCount(0);
   await expect(teacher.locator(".summary-card").first()).toContainText("15/15");
   await page.reload();
-  await page
-    .getByRole("button", { name: "Lanjutkan ekspedisi", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Lanjut", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Menara Awan kembali menyala." }),
   ).toBeVisible();
@@ -108,17 +104,17 @@ test("15 core missions, real teacher review, optional boss and unchanged main gr
   );
   await teacher.getByRole("button", { name: "← Kembali", exact: true }).click();
   await teacher.getByPlaceholder("Nama asli / samaran").fill(alias);
-  await teacher.getByRole("button", { name: "Buka rapor" }).click();
+  await teacher.getByRole("button", { name: "Buka" }).click();
   for (const [key] of BOSS.rubric)
     await teacher.locator(`.review-form [name="${key}"]`).fill("0");
   await teacher
     .locator(".review-form [name=comment]")
     .fill("Pengayaan perlu dilengkapi; nilai inti tetap.");
-  await teacher.getByRole("button", { name: "Simpan penilaian" }).click();
+  await teacher.getByRole("button", { name: "Simpan" }).click();
   await expect(teacher.locator(".review-form")).toHaveCount(0);
   await expect(teacher.locator(".summary-card").nth(1)).toContainText("100");
   await page.reload();
-  await page.getByRole("button", { name: "Rapor saya", exact: true }).click();
+  await page.getByRole("button", { name: "Rapor", exact: true }).click();
   await expect(page.locator(".summary-card").first()).toContainText("15/15");
   await expect(page.locator(".summary-card").nth(1)).toContainText("100");
   await page.screenshot({
