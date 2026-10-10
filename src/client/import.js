@@ -1,3 +1,4 @@
+import { updateDraft } from "./drafts.js";
 import { getMission } from "../shared/missions.js";
 import { newSession, reduceSession } from "../shared/assessment.js";
 import { validateEvent } from "../shared/contracts.js";
@@ -19,7 +20,7 @@ export function validateImport(raw, participantId) {
       ids.has(input.id) ||
       !Array.isArray(input.events) ||
       input.events.length > 10000 ||
-      input.missionVersion !== 1 ||
+      input.missionVersion !== m.missionVersion ||
       !Number.isFinite(input.scoringConfig?.baselineMultiplier) ||
       input.scoringConfig.baselineMultiplier < 0.5 ||
       input.scoringConfig.baselineMultiplier > 3
@@ -41,7 +42,7 @@ export function validateImport(raw, participantId) {
         e.seq !== s.events.length + 1 ||
         e.activeMs < s.activeMs ||
         e.activeMs > 86400000 ||
-        s.status === "complete"
+        s.status !== "active"
       )
         throw Error("Jejak cadangan tidak valid");
       eventIds.add(e.id);
@@ -55,11 +56,39 @@ export function validateImport(raw, participantId) {
       Number.isFinite(Date.parse(input.completedAt))
     )
       s.completedAt = input.completedAt;
+    if (input.draftAnswers !== undefined) {
+      if (
+        !input.draftAnswers ||
+        typeof input.draftAnswers !== "object" ||
+        Array.isArray(input.draftAnswers)
+      )
+        throw Error("Draf cadangan tidak valid");
+      for (const [key, value] of Object.entries(input.draftAnswers))
+        updateDraft(s, m, key, value);
+    }
     s.serverCreated = false;
     s.syncedCount = 0;
     return s;
   });
-  const conflicts=[];
-  if(raw.conflicts!==undefined){if(!Array.isArray(raw.conflicts)||raw.conflicts.length>1000)throw Error("Arsip konflik tidak valid");for(const conflict of raw.conflicts){const restored=validateImport({schemaVersion:1,participantId,sessions:[conflict.session]},participantId);conflicts.push({recordedAt:conflict.recordedAt,reason:"Konflik perangkat dari cadangan",session:restored.sessions[0]});}}
-  return { participantId, sessions, ...(conflicts.length?{conflicts}:{}) };
+  const conflicts = [];
+  if (raw.conflicts !== undefined) {
+    if (!Array.isArray(raw.conflicts) || raw.conflicts.length > 1000)
+      throw Error("Arsip konflik tidak valid");
+    for (const conflict of raw.conflicts) {
+      const restored = validateImport(
+        { schemaVersion: 1, participantId, sessions: [conflict.session] },
+        participantId,
+      );
+      conflicts.push({
+        recordedAt: conflict.recordedAt,
+        reason: "Konflik perangkat dari cadangan",
+        session: restored.sessions[0],
+      });
+    }
+  }
+  return {
+    participantId,
+    sessions,
+    ...(conflicts.length ? { conflicts } : {}),
+  };
 }

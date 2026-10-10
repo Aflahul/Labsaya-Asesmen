@@ -1,0 +1,893 @@
+:root {
+  --panel: rgba(12, 36, 49, 0.96);
+  --muted: #c1d5d7;
+  --line: rgba(203, 225, 213, 0.24);
+}
+.world-backdrop {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transition: background-image 0.4s;
+}
+#world:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, #082c40c9, #092b4030 70%),
+    linear-gradient(0deg, #082c4070, transparent 60%);
+}
+.world-clouds {
+  position: absolute;
+  bottom: -8%;
+  width: 120%;
+  opacity: 0.35;
+  animation: cloud-drift 55s ease-in-out infinite alternate;
+}
+.travel-ship {
+  position: absolute;
+  width: 340px;
+  left: -40%;
+  top: 22%;
+  opacity: 0;
+}
+.travelling .travel-ship {
+  opacity: 1;
+  animation: sail 1.4s ease-in-out forwards;
+  z-index: 1;
+}
+header {
+  background: #102d40e8;
+  backdrop-filter: blur(12px);
+}
+.footer {
+  background: #102d40d9;
+}
+.game-home {
+  position: relative;
+}
+.game-home .hero {
+  position: relative;
+  z-index: 2;
+  filter: none;
+  max-width: 630px;
+  width: 58%;
+}
+.game-home h1 {
+  font-size: clamp(48px, 5.7vw, 78px);
+}
+.hero-island {
+  position: absolute;
+  width: 59%;
+  right: -3%;
+  top: 0;
+  filter: drop-shadow(0 30px 40px #052c4b55);
+  animation: float 7s ease-in-out infinite;
+}
+.nara-greeting {
+  position: absolute;
+  right: 0;
+  bottom: 25px;
+  display: flex;
+  align-items: center;
+  max-width: 380px;
+  background: #0d3045ed;
+  border: 1px solid #c5dec352;
+  border-radius: 20px;
+  padding: 4px 22px 4px 0;
+  box-shadow: 0 10px 45px #0b233955;
+}
+.nara-greeting img {
+  width: 125px;
+  height: 125px;
+  object-fit: contain;
+}
+.nara-greeting p {
+  margin: 0;
+  font-size: 14px;
+  color: #edf4ee;
+}
+.nara-greeting small {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: #cbb784;
+  margin-top: 10px;
+}
+.hero-foot {
+  line-height: 1.8;
+  color: #ecf0df;
+}
+.hero p {
+  color: #d8e7e4;
+}
+.hero .notice {
+  font-size: 13px;
+}
+.map-heading {
+  padding: 20px 24px;
+  background: #0b3043e6;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+.map-heading h2 {
+  margin: 10px 0;
+}
+.map-heading p {
+  margin: 0;
+}
+.island-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px 30px;
+}
+.island-card {
+  min-width: 0;
+  position: relative;
+}
+.island-card:nth-child(4) {
+  grid-column: 1;
+  margin-left: 30%;
+}
+.island-card:nth-child(5) {
+  grid-column: 2;
+  margin-left: 30%;
+}
+.island-card:nth-child(n + 4) {
+  width: 100%;
+}
+.island-art {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent !important;
+  display: block;
+  aspect-ratio: 1.45;
+  filter: drop-shadow(0 20px 14px #09253570);
+  animation: float 7s ease-in-out infinite;
+}
+.island-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.island-card:nth-child(2n) .island-art {
+  animation-delay: -3s;
+}
+.island-card.locked .island-art {
+  filter: grayscale(0.65);
+  opacity: 0.75;
+  animation: none;
+}
+.island-art:disabled {
+  opacity: 0.75;
+}
+.island-info {
+  position: relative;
+  margin-top: -15px;
+  background: linear-gradient(145deg, #173e50fa, #0c2a3df5);
+  border: 1px solid #cddac34d;
+  border-top: 2px solid #c9b47a;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 12px 26px #09253555;
+}
+.island-info h3 {
+  font-family: Georgia, serif;
+  font-weight: 400;
+  font-size: 26px;
+  margin: 8px 0;
+}
+.island-info p {
+  font-size: 13px;
+  margin: 0;
+}
+.island-info > small {
+  color: #a7c0c5;
+  font-size: 11px;
+}
+.island-info .eyebrow {
+  letter-spacing: 1.7px;
+  font-size: 10px;
+}
+.mission-list {
+  display: grid;
+  gap: 6px;
+  margin-top: 16px;
+}
+.mission-list button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  padding: 11px 9px;
+  background: #234957;
+  font-size: 12px;
+  min-height: 44px;
+}
+.mission-list button > span {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid #c0d8bd66;
+  border-radius: 50%;
+  color: #e8d39e;
+}
+.mission-list small {
+  margin-left: auto;
+  color: #d7d5aa;
+}
+.mission-list button:disabled {
+  opacity: 0.65;
+}
+.ending-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  align-items: center;
+  margin-top: 32px;
+  overflow: hidden;
+}
+.ending-card > img {
+  width: 100%;
+  border-radius: 12px;
+}
+body[data-route="mission"] #world:after {
+  background: #092a3c45;
+}
+.mission-layout {
+  grid-template-columns: minmax(0, 1fr) 255px;
+}
+.mission-panel {
+  box-shadow: 0 24px 60px #071d3577;
+  border-top: 2px solid #ccb574;
+}
+.instruction {
+  margin-top: 20px;
+  padding: 18px;
+  background: #244d55;
+  border-left: 3px solid #dfc38b;
+  border-radius: 0 10px 10px 0;
+  font-size: 15px;
+}
+.instruction p {
+  margin: 8px 0 0;
+  color: #e1eeeb;
+}
+.side-panel {
+  background: #0c3046ed;
+}
+.nara-portrait {
+  width: 100%;
+  height: 180px;
+  object-fit: contain;
+}
+.side-panel p {
+  font-size: 13px;
+}
+.side-panel h3 {
+  color: #ecd59e;
+}
+.topline > .eyebrow {
+  padding: 10px;
+  background: #102d40e8;
+  border-radius: 8px;
+  letter-spacing: 1.5px;
+}
+.answer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin: 20px 0;
+}
+.answer-grid label {
+  font-size: 14px;
+  line-height: 1.5;
+}
+.answer-grid select,
+.answer-grid input {
+  margin-top: 8px;
+}
+.activity label {
+  display: block;
+  color: #e2eeea;
+}
+.activity select {
+  font-size: 14px;
+  min-height: 46px;
+}
+.activity textarea,
+textarea {
+  font: inherit;
+  line-height: 1.6;
+  background: #102b3a;
+  color: #edf4ec;
+  border: 1px solid #728f96;
+  border-radius: 9px;
+  padding: 14px;
+  width: 100%;
+  resize: vertical;
+  margin: 8px 0 20px;
+}
+.code-editor {
+  font-family: ui-monospace, monospace !important;
+  tab-size: 2;
+}
+.activity textarea:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid #f3d49d;
+  outline-offset: 3px;
+}
+.trace {
+  font-size: 14px;
+  line-height: 1.7;
+  word-break: normal;
+  overflow-wrap: anywhere;
+  border-radius: 10px;
+  max-height: 400px;
+}
+.machine-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 15px 0;
+}
+.machine-cell {
+  flex: 1;
+  min-width: 95px;
+  padding: 16px;
+  background: #275362;
+  border: 1px solid #94c8bc;
+  border-radius: 10px;
+  box-shadow: inset 0 -5px 0 #133942;
+}
+.machine-cell small {
+  display: block;
+  color: #c5d9d5;
+  font-size: 11px;
+}
+.machine-cell strong {
+  display: block;
+  margin-top: 8px;
+  color: #f1d6a1;
+  font-size: 22px;
+}
+.sim-caption {
+  color: #d6ded4;
+  font-size: 12px;
+}
+.machine-path {
+  padding: 15px;
+  background: #244a52;
+  border-radius: 9px;
+  letter-spacing: 1px;
+  line-height: 1.8;
+}
+.flow-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px;
+  background: #183e49;
+  border-radius: 12px;
+}
+.flow-preview > span {
+  padding: 10px 24px;
+  border: 1px solid #9bbcaf;
+  border-radius: 30px;
+  background: #2c5456;
+  text-align: center;
+}
+.flow-preview .decision {
+  border-radius: 8px;
+  border-color: #ead39b;
+  background: #595b3e;
+  min-width: 180px;
+}
+.flow-branches {
+  display: flex;
+  gap: 28px;
+  justify-content: center;
+  text-align: center;
+  flex-wrap: wrap;
+}
+.flow-branches span {
+  padding: 14px;
+  border-top: 2px solid #b9ceac;
+  color: #efddb2;
+}
+.feedback {
+  padding: 18px !important;
+  border-radius: 10px;
+  background: #284a4a;
+  margin-top: 20px;
+}
+.review-form {
+  padding: 25px;
+  margin: 25px 0;
+  border: 1px solid #ddc584;
+  border-radius: 12px;
+  background: #173c4a;
+}
+.written-answer {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: #0e2b3b;
+  padding: 18px;
+  font: inherit;
+  line-height: 1.7;
+}
+.review-form h4 {
+  color: #efd8a8;
+}
+.badge {
+  white-space: nowrap;
+}
+.notice {
+  font-size: 13px;
+}
+button {
+  min-height: 42px;
+}
+details > summary {
+  cursor: pointer;
+  padding: 12px 0;
+}
+@keyframes float {
+  50% {
+    transform: translateY(-10px);
+  }
+}
+@keyframes cloud-drift {
+  to {
+    transform: translateX(-12%);
+  }
+}
+@keyframes sail {
+  to {
+    left: 70%;
+    transform: translateY(-40px);
+  }
+}
+.reduced-motion *,
+.low-effects * {
+  animation: none !important;
+  transition: none !important;
+}
+.reduced-motion .travel-ship {
+  left: 45%;
+}
+@media (min-width: 1450px) {
+  .game-home {
+    min-height: 680px;
+  }
+}
+@media (max-width: 1000px) {
+  .island-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+  .island-card:nth-child(n + 4) {
+    grid-column: auto;
+    margin-left: 0;
+  }
+  .game-home .hero {
+    width: 65%;
+  }
+  .hero-island {
+    right: -5%;
+    top: 15%;
+    width: 52%;
+  }
+  .nara-greeting {
+    bottom: -10px;
+    max-width: 320px;
+  }
+  .mission-layout {
+    grid-template-columns: minmax(0, 1fr) 210px;
+  }
+}
+@media (max-width: 800px) {
+  .mission-layout {
+    grid-template-columns: 1fr;
+  }
+  .side-panel {
+    order: 1;
+  }
+  .nara-portrait {
+    width: 100px;
+    height: 100px;
+    float: right;
+  }
+  .game-home {
+    display: block;
+    padding-bottom: 100px;
+  }
+  .game-home .hero {
+    width: 100%;
+    padding-bottom: 0;
+  }
+  .hero-island {
+    position: relative;
+    display: block;
+    right: auto;
+    top: auto;
+    width: 85%;
+    margin: -30px auto -70px;
+    z-index: -1;
+  }
+  .nara-greeting {
+    bottom: 0;
+    right: 0;
+  }
+  .game-home h1 {
+    font-size: 52px;
+  }
+  .map-heading {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .map-heading h2 {
+    font-size: 28px;
+  }
+  .ending-card {
+    grid-template-columns: 1fr;
+  }
+  .mission-title {
+    flex-wrap: wrap;
+  }
+  header {
+    gap: 12px;
+  }
+  nav {
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 540px) {
+  main {
+    padding: 22px 5vw 35px;
+  }
+  .island-grid {
+    grid-template-columns: 1fr;
+  }
+  .island-art {
+    max-width: 350px;
+    margin: auto;
+  }
+  .island-info {
+    margin-top: -20px;
+  }
+  .answer-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .game-home h1 {
+    font-size: 43px;
+    letter-spacing: -1px;
+  }
+  .hero .eyebrow {
+    font-size: 10px;
+    letter-spacing: 2px;
+  }
+  .hero-foot {
+    gap: 18px;
+    font-size: 9px;
+  }
+  .hero-island {
+    width: 100%;
+    margin-top: -12px;
+  }
+  .nara-greeting img {
+    width: 90px;
+    height: 100px;
+  }
+  .panel {
+    padding: 20px;
+  }
+  .mission-panel h2 {
+    font-size: 30px;
+  }
+  .topline {
+    flex-wrap: wrap;
+  }
+  .summary-card {
+    padding: 14px;
+  }
+  .summary-card strong {
+    font-size: 25px;
+  }
+  .competencies {
+    grid-template-columns: 1fr;
+  }
+  .flow-branches {
+    gap: 8px;
+  }
+  .footer {
+    line-height: 2;
+  }
+  .footer span {
+    float: none !important;
+    display: block;
+  }
+  .brand {
+    font-size: 22px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+#world {
+  overflow: hidden;
+}
+.map-guide {
+  font-size: 13px;
+  margin-bottom: 0;
+  color: #e4eddf;
+  text-shadow: 0 2px 3px #072838;
+}
+.map-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 270px;
+  gap: 25px;
+  align-items: center;
+  min-height: 560px;
+}
+.constellation {
+  position: relative;
+  display: block;
+  height: 560px;
+}
+.constellation .island-card {
+  position: absolute;
+  width: 34%;
+  margin: 0 !important;
+}
+.constellation .island-card:nth-of-type(1) {
+  left: 0;
+  top: 10px;
+}
+.constellation .island-card:nth-of-type(2) {
+  left: 33%;
+  top: 25px;
+}
+.constellation .island-card:nth-of-type(3) {
+  left: 66%;
+  top: 10px;
+}
+.constellation .island-card:nth-of-type(4) {
+  left: 49%;
+  top: 280px;
+}
+.constellation .island-card:nth-of-type(5) {
+  left: 12%;
+  top: 280px;
+}
+.constellation .island-art {
+  aspect-ratio: 1.2;
+  max-width: none;
+}
+.island-label {
+  position: relative;
+  display: block;
+  width: 100%;
+  border-radius: 30px;
+  margin-top: -18px;
+  padding: 10px 8px;
+  background: #0f3449ec;
+  box-shadow: 0 6px 20px #082c3e80;
+  text-align: center;
+  white-space: normal;
+}
+.island-label small {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 1.2px;
+  color: #ccd2b8;
+}
+.island-label strong {
+  display: block;
+  font:
+    400 18px Georgia,
+    serif;
+  margin-top: 5px;
+}
+.selected .island-label {
+  border-color: #f1d18b;
+  background: #244d54;
+}
+.selected .island-art {
+  filter: drop-shadow(0 0 16px #e0d29466);
+}
+.map-links {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.map-links path {
+  fill: none;
+  stroke: #e0d2a5;
+  stroke-width: 2;
+  stroke-dasharray: 5 9;
+  opacity: 0.55;
+}
+.mission-dock {
+  padding: 22px;
+  border-top: 2px solid #d8bc83;
+}
+.mission-dock h3 {
+  font:
+    400 28px Georgia,
+    serif;
+  margin: 14px 0 10px;
+}
+.mission-dock > p {
+  font-size: 13px;
+}
+.mission-dock .eyebrow {
+  font-size: 10px;
+  letter-spacing: 1.3px;
+  line-height: 1.8;
+}
+.dock-nara {
+  display: block;
+  width: 130px;
+  height: 130px;
+  object-fit: contain;
+  margin: 10px auto -10px;
+}
+.mission-dock .notice {
+  margin: 0;
+}
+.constellation .locked .island-art {
+  opacity: 0.8;
+}
+@media (max-width: 1100px) {
+  .map-stage {
+    grid-template-columns: 1fr;
+  }
+  .constellation {
+    height: 550px;
+  }
+  .mission-dock {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 4px 30px;
+  }
+  .mission-dock .mission-list {
+    grid-column: 2;
+    grid-row: 1/5;
+    margin-top: 0;
+  }
+  .mission-dock h3 {
+    font-size: 27px;
+    margin: 5px 0;
+  }
+  .dock-nara {
+    display: none;
+  }
+  .mission-dock .notice {
+    grid-column: 1/3;
+  }
+  .constellation .island-art {
+    max-width: 260px;
+    margin: auto;
+  }
+  .island-label {
+    max-width: 235px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+@media (max-width: 540px) {
+  .constellation {
+    height: 750px;
+  }
+  .constellation .island-card {
+    width: 55%;
+  }
+  .constellation .island-card:nth-of-type(1) {
+    left: 0;
+    top: 0;
+  }
+  .constellation .island-card:nth-of-type(2) {
+    left: 44%;
+    top: 115px;
+  }
+  .constellation .island-card:nth-of-type(3) {
+    left: 0;
+    top: 265px;
+  }
+  .constellation .island-card:nth-of-type(4) {
+    left: 44%;
+    top: 410px;
+  }
+  .constellation .island-card:nth-of-type(5) {
+    left: 0;
+    top: 555px;
+  }
+  .island-label strong {
+    font-size: 17px;
+  }
+  .island-label small {
+    font-size: 8px;
+  }
+  .map-links {
+    display: none;
+  }
+  .mission-dock {
+    display: block;
+  }
+  .mission-dock .mission-list {
+    margin-top: 18px;
+  }
+  .mission-dock .notice {
+    margin-top: 12px;
+  }
+  .map-stage {
+    gap: 15px;
+  }
+  .constellation .island-art {
+    aspect-ratio: 1.35;
+  }
+}
+.flow-preview > span.flow-input {
+  border-radius: 0;
+  padding: 18px 30px;
+  position: relative;
+  background: transparent;
+  border: 0;
+  isolation: isolate;
+}
+.flow-input:before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: #37676a;
+  border: 1px solid #bcd5bc;
+}
+.shape-input:before {
+  transform: skewX(-14deg);
+}
+.shape-diamond:before {
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+}
+.flow-preview > span.decision {
+  border: 0;
+  border-radius: 0;
+  position: relative;
+  background: transparent;
+  isolation: isolate;
+  min-height: 100px;
+  min-width: 240px;
+  display: grid;
+  place-items: center;
+}
+.flow-preview > span.decision:before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  background: #6d6842;
+}
+.review-feedback {
+  margin-top: 30px;
+}
+.review-feedback .hint {
+  margin: 12px 0;
+}
+.review-feedback p {
+  margin: 10px 0 0;
+  white-space: pre-wrap;
+  color: #e3eeea;
+}

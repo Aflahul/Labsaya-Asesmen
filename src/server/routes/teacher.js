@@ -1,3 +1,5 @@
+import { getMission } from "../../shared/missions.js";
+import { gradeReview } from "../../shared/v2-evaluator.js";
 import { summarizeProgress } from "../../shared/progress.js";
 import { toCsv } from "../../shared/reports.js";
 import { loadProgress } from "./progress.js";
@@ -34,6 +36,44 @@ async function roster(db, query = {}) {
     );
 }
 export async function teacherRoutes(app) {
+  app.post("/api/teacher/sessions/:id/review", async (req) => {
+    const teacher = app.requireRole(req, "teacher");
+    const client = await app.db.connect();
+    try {
+      await client.query("BEGIN");
+      const { rows } = await client.query(
+        "SELECT document FROM mission_sessions WHERE id=$1 FOR UPDATE",
+        [req.params.id],
+      );
+      if (!rows[0]) fail(404, "Sesi tidak ditemukan");
+      const old = rows[0].document;
+      if (old.status !== "pending_review")
+        fail(409, "Karya sudah dinilai atau belum dikirim");
+      let graded;
+      try {
+        graded = gradeReview(
+          old,
+          getMission(old.missionId),
+          req.body?.marks,
+          req.body?.comment,
+          teacher.user_id,
+        );
+      } catch (e) {
+        fail(400, e.message);
+      }
+      await client.query(
+        "UPDATE mission_sessions SET document=$1,updated_at=$2 WHERE id=$3",
+        [JSON.stringify(graded), new Date(), old.id],
+      );
+      await client.query("COMMIT");
+      return { data: graded };
+    } catch (e) {
+      await client.query("ROLLBACK");
+      throw e;
+    } finally {
+      client.release();
+    }
+  });
   app.get("/api/teacher/participants", async (req) => {
     app.requireRole(req, "teacher");
     const rows = await roster(app.db, req.query);

@@ -1,16 +1,19 @@
-import { MISSIONS } from "./missions.js";
+import { MISSIONS, CORE_MISSIONS, ISLANDS } from "./missions.js";
+const valid = new Set(MISSIONS.map((m) => m.id));
 export function summarizeProgress({ sessions = [] }) {
   const latestByMission = {},
     bestByMission = {};
   for (const s of sessions) {
-    if (s.status !== "complete") continue;
-    const previous = latestByMission[s.missionId];
-    const stamp = (x) => x.completedAt || x.startedAt || "";
     if (
-      !previous ||
-      stamp(s) > stamp(previous) ||
-      (stamp(s) === stamp(previous) && (!stamp(s) || s.id > previous.id))
+      !valid.has(s.missionId) ||
+      s.status !== "complete" ||
+      !Number.isFinite(s.score) ||
+      s.score < 0 ||
+      s.score > 100
     )
+      continue;
+    const old = latestByMission[s.missionId];
+    if (!old || (s.completedAt || "") >= (old.completedAt || ""))
       latestByMission[s.missionId] = s;
     if (
       !bestByMission[s.missionId] ||
@@ -18,41 +21,48 @@ export function summarizeProgress({ sessions = [] }) {
     )
       bestByMission[s.missionId] = s;
   }
-  const core = MISSIONS.filter((m) => !m.enrichment),
-    done = core.filter((m) => latestByMission[m.id]);
-  const mean = (x) =>
-    x.length ? Math.round(x.reduce((a, b) => a + b, 0) / x.length) : null;
+  const done = CORE_MISSIONS.filter((m) => bestByMission[m.id]);
+  const mean = (rows) =>
+    rows.length ? rows.reduce((n, s) => n + s.score, 0) / rows.length : null;
+  const rawScore =
+    done.length === CORE_MISSIONS.length
+      ? mean(done.map((m) => bestByMission[m.id]))
+      : null;
   const totals = { activeMs: 0, attempts: 0, errors: 0, resets: 0, hints: 0 };
-  for (const s of sessions) for (const k in totals) totals[k] += s[k] || 0;
+  for (const s of sessions.filter((s) => valid.has(s.missionId)))
+    for (const k in totals) totals[k] += s[k] || 0;
   return {
     latestByMission,
     bestByMission,
     completed: done.length,
-    score:
-      done.length === 16
-        ? mean(done.map((m) => latestByMission[m.id].score))
-        : null,
-    accuracy: mean(done.map((m) => latestByMission[m.id].components.K)),
-    enrichmentCompleted: MISSIONS.filter(
-      (m) => m.enrichment && latestByMission[m.id],
+    coreCount: CORE_MISSIONS.length,
+    rawScore,
+    score: rawScore === null ? null : Math.round(rawScore * 100) / 100,
+    accuracy: mean(done.map((m) => bestByMission[m.id])),
+    bossUnlocked: rawScore !== null && rawScore > 95,
+    pendingReview: sessions.filter(
+      (s) => valid.has(s.missionId) && s.status === "pending_review",
     ).length,
-    competencies: Array.from({ length: 9 }, (_, i) => {
-      const ms = MISSIONS.filter((m) => m.island === i + 1);
-      const rows = ms.map((m) => latestByMission[m.id]).filter(Boolean);
+    enrichmentCompleted: MISSIONS.filter(
+      (m) => m.enrichment && bestByMission[m.id],
+    ).length,
+    legacyCount: sessions.filter((s) => !valid.has(s.missionId)).length,
+    competencies: ISLANDS.map((i) => {
+      const ms = CORE_MISSIONS.filter((m) => m.island === i.id),
+        rows = ms.map((m) => bestByMission[m.id]).filter(Boolean);
       return {
-        name: ms[0].competency,
-        complete: rows.length === 2,
-        score: rows.length === 2 ? mean(rows.map((s) => s.score)) : null,
+        name: i.name,
+        complete: rows.length === 3,
+        score: rows.length === 3 ? Math.round(mean(rows) * 100) / 100 : null,
       };
     }),
     totals,
   };
 }
 export function unlocked(m, summary) {
-  return (
-    m.island === 1 ||
-    Array.from({ length: (m.island - 1) * 2 }, (_, i) => MISSIONS[i]).every(
-      (x) => summary.latestByMission[x.id],
-    )
+  if (m.missionVersion !== 2) return false;
+  if (m.enrichment) return summary.bossUnlocked === true;
+  return CORE_MISSIONS.filter((x) => x.island < m.island).every(
+    (x) => summary.bestByMission[x.id],
   );
 }

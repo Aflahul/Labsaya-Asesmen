@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import { MISSIONS } from "../../src/shared/missions.js";
+import { MISSIONS } from "../../src/shared/legacy/missions.js";
 for (const m of MISSIONS)
   test(`${m.id} wrong then correct action sequence`, async () => {
     const { initialState, applyAction, evaluate } =

@@ -1,0 +1,213 @@
+{
+  "sourceFolder": "https://drive.google.com/drive/folders/16gTL9i8vJ7p6s1M6PqSaKPo_NJ8x95u6",
+  "assets": [
+    {
+      "source": "character-nara-celebrate.png",
+      "file": "character-nara-celebrate.webp",
+      "width": 1100,
+      "height": 1100,
+      "bytes": 110118,
+      "sourceSha256": "d2f52b2ce0b8ff3175006ab33dcb2a65a9b6a2f0e2569634b6fe08f3eeedc22e"
+    },
+    {
+      "source": "character-nara-idle.png",
+      "file": "character-nara-idle.webp",
+      "width": 1100,
+      "height": 1100,
+      "bytes": 92512,
+      "sourceSha256": "6ce13cb266c0fb0cb54ffa9d3a832113a35436b5fa5de97925b545549fa63fdd"
+    },
+    {
+      "source": "character-nara-thinking.png",
+      "file": "character-nara-thinking.webp",
+      "width": 1100,
+      "height": 1100,
+      "bytes": 96692,
+      "sourceSha256": "f76c0bcc8b28779e1d8b5a0e5c9fb93ffcf4cbfa7ca33427532ec9d43f6f1d8a"
+    },
+    {
+      "source": "ending-network-restored.png",
+      "file": "ending-network-restored.webp",
+      "width": 1672,
+      "height": 941,
+      "bytes": 283640,
+      "sourceSha256": "31e3d1f8d324511ae25c0e1f7eccc35b5cf8027c9f27881cd2ec4c51371a8fd9"
+    },
+    {
+      "source": "fx-energy-glow.png",
+      "file": "fx-energy-glow.webp",
+      "width": 1100,
+      "height": 1100,
+      "bytes": 268056,
+      "sourceSha256": "e9f19cd8ee48bbc7283ba9d0d2121e5290e2b12713efb77c072d07461c184c4a"
+    },
+    {
+      "source": "fx-portal-ring.png",
+      "file": "fx-portal-ring.webp",
+      "width": 1100,
+      "height": 1100,
+      "bytes": 208020,
+      "sourceSha256": "1c5aa5a4eeb73bfe8ebd31b2ace2bdd5091d45b971789439bd1f6fb7d008c3f2"
+    },
+    {
+      "source": "fx-success-spark.png",
+      "file": "fx-success-spark.webp",
+      "width": 1100,
+      "height": 1100,
+      "bytes": 71538,
+      "sourceSha256": "ac7d51e5f34ff00067492a4d19d3d3f562d94c0754cfb06babbfbb15768244e8"
+    },
+    {
+      "source": "island-bengkel-logika.png",
+      "file": "island-bengkel-logika.webp",
+      "width": 1100,
+      "height": 733,
+      "bytes": 205034,
+      "sourceSha256": "3875f1b982ede4ce8cdb6d73cf4bb3f739486359bd3ad620433bc3fcd1874719"
+    },
+    {
+      "source": "island-gerbang-alur.png",
+      "file": "island-gerbang-alur.webp",
+      "width": 1100,
+      "height": 733,
+      "bytes": 119484,
+      "sourceSha256": "3379170ea5d2f75b256882b7673ae5f14673abb9061ea149a4c06634167273d7"
+    },
+    {
+      "source": "island-menara-program.png",
+      "file": "island-menara-program.webp",
+      "width": 1100,
+      "height": 733,
+      "bytes": 145878,
+      "sourceSha256": "ef6aa26809ca81687bbb521c6c8cdb9e3997a3d920575b02ce0667c3f12440a1"
+    },
+    {
+      "source": "island-pelabuhan-data.png",
+      "file": "island-pelabuhan-data.webp",
+      "width": 1100,
+      "height": 733,
+      "bytes": 125498,
+      "sourceSha256": "7f9336f09718fc8c956415ba7002622a922f54d75e7d204714f59371796b323e"
+    },
+    {
+      "source": "island-pusat-mesin.png",
+      "file": "island-pusat-mesin.webp",
+      "width": 1100,
+      "height": 733,
+      "bytes": 195676,
+      "sourceSha256": "af6e43b71b0848c04f7297e782f4554ee6f30c1631d7a76f6e291bb172f9c2fc"
+    },
+    {
+      "source": "prop-airship.png",
+      "file": "prop-airship.webp",
+      "width": 1100,
+      "height": 1100,
+      "bytes": 145546,
+      "sourceSha256": "a5e1f1e43fdaf714605ce69cad2409644bfb6e58a27f70d2bdd9b92e57464d06"
+    },
+    {
+      "source": "prop-beacon.png",
+      "file": "prop-beacon.webp",
+      "width": 1100,
+      "height": 1100,
+      "bytes": 97130,
+      "sourceSha256": "0ef4d1b746aa886bdcf2e4ff05cb0a09081275ec95041d4efeb6b235eaf2fca4"
+    },
+    {
+      "source": "prop-cargo-crate.png",
+      "file": "prop-cargo-crate.webp",
+      "width": 597,
+      "height": 606,
+      "bytes": 52464,
+      "sourceSha256": "cea4255dee77f98adb5cecb2bfccd8713607560db8ac568e930078be41ff1959"
+    },
+    {
+      "source": "prop-drone.png",
+      "file": "prop-drone.webp",
+      "width": 1100,
+      "height": 1100,
+      "bytes": 177880,
+      "sourceSha256": "6966f369d72f9d67589210770cf6ba09bfb5dc2a2f344eea78eab2e921edb395"
+    },
+    {
+      "source": "scene-bengkel-logika.png",
+      "file": "scene-bengkel-logika.webp",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 491696,
+      "sourceSha256": "752a5288ca261907297f812f09ea06a4e9e36bdeb983dd5f091696f85331d338"
+    },
+    {
+      "source": "scene-gerbang-alur.png",
+      "file": "scene-gerbang-alur.webp",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 403302,
+      "sourceSha256": "295f9ccef5a771da612914bd0e4174df67d1274204b71de051bdff84e50d6a49"
+    },
+    {
+      "source": "scene-menara-program.png",
+      "file": "scene-menara-program.webp",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 350480,
+      "sourceSha256": "abae629ce23993becf77496b99006e2ef4498d090a928497d0fa4bff89f53aa6"
+    },
+    {
+      "source": "scene-pelabuhan-data.png",
+      "file": "scene-pelabuhan-data.webp",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 320236,
+      "sourceSha256": "29ef606227c0773688894da6d80f6f122b35256f43004904f49b329bb7a00b43"
+    },
+    {
+      "source": "scene-pusat-mesin.png",
+      "file": "scene-pusat-mesin.webp",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 327890,
+      "sourceSha256": "95a7e0407dd56229003191b49dbc7fa617d9755a1f0364d4f6bf0ba0d298d1ae"
+    },
+    {
+      "source": "scene-ruang-arsitek.png",
+      "file": "scene-ruang-arsitek.webp",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 291740,
+      "sourceSha256": "d8883baf5a7ad94261dc228851007bf69560e412cf906f0f9207f0bcd975ec5c"
+    },
+    {
+      "source": "world-cloud-far.png",
+      "file": "world-cloud-far.webp",
+      "width": 1100,
+      "height": 367,
+      "bytes": 76428,
+      "sourceSha256": "62f51ba64f2c3458364c0b8a643f27bc7fe73d7c70f9deac73db291510c819de"
+    },
+    {
+      "source": "world-cloud-near.png",
+      "file": "world-cloud-near.webp",
+      "width": 1100,
+      "height": 367,
+      "bytes": 48870,
+      "sourceSha256": "61bef94476fb5b3900fb88cdac237fdfa4aee3e3ac38f056d2c91bfaf814620f"
+    },
+    {
+      "source": "world-fog.png",
+      "file": "world-fog.webp",
+      "width": 1100,
+      "height": 1100,
+      "bytes": 208950,
+      "sourceSha256": "220a5e6a6d67c82f1bb397ae0ce494fa609688758afaf8f530b8e41c058dccfc"
+    },
+    {
+      "source": "world-sky.png",
+      "file": "world-sky.webp",
+      "width": 1672,
+      "height": 941,
+      "bytes": 76916,
+      "sourceSha256": "a437180aa9f8067eda9d6f075e942977f70dc30039be4dd3364dedffc9cca520"
+    }
+  ]
+}

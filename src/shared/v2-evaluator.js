@@ -1,0 +1,174 @@
+import { runPython } from "./python.js";
+export function initialV2(m) {
+  return {
+    answers: { ...(m.code ? { code: m.code } : {}) },
+    tested: false,
+    trace: null,
+  };
+}
+export function actionV2(m, state, a) {
+  if (
+    a.op !== "answer" ||
+    typeof a.key !== "string" ||
+    typeof a.value !== "string"
+  )
+    return { state, errors: ["Tindakan tidak sesuai misi"] };
+  const f = m.rules.fields.find((f) => f.key === a.key),
+    written = m.written?.some(([k]) => k === a.key),
+    code = a.key === "code" && m.code;
+  if (
+    (!f && !written && !code) ||
+    a.value.length > (code ? 6000 : written ? 5000 : 300) ||
+    (f?.options && !f.options.includes(a.value))
+  )
+    return { state, errors: ["Pilihan tidak sesuai misi"] };
+  return {
+    state: {
+      ...state,
+      answers: { ...state.answers, [a.key]: a.value },
+      tested: false,
+      trace: null,
+    },
+    errors: [],
+  };
+}
+export function evaluateV2(m, state) {
+  const a = state.answers || {};
+  if (m.written) {
+    const ready = m.written.every(
+      ([k]) => typeof a[k] === "string" && a[k].trim().length > 0,
+    );
+    return {
+      ready,
+      pending: true,
+      accuracy: null,
+      feedback: ready
+        ? "Karya tersimpan. Menunggu penilaian guru dengan rubrik."
+        : "Lengkapi setiap bagian karya sebelum mengirim.",
+    };
+  }
+  const fields = m.rules.fields;
+  const ready =
+    fields.every((f) => a[f.key] !== undefined) &&
+    (!m.code || !!a.code?.trim());
+  let total = fields.reduce((sum, f) => sum + f.weight, 0),
+    correct = fields.reduce(
+      (sum, f) => sum + (a[f.key] === m.rules.answers[f.key] ? f.weight : 0),
+      0,
+    ),
+    runs = [];
+  if (m.kind === "python") {
+    const samples = [
+      [70, 80, 90, 60, 100],
+      [50, 70, 60, 80, 90],
+      [20, 40, 60, 80, 100],
+    ];
+    runs = samples.map((nilai) => ({
+      input: nilai,
+      expected: nilai.reduce((a, b) => a + b) / nilai.length,
+      ...runPython(a.code || "", { nilai }),
+    }));
+    total = 100;
+    correct = runs.reduce(
+      (sum, r) =>
+        sum +
+        (r.ok && r.outputs.length === 1 && r.outputs[0] === r.expected
+          ? 100 / 3
+          : 0),
+      0,
+    );
+  } else if (m.kind === "python-debug") {
+    const inputs = [
+      ["Pangan", "Kayu", "Batu"],
+      ["Beras", "Kayu", "Batu"],
+    ];
+    runs = inputs.map((kargo) => ({
+      input: kargo,
+      expected: [kargo[0], "Air", "Obat"],
+      ...runPython(a.code || "", { kargo }),
+    }));
+    total += 40;
+    correct += runs.reduce(
+      (sum, r) =>
+        sum +
+        (r.ok && JSON.stringify(r.outputs.at(-1)) === JSON.stringify(r.expected)
+          ? 20
+          : 0),
+      0,
+    );
+  }
+  const accuracy = total ? Math.round((100 * correct) / total) : 0;
+  return {
+    ready,
+    accuracy,
+    runs,
+    feedback: !ready
+      ? "Lengkapi bagian yang belum diisi."
+      : accuracy === 100
+        ? "Semua hasil sesuai syarat. Jalur siap dipulihkan."
+        : `${accuracy}% bukti sesuai syarat. Bandingkan keputusanmu dengan data dan kondisi batas.`,
+  };
+}
+export function reduceV2(old, e, m) {
+  if (old.events.some((x) => x.id === e.id) || old.status !== "active")
+    return old;
+  const s = structuredClone(old);
+  s.events.push(e);
+  s.activeMs = Math.max(s.activeMs, e.activeMs);
+  s.feedback = "";
+  if (e.type === "action") {
+    const r = actionV2(m, s.state, e.payload);
+    s.state = r.state;
+    if (r.errors.length) {
+      s.errors++;
+      s.feedback = r.errors.join(" ");
+    }
+  }
+  if (e.type === "hint") s.hints++;
+  if (e.type === "reset") {
+    s.resets++;
+    s.state = initialV2(m);
+  }
+  if (["run", "submit"].includes(e.type)) {
+    const r = evaluateV2(m, s.state);
+    s.attempts++;
+    s.feedback = r.feedback;
+    s.state.trace = r.runs || null;
+    s.state.tested = true;
+    if (e.type === "submit" && r.ready) {
+      s.firstAccuracy = r.accuracy;
+      s.status = r.pending ? "pending_review" : "complete";
+      s.submittedAt = new Date().toISOString();
+      s.completedAt = r.pending ? null : s.submittedAt;
+      s.score = r.accuracy;
+      s.components = r.pending ? null : { K: r.accuracy };
+    }
+  }
+  return s;
+}
+export function gradeReview(session, m, marks, comment, teacherId) {
+  if (!m.written || session.status !== "pending_review")
+    throw Error("Karya tidak menunggu penilaian");
+  if (typeof comment !== "string" || !comment.trim() || comment.length > 3000)
+    throw Error("Tuliskan umpan balik guru");
+  if (!marks || Object.keys(marks).length !== m.rubric.length)
+    throw Error("Rubrik belum lengkap");
+  for (const [key, , max] of m.rubric)
+    if (!Number.isFinite(marks[key]) || marks[key] < 0 || marks[key] > max)
+      throw Error("Skor rubrik di luar rentang");
+  const score = m.rubric.reduce((n, [key]) => n + marks[key], 0);
+  return {
+    ...session,
+    status: "complete",
+    score,
+    components: { K: score },
+    completedAt: new Date().toISOString(),
+    review: {
+      teacherId,
+      marks,
+      comment: comment.trim(),
+      at: new Date().toISOString(),
+    },
+    feedback: "Karya sudah dinilai guru. " + comment.trim(),
+  };
+}

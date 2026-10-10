@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import { MISSIONS } from "../../src/shared/missions.js";
+import { MISSIONS } from "../../src/shared/legacy/missions.js";
 test("weighted score and time boundaries", async () => {
   const { scoreSession, weightedScore } =
     await import("../../src/shared/assessment.js");
@@ -43,7 +43,7 @@ test("first accuracy and history preserved across reset", async () => {
   expect(s.resets).toBe(1);
 });
 test("final score requires all 16 core missions", async () => {
-  const { summarizeProgress } = await import("../../src/shared/progress.js");
+  const { summarizeProgress } = await import("../../src/shared/legacy/progress.js");
   const sessions = MISSIONS.slice(0, 15).map((m) => ({
     missionId: m.id,
     status: "complete",
@@ -62,7 +62,7 @@ test("final score requires all 16 core missions", async () => {
 test("first step accuracy cannot exceed 100 and best session remains independent", async () => {
   const { newSession, reduceSession } =
     await import("../../src/shared/assessment.js");
-  const { summarizeProgress } = await import("../../src/shared/progress.js");
+  const { summarizeProgress } = await import("../../src/shared/legacy/progress.js");
   const m = MISSIONS[7];
   let s = newSession(m, "p");
   s.correctSteps = 100;

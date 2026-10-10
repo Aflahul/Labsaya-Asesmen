@@ -1,61 +1,38 @@
 import { test, expect } from "@playwright/test";
-test("register and start expedition with skip travel", async ({ page }) => {
-  await page.goto("/");
-  await page
-    .getByRole("button", { name: "Mulai Petualangan", exact: true })
-    .click();
-  await page.getByLabel("Nama asli").fill("Murid Uji");
-  await page.getByLabel("Nama samaran").fill("Bintang" + Date.now());
-  await page.getByLabel("Kelas / rombel").fill("X RPL");
-  await page.getByLabel("Nomor absen").fill("1");
-  await page.getByRole("button", { name: "Buat akun & mulai" }).click();
-  await page.getByRole("button", { name: "Lewati perjalanan" }).click();
-  await expect(
-    page.getByRole("heading", { name: "Bongkar Misi Pameran", exact: true }),
-  ).toBeVisible();
-  await page
-    .getByRole("button", { name: "Periksa jawaban", exact: true })
-    .click();
-  await expect(page.getByRole("status")).toContainText("belum");
-});
-test("cancelled logout resumes active timer and corrupt cache is retained", async ({
+import { register, enterMission } from "./helpers.js";
+import { MISSIONS } from "../../src/shared/missions.js";
+test("incomplete answer stays active, keyboard choices and drafts survive navigation", async ({
   page,
 }) => {
-  await page.goto("/");
-  await page
-    .getByRole("button", { name: "Mulai Petualangan", exact: true })
-    .click();
-  await page.getByLabel("Nama asli").fill("Integritas Uji");
-  await page.getByLabel("Nama samaran").fill("Integritas" + Date.now());
-  await page.getByLabel("Kelas / rombel").fill("X");
-  await page.getByLabel("Nomor absen").fill("1");
-  await page.getByRole("button", { name: "Buat akun & mulai" }).click();
-  await page.getByRole("button", { name: "Lewati perjalanan" }).click();
-  await page
-    .getByRole("button", { name: "Siapkan karya", exact: false })
-    .click();
-  await page
-    .getByRole("button", { name: "Matikan suara", exact: true })
-    .click();
+  await register(page);
+  await enterMission(page, MISSIONS[0]);
+  await page.locator("#submit").click();
+  await expect(page.locator(".feedback")).toContainText("Lengkapi");
+  await page.locator("[data-answer=phone]").selectOption("String");
+  await page.getByRole("button", { name: "Peta dunia", exact: true }).click();
+  await page.locator('[data-mission="v2p01m01"]').click();
+  await enterMission(page, MISSIONS[0]);
+  await expect(page.locator("[data-answer=phone]")).toHaveValue("String");
+});
+test("cancelled logout resumes active timer and corrupt cache stays recoverable", async ({
+  page,
+  context,
+}) => {
+  await register(page, "Integritas Uji");
+  await enterMission(page, MISSIONS[0]);
+  await context.setOffline(true);
+  await page.locator("[data-answer=phone]").selectOption("String");
   page.once("dialog", (d) => d.dismiss());
   await page.getByRole("button", { name: "Keluar", exact: true }).click();
-  const before = await page.evaluate(() => {
-    const a = JSON.parse(localStorage.getItem("pulau:last-account"));
-    return JSON.parse(localStorage.getItem(`pulau:progress:v1:${a.user.id}`))
-      .sessions[0].activeMs;
-  });
-  await expect
-    .poll(
-      () =>
-        page.evaluate(() => {
-          const a = JSON.parse(localStorage.getItem("pulau:last-account"));
-          return JSON.parse(
-            localStorage.getItem(`pulau:progress:v1:${a.user.id}`),
-          ).sessions[0].activeMs;
-        }),
-      { timeout: 10000 },
-    )
-    .toBeGreaterThan(before + 1000);
+  const time = () =>
+    page.evaluate(() => {
+      const a = JSON.parse(localStorage.getItem("pulau:last-account"));
+      return JSON.parse(localStorage.getItem(`pulau:progress:v1:${a.user.id}`))
+        .sessions[0].activeMs;
+    });
+  const before = await time();
+  await expect.poll(time, { timeout: 10000 }).toBeGreaterThan(before + 1000);
+  await context.setOffline(false);
   await page.locator(".brand").click();
   await expect(page.locator("[data-sync]").first()).toContainText(
     "Tersinkron",

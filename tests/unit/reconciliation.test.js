@@ -47,7 +47,7 @@ test("divergent pending evidence remains archived and warning visible", async ()
 test("latest score independent of shuffled session array", () => {
   const a = {
       id: "a",
-      missionId: "p01m01",
+      missionId: "v2p01m01",
       status: "complete",
       score: 100,
       components: { K: 100 },
@@ -55,6 +55,6 @@ test("latest score independent of shuffled session array", () => {
     },
     b = { ...a, id: "b", score: 94, completedAt: "2026-10-09T02:00:00Z" };
   expect(
-    summarizeProgress({ sessions: [b, a] }).latestByMission.p01m01.id,
+    summarizeProgress({ sessions: [b, a] }).latestByMission.v2p01m01.id,
   ).toBe("b");
 });

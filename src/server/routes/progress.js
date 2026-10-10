@@ -1,3 +1,7 @@
+import {
+  summarizeProgress as legacySummary,
+  unlocked as legacyUnlocked,
+} from "../../shared/legacy/progress.js";
 import { getMission } from "../../shared/missions.js";
 import { newSession, reduceSession } from "../../shared/assessment.js";
 import { summarizeProgress, unlocked } from "../../shared/progress.js";
@@ -35,7 +39,12 @@ export async function progressRoutes(app) {
         fail(403, "Sesi bukan milik Anda");
       return { data: existing.rows[0].document };
     }
-    if (!unlocked(m, summarizeProgress(await loadProgress(app.db, a.user_id))))
+    const progress = await loadProgress(app.db, a.user_id);
+    if (
+      !(m.missionVersion === 1
+        ? legacyUnlocked(m, legacySummary(progress))
+        : unlocked(m, summarizeProgress(progress)))
+    )
       fail(403, "Pulau masih terkunci");
     const config = (
       await app.db.query("SELECT value FROM settings WHERE name='scoring'")
@@ -81,7 +90,7 @@ export async function progressRoutes(app) {
             fail(409, "Isi event duplikat berbeda");
           continue;
         }
-        if (s.status === "complete") fail(409, "Sesi sudah selesai");
+        if (s.status !== "active") fail(409, "Sesi sudah dikirim atau selesai");
         if (
           e.seq !== s.events.length + 1 ||
           e.activeMs < s.activeMs ||
