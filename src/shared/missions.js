@@ -1,3 +1,4 @@
+import { GUIDANCE } from "./mission-guidance.js";
 import { MISSIONS as LEGACY } from "./legacy/missions.js";
 export const ISLANDS = [
   {
@@ -70,6 +71,7 @@ const make = (
     indicators: [`V2.${island}.${n}`],
     narrative: `Pulihkan layanan ${i.name}. Setiap solusi yang kamu bangun membantu menyambungkan jaringan Menara Awan.`,
     instructions,
+    guidance: GUIDANCE[`v2p0${island}m0${n}`],
     elements: fields.length,
     canonicalSteps: fields.length,
     hints: [
@@ -91,29 +93,29 @@ export const MISSIONS = [
     "Daftarkan Kargo",
     "C3",
     "form",
-    "Isi konfigurasi pengiriman: nomor telepon harus tetap memiliki nol di depan, berat boleh desimal, dan status siap hanya benar/salah.",
+    "Nomor telepon harus tetap memiliki angka 0 di depan. Jumlah paket dipakai untuk menghitung banyak barang. Berat boleh berupa angka desimal. Status siap hanya memiliki dua keadaan: benar atau salah.",
     [
       field(
         "phone",
-        'Tipe data telepon "08123"',
+        'Jenis data untuk nomor telepon "08123"',
         ["String", "Integer", "Float", "Boolean"],
         "String",
       ),
       field(
         "count",
-        "jumlah_paket untuk tiga paket",
+        "Nilai jumlah_paket jika ada tiga paket",
         ["3", '"3"', "3.5", "True"],
         "3",
       ),
       field(
         "weight",
-        "Tipe data berat = 2.75",
+        "Jenis data untuk berat 2.75 kg",
         ["String", "Integer", "Float", "Boolean"],
         "Float",
       ),
       field(
         "ready",
-        "siap untuk pengiriman yang telah disetujui",
+        "Nilai siap jika pengiriman sudah disetujui",
         ["True", '"siap"', "0", "2.75"],
         "True",
       ),
@@ -125,7 +127,7 @@ export const MISSIONS = [
     "Atur Rak",
     "C3",
     "list",
-    'Rak awal ["Pangan", "Kayu", "Batu"]. Ganti Kayu menjadi Air, hapus Batu, lalu tambahkan Obat. Pilih operasi Python dan hasilnya.',
+    'Rak awal ["Pangan", "Kayu", "Batu"]. Ganti Kayu menjadi Air, hapus Batu, lalu tambahkan Obat. Pilih perintah Python. Rak hasilnya akan terlihat di pratinjau.',
     [
       field("index", "Indeks Kayu", ["0", "1", "2"], "1"),
       field(
@@ -155,7 +157,7 @@ export const MISSIONS = [
     "Siapkan Keberangkatan",
     "C3",
     "form",
-    "Kapal berkapasitas 10 kg dan energi 20 unit. Berangkat jika berat ≤ 10, energi ≥ 12, dan siap = True. Terapkan semua syarat pada setiap manifest.",
+    "Kapal boleh membawa paling banyak 10 kg. Energi tiap perjalanan tercantum pada data A–D. Berangkat jika berat ≤ 10, energi ≥ 12, dan siap = True. Periksa semua syarat pada setiap perjalanan.",
     [
       field(
         "a",
@@ -189,7 +191,7 @@ export const MISSIONS = [
     "Bangun Jalur",
     "C3",
     "flow",
-    "Pintu menerima pesanan jika stok ≥ pesanan. Rakit diagram dari input hingga output. Pilih langkah serta simbol; panah menunjukkan arah eksekusi.",
+    "Gerbang menerima pesanan jika stok cukup, termasuk saat stok sama dengan pesanan. Jika stok kurang, pesanan ditunda. Panah menunjukkan urutan langkah.",
     [
       field(
         "first",
@@ -247,7 +249,7 @@ export const MISSIONS = [
     "Perbaiki Batas",
     "C4",
     "boundary",
-    "Gerbang memakai stok > pesanan dan menolak stok 3 untuk pesanan 3. Temukan sebab, perbaiki operator, dan lengkapi bukti pengujian.",
+    "Gerbang saat ini memakai stok > pesanan. Akibatnya, stok 3 untuk pesanan 3 ditolak. Padahal, stok yang tepat cukup seharusnya diterima.",
     [
       field(
         "cause",
@@ -260,7 +262,13 @@ export const MISSIONS = [
         "Nilai sama tidak diterima oleh >",
         30,
       ),
-      field("operator", "Operator perbaikan", [">", ">=", "<", "=="], ">=", 40),
+      field(
+        "operator",
+        "Tanda pembanding untuk memperbaiki gerbang",
+        [">", ">=", "<", "=="],
+        ">=",
+        40,
+      ),
       field("a", "Hasil stok 2, pesanan 3", ["Terima", "Tunda"], "Tunda", 10),
       field("b", "Hasil stok 3, pesanan 3", ["Terima", "Tunda"], "Terima", 10),
       field("c", "Hasil stok 4, pesanan 3", ["Terima", "Tunda"], "Terima", 10),
@@ -297,21 +305,21 @@ export const MISSIONS = [
     "Atur Pengiriman",
     "C3",
     "pseudocode",
-    "Aturan: jika jarak ≤ 5, biaya = 4000; selain itu biaya = 7000. Terapkan pseudocode pada tiga pengiriman.",
+    "Biaya pengiriman Rp4.000 untuk jarak hingga 5 km (termasuk 5 km), dan Rp7.000 untuk jarak lebih dari 5 km. Terapkan pseudocode pada tiga pengiriman.",
     [
       field(
         "condition",
-        "Kondisi IF",
+        "Kondisi setelah IF (jika)",
         ["jarak < 5", "jarak ≤ 5", "jarak > 5"],
         "jarak ≤ 5",
       ),
-      field("a", "Biaya jarak 2", ["4000", "7000"], "4000"),
-      field("b", "Biaya jarak 5", ["4000", "7000"], "4000"),
-      field("c", "Biaya jarak 8", ["4000", "7000"], "7000"),
+      field("a", "Biaya untuk 2 km (rupiah)", ["4000", "7000"], "4000"),
+      field("b", "Biaya untuk 5 km (rupiah)", ["4000", "7000"], "4000"),
+      field("c", "Biaya untuk 8 km (rupiah)", ["4000", "7000"], "7000"),
     ],
     {
       snippet:
-        "INPUT jarak\nIF jarak ≤ 5 THEN biaya ← 4000\nELSE biaya ← 7000\nOUTPUT biaya",
+        "INPUT jarak\nIF [pilih kondisi] THEN biaya ← 4000\nELSE biaya ← 7000\nOUTPUT biaya",
     },
   ),
   make(
@@ -320,11 +328,11 @@ export const MISSIONS = [
     "Lacak Gangguan",
     "C4",
     "debug",
-    "Target energi = paket × 2. Program membaca paket, menampilkan energi, baru menghitung energi. Paket 3 menghasilkan nilai belum tersedia. Analisis urutan dan buktikan perbaikannya.",
+    "Kebutuhan energi adalah jumlah paket × 2. Pada kode di bawah, ketika jumlah paket 3, program mencoba menampilkan energi yang belum memiliki nilai.",
     [
       field(
         "cause",
-        "Akar gangguan",
+        "Penyebab gangguan",
         [
           "Output terjadi sebelum assignment energi",
           "Angka 3 tidak boleh menjadi input",
@@ -401,7 +409,7 @@ export const MISSIONS = [
     "Jalankan Perhitungan",
     "C3",
     "memory",
-    "RAM: alamat 10 berisi 12, alamat 11 berisi 8. LOAD [10] membaca isi alamat 10; ADD [11] menambahkan isi alamat 11; STORE [12] menyimpan hasil. Lengkapi tracing.",
+    "RAM: alamat 10 berisi 12, alamat 11 berisi 8. LOAD [10] membaca isi alamat 10; ADD [11] menambahkan isi alamat 11; STORE [12] menyimpan hasil. Tentukan nilai setelah setiap instruksi dijalankan.",
     [
       field("load", "Akumulator setelah LOAD [10]", ["10", "12", "0"], "12"),
       field("add", "Akumulator setelah ADD [11]", ["21", "19", "20"], "20"),
@@ -456,7 +464,7 @@ export const MISSIONS = [
     "Pulihkan Pengolah Nilai",
     "C3",
     "python",
-    "Lengkapi program rata-rata lima murid. Gunakan list nilai, sum(nilai), len(nilai), operator /, dan print. Uji sebelum mengirim.",
+    "Program awal membaca daftar nilai lima murid, tetapi perhitungan rata-ratanya salah. Hasil yang diminta adalah satu angka rata-rata dari daftar tersebut.",
     [],
     {
       code: "nilai = [70, 80, 90, 60, 100]\ntotal = sum(nilai)\nrata = total / 4\nprint(rata)",
@@ -471,7 +479,7 @@ export const MISSIONS = [
     "Perbaiki Daftar",
     "C4",
     "python-debug",
-    'Target akhir ["Pangan", "Air", "Obat"]. Kode menghapus indeks 1 setelah Kayu diganti Air. Analisis bug, perbaiki kode, dan prediksi hasil pengujian.',
+    'Untuk daftar awal pada kode, hasil yang diminta adalah ["Pangan", "Air", "Obat"]. Saat ini Air justru hilang setelah program dijalankan.',
     [
       field(
         "cause",
@@ -534,7 +542,7 @@ export const MISSIONS = [
     "Ruang Arsitek",
     "C6",
     "boss",
-    "Rancang sistem distribusi bantuan. Terima stok dan jumlah permintaan; kirim bila keduanya tidak negatif dan stok cukup. Tampilkan keputusan serta sisa stok. Tentukan data, buat algoritma sendiri, dan rancang kasus normal, batas, serta input tidak valid.",
+    "Rancang sistem distribusi bantuan. Terima stok dan jumlah permintaan; kirim bila keduanya tidak negatif dan stok cukup. Tampilkan keputusan serta sisa stok. Jika stok kurang, tunda pengiriman dan biarkan stok tetap. Jika masukan negatif, tampilkan pesan tidak valid dan jangan lakukan pengiriman; jelaskan bahwa sisa stok belum dihitung. Tentukan data, buat algoritma sendiri, dan rancang kasus normal, batas, serta input tidak valid.",
     [],
     {
       enrichment: true,

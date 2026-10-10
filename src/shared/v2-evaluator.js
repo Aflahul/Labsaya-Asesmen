@@ -44,7 +44,12 @@ export function evaluateV2(m, state) {
       accuracy: null,
       feedback: ready
         ? "Karya tersimpan. Menunggu penilaian guru dengan rubrik."
-        : "Lengkapi setiap bagian karya sebelum mengirim.",
+        : "Lengkapi bagian: " +
+          m.written
+            .filter(([k]) => !a[k]?.trim())
+            .map(([, label]) => label)
+            .join("; ") +
+          ".",
     };
   }
   const fields = m.rules.fields;
@@ -103,10 +108,15 @@ export function evaluateV2(m, state) {
     accuracy,
     runs,
     feedback: !ready
-      ? "Lengkapi bagian yang belum diisi."
+      ? "Lengkapi bagian: " +
+        [
+          ...fields.filter((f) => a[f.key] === undefined).map((f) => f.label),
+          ...(m.code && !a.code?.trim() ? ["Editor program"] : []),
+        ].join("; ") +
+        "."
       : accuracy === 100
         ? "Semua hasil sesuai syarat. Jalur siap dipulihkan."
-        : `${accuracy}% bukti sesuai syarat. Bandingkan keputusanmu dengan data dan kondisi batas.`,
+        : `${accuracy}% jawaban sesuai syarat. Periksa kembali pilihan atau hasil uji yang belum sesuai. Kamu boleh memperbaiki jawaban sebelum mengirim.`,
   };
 }
 export function reduceV2(old, e, m) {

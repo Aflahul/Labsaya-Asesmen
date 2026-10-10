@@ -42,6 +42,7 @@ let auth = null,
   reportProgress = null,
   reportIdentity = null,
   travelVersion = 0,
+  pendingMission = null,
   cacheWarning = "",
   displayedFingerprint = "";
 const $ = (s) => document.querySelector(s);
@@ -199,14 +200,14 @@ function shell(content) {
 function home() {
   world.reset();
   shell(
-    `<section class="home game-home"><div class="hero"><div class="eyebrow">EKSPEDISI MENARA AWAN · INFORMATIKA KELAS X</div><h1>Hidupkan kembali<br><em>Menara Awan.</em></h1><p>Lima pulau kehilangan koneksi. Bersama Nara, gunakan data, algoritma, dan program untuk menyambungkan dunia ini kembali.</p><div class="actions"><button class="primary" data-nav="${auth?.role === "participant" ? "map" : "register"}">${auth?.role === "participant" ? "Lanjutkan ekspedisi" : "Mulai ekspedisi"}</button>${!auth ? '<button data-nav="login">Sudah punya akun? Masuk</button>' : ""}</div><div class="hero-foot"><span>5 PULAU<br>SATU PERJALANAN</span><span>15 MISI INTI<br>1 BOS RAHASIA</span><span>COBA · PERIKSA<br>PELAJARI</span></div><p class="notice">Petunjuk dan waktu bermain tidak mengurangi nilai.</p></div><img class="hero-island" src="/game-assets/island-menara-program.webp" alt="Menara Program melayang di atas awan"><div class="nara-greeting"><img src="/game-assets/character-nara-idle.webp" alt="Nara, robot pemandu"><p>“Kita mulai dari satu koneksi kecil. Siap?”<small>NARA · PEMANDU EKSPEDISI</small></p></div></section>`,
+    `<section class="home game-home"><div class="hero"><div class="eyebrow">EKSPEDISI MENARA AWAN · INFORMATIKA KELAS X</div><h1>Hidupkan kembali<br><em>Menara Awan.</em></h1><p>Lima pulau kehilangan koneksi. Bersama Nara, gunakan data, algoritma, dan program untuk menyambungkan dunia ini kembali.</p><div class="actions"><button class="primary" data-nav="${auth?.role === "participant" ? "map" : "register"}">${auth?.role === "participant" ? "Lanjutkan ekspedisi" : "Buat akun dan mulai"}</button>${!auth ? '<button data-nav="login">Sudah punya akun? Masuk</button>' : ""}</div><div class="hero-foot"><span>5 PULAU<br>SATU PERJALANAN</span><span>15 MISI INTI<br>1 BOS RAHASIA</span><span>CARA BERMAIN<br>COBA · UJI · PERBAIKI</span></div><p class="notice">Buat akun sebelum misi pertama. Petunjuk dan waktu bermain tidak mengurangi nilai.</p></div><img class="hero-island" src="/game-assets/island-menara-program.webp" alt="Menara Program melayang di atas awan"><div class="nara-greeting"><img src="/game-assets/character-nara-idle.webp" alt="Nara, robot pemandu"><p>“Kita mulai dari satu koneksi kecil. Siap?”<small>NARA · PEMANDU EKSPEDISI</small></p></div></section>`,
   );
 }
 function authForm(kind) {
   const register = kind === "register",
     teacher = kind === "teacher-login";
   shell(
-    `<section class="panel auth-panel"><div class="eyebrow">${teacher ? "Ruang pendidik" : "Identitas penjelajah"}</div><h2 style="margin-top:12px">${register ? "Mulai ekspedisimu" : teacher ? "Masuk halaman guru" : "Selamat datang kembali"}</h2><p>${teacher ? "Lihat bukti belajar dan perkembangan peserta." : register ? "Gunakan nama asli untuk rapor dan nama samaran untuk leaderboard." : "Masuk dengan nama asli dan nama samaran yang sama saat mendaftar."}</p><form id="auth-form" data-kind="${kind}">${teacher ? '<label for="username">Username guru</label><input id="username" name="username" required autocomplete="username"><label for="password">Kata sandi</label><input id="password" name="password" type="password" required autocomplete="current-password">' : '<label for="realName">Nama asli</label><input id="realName" name="realName" maxlength="100" required autocomplete="name"><label for="alias">Nama samaran</label><input id="alias" name="alias" maxlength="100" required autocomplete="username">'}${register ? '<label for="className">Kelas / rombel</label><input id="className" name="className" maxlength="50" required placeholder="Contoh: X RPL 1"><label for="attendance">Nomor absen</label><input id="attendance" name="attendance" type="number" min="1" max="999" required>' : ""}<p id="error" role="alert" class="error"></p><div class="actions"><button class="primary" type="submit">${register ? "Buat akun & mulai" : "Masuk"}</button><button type="button" class="ghost" data-nav="home">Kembali</button></div></form><p class="notice">${teacher ? "Akun guru disediakan oleh pengelola aplikasi." : "Nama bukan rahasia. Jangan gunakan nama samaran yang sama dengan data akun sensitif. Siapa pun yang mengetahui kedua nama dapat masuk ke akun ini."}</p></section>`,
+    `<section class="panel auth-panel"><div class="eyebrow">${teacher ? "Ruang pendidik" : "Identitas penjelajah"}</div><h2 style="margin-top:12px">${register ? "Mulai ekspedisimu" : teacher ? "Masuk halaman guru" : "Selamat datang kembali"}</h2><p>${teacher ? "Lihat bukti belajar dan perkembangan peserta." : register ? "Gunakan nama asli untuk rapor dan nama samaran untuk leaderboard." : "Masuk dengan nama asli dan nama samaran yang sama saat mendaftar."}</p><form id="auth-form" data-kind="${kind}">${teacher ? '<label for="username">Username guru</label><input id="username" name="username" required autocomplete="username"><label for="password">Kata sandi</label><input id="password" name="password" type="password" required autocomplete="current-password">' : '<label for="realName">Nama asli</label><input id="realName" name="realName" maxlength="100" required autocomplete="name"><label for="alias">Nama samaran</label><input id="alias" name="alias" maxlength="100" required autocomplete="username">'}${register ? '<label for="className">Kelas / rombel</label><input id="className" name="className" maxlength="50" required placeholder="Contoh: X RPL 1"><label for="attendance">Nomor absen</label><input id="attendance" name="attendance" type="number" min="1" max="999" required aria-describedby="attendance-help"><p id="attendance-help" class="notice">Isi nomor absen dari sekolah, misalnya 1 untuk absen 01 (1–999).</p>' : ""}<p id="error" role="alert" class="error"></p>${!teacher ? '<p class="notice">Nama asli dan nama samaran dipakai untuk masuk. Siapa pun yang mengetahui keduanya dapat mengakses akun ini. Jangan gunakan kata sandi akun lain sebagai nama samaran.</p>' : ""}<div class="actions"><button class="primary" type="submit">${register ? "Buat akun & mulai" : "Masuk"}</button><button type="button" class="ghost" data-nav="home">Kembali</button></div></form><p class="notice">${teacher ? "Akun guru disediakan oleh pengelola aplikasi." : "Simpan nama yang kamu gunakan agar bisa melanjutkan di perangkat lain."}</p></section>`,
   );
 }
 async function activate(data) {
@@ -266,16 +267,40 @@ function map() {
   );
 }
 async function travel(m) {
+  if (!unlocked(m, summarizeProgress(progress))) return;
+  const previous =
+    route === "mission" && current() ? getMission(current().missionId) : null;
+  const kind = m.enrichment
+    ? "boss"
+    : previous
+      ? previous.island === m.island
+        ? "task"
+        : "island"
+      : "enter";
   pause();
   const version = ++travelVersion;
+  pendingMission = null;
   route = "travel";
-  audio.play("travel");
+  if (kind !== "task") audio.play("travel");
+  const heading =
+    kind === "task"
+      ? "Siap untuk tugas berikutnya?"
+      : kind === "island"
+        ? "Menuju " + m.islandName
+        : kind === "boss"
+          ? "Portal Ruang Arsitek terbuka"
+          : "Memasuki " + m.islandName;
   shell(
-    `<section class="travel"><div class="panel"><div class="eyebrow">${m.enrichment ? "Pengayaan" : "Memulihkan jalur energi"} · Pulau ${m.island}</div><h2>Pulau ${esc(m.islandName)}</h2><p>${esc(m.narrative)}</p><button id="skip" class="primary">Lewati perjalanan</button></div></section>`,
+    `<section class="travel arrival" data-transition="${kind}"><div class="panel arrival-card"><div class="eyebrow">${kind === "task" ? "Masih di " + esc(m.islandName) : kind === "island" ? "Perjalanan antarpulau" : kind === "boss" ? "Pengayaan opsional" : "Mendarat di pulau"}</div><h2 tabindex="-1" id="arrival-heading">${esc(heading)}</h2><div class="arrival-nara"><img src="/game-assets/character-nara-idle.webp" alt=""><div><strong>Nara · pemandumu</strong><p>${esc(m.guidance.goal)}</p></div></div><p>Tugas berikutnya: <strong>${esc(m.title)}</strong></p><p class="notice">Baca arahan ini dulu. Misi baru dimulai saat kamu siap.</p><div id="arrival-actions"><button id="skip">Lewati animasi</button></div><button class="ghost" data-nav="map">Kembali ke peta</button></div></section>`,
   );
-  await world.travelTo(m.island);
-  if (version !== travelVersion) return;
-  openMission(m);
+  $("#arrival-heading").focus({ preventScroll: true });
+  await world.travelTo(m.scene || m.slug, kind);
+  if (version !== travelVersion || route !== "travel") return;
+  pendingMission = m;
+  const skippedWithKeyboard = document.activeElement?.id === "skip";
+  $("#arrival-actions").innerHTML =
+    '<button id="begin-mission" class="primary">Mulai misi saat siap →</button>';
+  if (skippedWithKeyboard) $("#begin-mission").focus({ preventScroll: true });
 }
 function openMission(m, replay = false) {
   const summary = summarizeProgress(progress);
@@ -307,6 +332,8 @@ function openMission(m, replay = false) {
   if (!document.hidden && s.status === "active") timer.start();
   save();
   renderMission();
+  $("#mission-heading")?.focus({ preventScroll: true });
+  window.scrollTo({ top: 0, behavior: "instant" });
   scheduleSync();
 }
 function fingerprint(s) {
@@ -321,17 +348,22 @@ function fingerprint(s) {
   });
 }
 function renderMission() {
+  const focusedId = document.activeElement?.id;
   const s = current();
   if (!s) return;
   displayedFingerprint = fingerprint(s);
   const m = getMission(s.missionId),
     summary = summarizeProgress(progress),
     done = s.status === "complete",
-    pending = s.status === "pending_review";
+    pending = s.status === "pending_review",
+    guide = m.guidance,
+    perfect = done && s.score === 100;
   world.setScene(m.scene || m.slug);
   shell(
-    `<div class="topline"><button class="ghost small" data-nav="map">← Peta dunia</button><span class="eyebrow">${esc(m.islandName)} · ${m.enrichment ? "BOS OPSIONAL" : m.meeting + " · Misi " + Number(m.id.slice(-2)) + "/3"}</span></div><div class="mission-layout"><section class="panel mission-panel"><div class="mission-title"><div><div class="eyebrow">${esc(m.bloom)} · AKM ${esc(m.akm)} · ${m.enrichment ? "PENGAYAAN" : "MISI INTI"}</div><h2>${esc(m.title)}</h2></div><span class="badge">${done ? "✓ Dinilai" : pending ? "◷ Menunggu guru" : "Sedang dimainkan"}</span></div><div class="instruction"><strong>Tujuan misimu</strong><p>${esc(m.instructions)}</p></div><div class="activity" ${done || pending ? "inert" : ""}>${m.missionVersion === 2 ? v2ActivityHtml(m, draftState(s)) : activityHtml(m, s.state)}</div><div class="feedback" role="status" aria-live="polite">${esc(s.feedback || "Bangun solusimu. Uji dulu, lalu kirim saat siap.")}</div>${hint ? `<div class="hint">✧ ${esc(hint)}</div>` : ""}<div class="mission-controls">${done ? '<button class="primary" id="next">Lanjutkan →</button><button id="replay">Coba lagi</button>' : pending ? '<button class="primary" data-nav="map">Kembali ke peta</button><button id="refresh-progress">Periksa penilaian guru</button><button data-nav="report">Lihat status karya</button>' : `<button class="primary" id="submit">${m.written ? "Kirim karya ke guru" : "Kirim jawaban"}</button>${!m.written ? '<button id="run">Uji solusi</button>' : ""}<button id="hint">✧ Petunjuk</button><button class="ghost" id="reset">Mulai ulang tugas</button>`}</div><p class="notice">${m.enrichment ? "Pengayaan opsional. Hasilnya tidak memengaruhi nilai inti." : m.written ? "Nilai akan muncul setelah guru meninjau karya dengan rubrik." : "Kirim mengakhiri percobaan ini. Kamu dapat mencoba lagi; nilai terbaik tetap tersimpan."}</p></section><aside class="panel side-panel"><img class="nara-portrait" src="/game-assets/character-nara-${done ? "celebrate" : pending ? "idle" : "thinking"}.webp" alt="Nara"><h3>${done ? "Koneksi dipulihkan!" : pending ? "Karyamu sudah terkirim." : "Satu langkah lagi."}</h3><p>${pending ? "Guru akan membaca bukti dan alasanmu. Kamu boleh kembali ke peta." : "Perhatikan data dan syaratnya. Tidak perlu terburu-buru."}</p><div class="meter"><span style="width:${(summary.completed / 15) * 100}%"></span></div><div class="metric">Misi inti<strong>${summary.completed}/15</strong></div><div class="metric">Waktu aktif<strong id="timer">${seconds(s.activeMs)}</strong></div>${done ? `<div class="metric">Nilai percobaan<strong>${s.score}</strong></div>` : ""}<p class="notice">Waktu, petunjuk, dan banyaknya pengujian tidak mengurangi nilai.</p><span class="statusbar"><i class="dot"></i><span data-sync>${esc(syncStatus)}</span></span></aside></div>`,
+    `<div class="topline"><button class="ghost small" data-nav="map">← Peta dunia</button><span class="eyebrow">${esc(m.islandName)} · ${m.enrichment ? "BOS OPSIONAL" : m.meeting + " · Misi " + Number(m.id.slice(-2)) + "/3"}</span></div><div class="mission-layout"><section class="panel mission-panel"><div class="mission-title"><div><div class="eyebrow">${m.enrichment ? "TANTANGAN PILIHAN" : "MISI INTI"}</div><h2 id="mission-heading" tabindex="-1">${esc(m.title)}</h2></div><span class="badge">${done ? "✓ Dinilai" : pending ? "◷ Menunggu guru" : "Sedang dimainkan"}</span></div><section class="nara-guide" aria-label="Arahan Nara"><div class="nara-intro"><img src="/game-assets/character-nara-${perfect ? "celebrate" : "thinking"}.webp" alt=""><div><strong>Nara · pemandumu</strong><p>${esc(guide.goal)}</p></div></div><strong>Langkahmu</strong><ol>${guide.steps.map((step) => `<li>${esc(step)}</li>`).join("")}</ol><p class="nara-help">${esc(guide.help)}</p></section><div class="instruction"><strong>Data dan aturan tugas</strong><p>${esc(m.instructions)}</p></div><div class="activity" ${done || pending ? "inert" : ""}>${m.missionVersion === 2 ? v2ActivityHtml(m, draftState(s)) : activityHtml(m, s.state)}</div><div class="feedback" role="status" aria-live="polite">${esc((done && s.score < 100 ? "Jawaban sudah dinilai. Masih ada bagian yang dapat diperbaiki. Pilih Coba lagi jika ingin meningkatkan nilai; nilai terbaik tetap tersimpan." : s.feedback) || (m.written ? "Nara: Lengkapi semua bagian tulisan, baca rubrik, lalu kirim karya ke guru." : "Nara: Isi jawaban, tekan Uji solusi, lalu perbaiki jika perlu. Kirim jawaban saat kamu siap."))}</div>${hint ? `<div class="hint"><strong>Petunjuk Nara</strong><p>${esc(hint)}</p></div>` : ""}<div class="mission-controls">${done ? '<button class="primary" id="next">Lanjutkan →</button><button id="replay">Coba lagi</button>' : pending ? '<button class="primary" data-nav="map">Kembali ke peta</button><button id="refresh-progress">Periksa penilaian guru</button><button data-nav="report">Lihat status karya</button>' : `${!m.written ? '<button id="run">Uji solusi</button>' : ""}<button class="primary" id="submit">${m.written ? "Kirim karya ke guru" : "Kirim jawaban"}</button><button id="hint">✧ Tanya Nara</button><button class="ghost" id="reset">Mulai ulang tugas</button>`}</div><p class="notice">${m.enrichment ? "Pengayaan opsional. Hasilnya tidak memengaruhi nilai inti." : m.written ? "Nilai akan muncul setelah guru meninjau karya dengan rubrik." : "Uji solusi tidak mengakhiri percobaan. Kirim jawaban mengakhiri percobaan dan menyimpan nilai. Kamu boleh mencoba lagi; nilai terbaik tetap tersimpan."}</p></section><aside class="panel side-panel"><h3>${perfect ? "Semua hasil sesuai!" : done ? "Jawaban sudah dinilai" : pending ? "Karyamu sudah terkirim" : "Catatan perjalanan"}</h3><p>${pending ? "Guru akan membaca bukti dan alasanmu. Nilai inti baru lengkap setelah karya ini dinilai. Kamu boleh kembali ke peta." : "Perhatikan data dan syaratnya. Tidak perlu terburu-buru."}</p><div class="meter"><span style="width:${(summary.completed / 15) * 100}%"></span></div><div class="metric">Misi inti<strong>${summary.completed}/15</strong></div><details><summary>Detail penilaian</summary><p>${esc(m.bloom)} · AKM ${esc(m.akm)}</p></details><div class="metric">Waktu aktif<strong id="timer">${seconds(s.activeMs)}</strong></div>${done ? `<div class="metric">Nilai percobaan<strong>${s.score}</strong></div>` : ""}<p class="notice">Waktu, petunjuk, dan banyaknya pengujian tidak mengurangi nilai.</p><span class="statusbar"><i class="dot"></i><span data-sync>${esc(syncStatus)}</span></span></aside></div>`,
   );
+  if (focusedId)
+    document.getElementById(focusedId)?.focus({ preventScroll: true });
 }
 function table(rows) {
   if (!rows.length) return "<p>Belum ada data.</p>";
@@ -415,6 +447,7 @@ function settings() {
 function navigate(next) {
   pause();
   travelVersion++;
+  pendingMission = null;
   world.skip();
   world.reset();
   route = next;
@@ -545,6 +578,12 @@ app.addEventListener("click", async (e) => {
           audio.muted ? "Aktifkan suara" : "Matikan suara",
         );
         break;
+      case "begin-mission": {
+        const m = pendingMission;
+        pendingMission = null;
+        if (m && route === "travel") openMission(m);
+        break;
+      }
       case "skip":
         world.skip();
         break;
@@ -559,11 +598,18 @@ app.addEventListener("click", async (e) => {
         break;
       case "submit":
         emit("submit");
+        if (current()?.status === "active") {
+          const empty = [
+            ...app.querySelectorAll(".activity select, .activity textarea"),
+          ].find((el) => !el.value.trim());
+          empty?.focus();
+        }
         break;
       case "hint": {
         const s = current(),
           m = getMission(s.missionId);
-        hint = m.hints[Math.min(s.hints, m.hints.length - 1)];
+        hint =
+          m.guidance?.hint || m.hints[Math.min(s.hints, m.hints.length - 1)];
         emit("hint");
         break;
       }
