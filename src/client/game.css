@@ -891,3 +891,204 @@ details > summary {
   white-space: pre-wrap;
   color: #e3eeea;
 }
+
+/* Readable glass panels let the scene remain part of the mission. */
+body[data-route="mission"] .mission-panel {
+  background: rgba(9, 32, 45, 0.78);
+  backdrop-filter: blur(5px);
+}
+body[data-route="mission"] .side-panel {
+  background: rgba(9, 32, 45, 0.86);
+}
+.nara-guide {
+  margin-top: 22px;
+  padding: 20px;
+  border: 1px solid #a7c8be88;
+  border-radius: 16px;
+  background: #143746df;
+  font-size: 16px;
+  line-height: 1.7;
+}
+.nara-intro,
+.arrival-nara {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.nara-intro img {
+  width: 100px;
+  height: 115px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.nara-intro strong,
+.arrival-nara strong {
+  color: #f5d99e;
+}
+.nara-intro p {
+  margin: 8px 0;
+  color: #f1f7f2;
+}
+.nara-guide ol {
+  margin: 10px 0;
+  padding-left: 24px;
+}
+.nara-guide li {
+  padding: 4px 0;
+}
+.nara-help {
+  color: #dbece6;
+  padding-top: 12px;
+  border-top: 1px solid #a7c8be55;
+  margin-bottom: 0;
+}
+.instruction {
+  background: #163d49df;
+  font-size: 16px;
+  line-height: 1.7;
+}
+.activity select,
+.answer-grid label {
+  font-size: 16px;
+}
+.activity select {
+  background: #102b3a;
+  color: #f1f7f2;
+}
+.hero-foot,
+.footer,
+.map-guide,
+.island-label small {
+  font-size: 12px;
+}
+.hero-foot {
+  padding: 14px;
+  border-radius: 10px;
+  background: #0c3046d9;
+}
+.arrival {
+  min-height: 70vh;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding-top: 180px;
+}
+.arrival-card {
+  max-width: 620px;
+  background: #0c293beb;
+  text-align: left;
+}
+.arrival-card h2 {
+  font-size: clamp(25px, 4vw, 38px);
+  margin: 16px 0;
+}
+.arrival-nara img {
+  width: 90px;
+  height: 105px;
+  object-fit: contain;
+}
+.arrival-nara p {
+  line-height: 1.65;
+  margin: 8px 0;
+}
+#arrival-actions {
+  margin: 18px 0 10px;
+}
+.arrival-island {
+  display: none;
+  position: absolute;
+  width: min(60vw, 800px);
+  right: 3%;
+  top: 8%;
+}
+.travelling[data-transition="enter"] .arrival-island,
+.travelling[data-transition="island"] .arrival-island {
+  display: block;
+  z-index: 1;
+  animation: approach-island 3s ease-in-out both;
+}
+.travelling[data-transition="island"] .arrival-island {
+  animation-duration: 4.2s;
+}
+.travelling[data-transition="island"] .travel-ship {
+  animation-duration: 4.2s;
+}
+.travelling[data-transition="enter"] .travel-ship {
+  animation-duration: 3s;
+}
+.travelling[data-transition="task"] .travel-ship,
+.travelling[data-transition="boss"] .travel-ship {
+  display: none;
+}
+.travelling[data-transition="task"] .world-backdrop {
+  animation: step-within-island 0.9s ease-in-out both;
+}
+.travelling[data-transition="boss"] .world-backdrop {
+  animation: portal-arrival 2.2s ease-out both;
+}
+.shape-unselected:before {
+  background: #1c3e49;
+  border: 2px dashed #bcd5bc;
+}
+@keyframes approach-island {
+  from {
+    transform: translate(22%, -8%) scale(0.3);
+    opacity: 0.25;
+  }
+  70% {
+    opacity: 1;
+  }
+  to {
+    transform: translate(0, 2%) scale(1.15);
+    opacity: 1;
+  }
+}
+@keyframes step-within-island {
+  from {
+    transform: scale(1.035);
+    filter: brightness(0.7);
+  }
+  to {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+@keyframes portal-arrival {
+  from {
+    transform: scale(1.15);
+    filter: brightness(1.7);
+  }
+  to {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+@media (max-width: 540px) {
+  .nara-guide {
+    padding: 14px;
+  }
+  .nara-intro {
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .nara-intro img {
+    width: 65px;
+    height: 90px;
+  }
+  .arrival {
+    padding-top: 135px;
+  }
+  .arrival-island {
+    width: 90vw;
+    right: -5%;
+    top: 12%;
+  }
+  .arrival-nara img {
+    width: 65px;
+    height: 85px;
+  }
+  .hero-foot {
+    font-size: 12px;
+    gap: 12px;
+  }
+}

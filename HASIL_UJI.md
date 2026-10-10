@@ -28,3 +28,12 @@ Satu peninjau dengan konteks baru memeriksa seluruh perubahan. Dua temuan pentin
 ## Batas verifikasi
 
 Ini bukti lokal, belum smoke test deployment Vercel atau database Neon nyata. Belum diuji pada Safari/Firefox atau perangkat sekolah fisik; audio belum dinilai pendengar. Label Bloom/AKM adalah rancangan soal dan tetap memerlukan telaah pendidik. Panduan lama dan hasil uji sebelumnya disimpan di `docs/legacy/`.
+
+## Pembaruan keterbacaan dan transisi (10 Oktober 2026)
+
+- Regresi flowchart: diagram kosong tidak memberikan jawaban dan diagram perbaikan dimulai dengan operator bug `>`.
+- Kolom belum lengkap disebutkan dalam umpan balik; fokus select dipertahankan setelah memilih.
+- Nara memberikan tujuan, langkah, penjelasan cara menjawab, serta petunjuk khusus pada 15 misi inti dan bos.
+- Pengarahan menunggu tombol Mulai misi saat siap. Transisi masuk pulau, antarpulau, dan antarmisi berbeda; meninggalkan transisi membatalkan pembukaan misi.
+- Validasi: 64 tes unit/API; 9 tes browser production termasuk perjalanan lengkap, penilaian guru, nilai bos terpisah, offline, serta desktop/tablet/ponsel dan reduced motion.
+- Build production berhasil. Screenshot ponsel diperiksa untuk keterbacaan Nara serta transparansi panel. Uji langsung bersama murid belum dilakukan.

@@ -7,7 +7,7 @@ export async function register(
 ) {
   await page.goto("/");
   await page
-    .getByRole("button", { name: "Mulai ekspedisi", exact: true })
+    .getByRole("button", { name: "Buat akun dan mulai", exact: true })
     .click();
   await page.getByLabel("Nama asli").fill(name);
   await page.getByLabel("Nama samaran").fill(alias);
@@ -17,9 +17,10 @@ export async function register(
 }
 export async function enterMission(page, m) {
   await page
-    .getByRole("button", { name: "Lewati perjalanan" })
+    .getByRole("button", { name: "Lewati animasi" })
     .click({ timeout: 2000 })
     .catch(() => {});
+  await page.locator("#begin-mission").click();
   await expect(
     page.getByRole("heading", { name: m.title, exact: true }),
   ).toBeVisible();
