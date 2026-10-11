@@ -117,6 +117,36 @@ test("15 core missions, real teacher review, optional boss and unchanged main gr
     path: "test-results/report-desktop.png",
     fullPage: true,
   });
+  const help = page.locator(".report-help");
+  const question = page
+    .locator(".report-question")
+    .filter({ hasText: "Apa bedanya Ulang, Coba, dan Bersihkan?" });
+  await expect(help).not.toHaveAttribute("open", "");
+  await help.locator(":scope > summary").focus();
+  await page.keyboard.press("Enter");
+  await expect(help).toHaveAttribute("open", "");
+  await expect(question.locator(".report-answer")).not.toBeVisible();
+  await question.locator("summary").click();
+  await expect(question.locator(".report-answer")).toBeVisible();
+  await expect(question).toContainText("nilai misi 98");
+  await expect(page.locator(".footer-credit a")).toHaveAttribute(
+    "href",
+    "https://aflahul.vercel.app/",
+  );
+  await page.setViewportSize({ width: 390, height: 844 });
+  await help.scrollIntoViewIfNeeded();
+  await expect(question.locator(".report-answer")).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+  await page.screenshot({
+    path: "test-results/report-help-mobile.png",
+    fullPage: true,
+  });
+  await help.locator(":scope > summary").click();
+  await expect(question.locator(".report-answer")).not.toBeVisible();
   expect(errors).toEqual([]);
   await context.close();
 });

@@ -1,0 +1,31 @@
+const question = (title, answer) =>
+  `<details class="report-question"><summary>${title}</summary><div class="report-answer">${answer}</div></details>`;
+
+export function reportHelp(report, teacher = false) {
+  const status = report.bossUnlocked
+    ? "Bos pengayaan terbuka"
+    : report.completed < 15
+      ? `Bos terkunci · ${report.completed}/15 misi dinilai`
+      : "Bos terkunci · nilai akhir belum mencapai 90";
+  return `<div class="report-guidance">
+    <p class="report-boss">${status}</p>
+    <details class="report-help">
+      <summary><span class="help-mark" aria-hidden="true">?</span> Cara membaca rapor</summary>
+      <div class="report-questions">
+        ${question("Bagaimana nilai akhir dihitung?", `<ol><li><strong>Nilai misi:</strong> nilai sesi terbaik dikurangi 1 poin untuk setiap Ulang, minimal 0.</li><li><strong>Nilai pulau:</strong> rata-rata nilai 3 misi di pulau itu.</li><li><strong>Nilai akhir:</strong> rata-rata nilai 5 pulau.</li></ol><p>Nilai akhir muncul setelah semua 15 misi dinilai. Nilai bos tidak masuk rata-rata.</p>`)}
+        ${question("Apa saja yang membentuk nilai sesi?", `<p>Setiap komponen dinilai pada skala 0–100, lalu dikalikan bobotnya:</p><ul><li>Ketepatan jawaban: <strong>60%</strong>.</li><li>Penggunaan petunjuk, percobaan, kesalahan, dan waktu aktif: masing-masing <strong>10%</strong>.</li></ul><p>Ketepatan penuh menyumbang 60 poin. Empat komponen lainnya menyumbang maksimal 10 poin per komponen.</p><p><strong>Ketepatan jawaban</strong> di ringkasan adalah rata-rata skor ketepatan dari sesi terbaik tiap misi yang sudah dinilai. Angka ini belum dikalikan bobot 60% dan bukan nilai akhir.</p>`)}
+        ${question("Apa bedanya Ulang, Coba, dan Bersihkan?", `<ul><li><strong>Ulang:</strong> memulai sesi baru. Setiap pengulangan memotong nilai misi 1 poin, meskipun sesi baru belum selesai. Contoh: nilai sesi terbaik 100, mengulang 2 kali → nilai misi 98.</li><li><strong>Coba:</strong> memeriksa jawaban dalam sesi yang sama. Pemeriksaan pertama mendapat poin penuh; setiap pemeriksaan tambahan mengurangi komponen percobaan sebesar 2 poin dari nilai sesi.</li><li><strong>Bersihkan:</strong> mengosongkan jawaban dalam sesi. Setiap penggunaan mengurangi komponen percobaan sebesar 1 poin dari nilai sesi.</li></ul><p>Komponen percobaan minimal 0 poin. Membuka kembali hasil tidak dihitung sebagai Ulang. Sesi kosong otomatis dari versi lama juga tidak dihitung.</p>`)}
+        ${question("Kapan saya bisa mendapat nilai 100?", `<p>Ketika ketepatan penuh, tanpa petunjuk atau kesalahan, satu pemeriksaan, tanpa Bersihkan, selesai dalam acuan waktu, dan belum pernah Ulang.</p><p>Setiap petunjuk mengurangi 2,5 poin dari nilai sesi; setiap kesalahan mengurangi 2 poin. Masing-masing komponen memiliki batas bawah 0 poin.</p>`)}
+        ${question("Bagaimana waktu memengaruhi nilai?", `<p>Komponen waktu memberi 10 poin penuh jika selesai dalam acuan waktu misi. Setelah itu, poin turun bertahap hingga 0 saat mencapai tiga kali acuan. Selesai lebih cepat di bawah acuan tetap mendapat poin yang sama.</p><p><strong>Total waktu aktif</strong> di ringkasan menjumlahkan semua sesi, termasuk pengulangan dan bos. Penilaian waktu memakai waktu pada sesi terpilih saja.</p>`)}
+        ${question("Kapan bos pengayaan terbuka?", `<p>Setelah semua <strong>15 misi dinilai</strong> dan <strong>nilai akhir minimal 90</strong>, sesudah potongan Ulang.</p><p>Angka di rapor dibulatkan untuk tampilan. Syarat bos memakai nilai sebelum pembulatan.</p>`)}
+        ${question(
+          "Bagaimana membaca tabel rincian?",
+          teacher
+            ? `<p><strong>Nilai</strong> adalah nilai misi setelah potongan Ulang. <strong>NilaiSesiTerbaik</strong> adalah nilai sebelum potongan. <strong>Pengulangan</strong> menunjukkan jumlah Ulang dan <strong>PotonganUlang</strong> menunjukkan poin yang dikurangi.</p><p>K = ketepatan, H = petunjuk, P = percobaan, E = kesalahan, W = waktu. Kelimanya adalah skor komponen pada skala 0–100, sebelum dikalikan bobot.</p>`
+            : `<p><strong>Sesi terbaik</strong> adalah nilai sebelum potongan. Kurangi <strong>Potongan Ulang</strong> untuk memperoleh <strong>Nilai misi</strong>.</p><p>Kolom ketepatan menampilkan maksimal 60 poin; petunjuk, percobaan, kesalahan, dan waktu masing-masing maksimal 10 poin. Jumlah kelimanya adalah nilai sesi terbaik.</p>`,
+        )}
+        ${question("Untuk apa Rekap, Cadangan, dan Pulihkan?", `<ul><li><strong>Rekap:</strong> unduh tabel nilai sebagai CSV. K, H, P, E, W di file ini adalah skor komponen 0–100, sebelum dikalikan bobot.</li><li><strong>Cadangan:</strong> unduh salinan jawaban dan progres sebagai JSON.</li>${teacher ? "" : "<li><strong>Pulihkan:</strong> muat kembali file cadangan JSON yang pernah disimpan.</li>"}</ul>`)}
+      </div>
+    </details>
+  </div>`;
+}

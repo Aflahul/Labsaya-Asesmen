@@ -730,3 +730,47 @@ th {
     scroll-behavior: auto !important;
   }
 }
+
+/* Report explanations are available on demand, with native keyboard support. */
+.report-guidance {
+  margin: 24px 0 16px;
+  border-top: 1px solid #ffffff24;
+  padding-top: 16px;
+}
+.report-boss { margin: 0 0 8px; font-weight: 600; }
+.report-help > summary,
+.report-question > summary {
+  cursor: pointer;
+  padding: 12px 8px;
+  min-height: 44px;
+  line-height: 1.5;
+}
+.report-help > summary { color: #ecd39c; font-weight: 600; }
+.help-mark {
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  margin: 0 6px;
+}
+.report-questions { margin-top: 8px; border-top: 1px solid #ffffff24; }
+.report-question { border-bottom: 1px solid #ffffff24; }
+.report-question > summary { font-weight: 600; }
+.report-help summary:hover { background: #ffffff09; border-radius: 8px; }
+.report-help summary:focus-visible { outline: 2px solid #ecd39c; outline-offset: 2px; border-radius: 8px; }
+.report-answer { max-width: 75ch; padding: 0 16px 12px; line-height: 1.65; }
+.report-answer p { margin: 8px 0; }
+.report-answer ul, .report-answer ol { padding-left: 24px; }
+.report-answer li { margin: 8px 0; }
+.footer { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; }
+.footer-credit { font-size: 13px; letter-spacing: normal; text-transform: none; }
+.footer-credit a { color: #ecd39c; text-underline-offset: 3px; }
+.footer-credit a:hover { color: #fff; }
+.footer-credit a:focus-visible { outline: 2px solid #ecd39c; outline-offset: 4px; }
+.footer-sync { margin-left: auto; }
+@media (max-width: 600px) {
+  .footer { flex-direction: column; align-items: flex-start; }
+  .footer-sync { margin-left: 0; }
+}
