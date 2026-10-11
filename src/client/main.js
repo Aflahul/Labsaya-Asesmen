@@ -352,10 +352,11 @@ function openMission(m, replay = false) {
   if (!unlocked(m, summary)) return;
   let s =
     !replay &&
-    progress.sessions.findLast(
+    (progress.sessions.findLast(
       (x) =>
         x.missionId === m.id && ["active", "pending_review"].includes(x.status),
-    );
+    ) ||
+      summary.bestByMission[m.id]);
   if (
     replay &&
     progress.sessions.some(
@@ -405,7 +406,7 @@ function renderMission() {
   world.setScene(m.scene || m.slug);
   world.setProp(m.prop);
   shell(
-    `<div class="topline"><button class="ghost small" data-nav="map">← Peta</button></div><div class="mission-layout"><section class="panel mission-panel"><div class="mission-title"><div><div class="eyebrow">${esc(m.islandName)} · ${m.enrichment ? "BOS OPSIONAL" : m.meeting + " · Misi " + Number(m.id.slice(-2)) + "/3"}</div><h2 id="mission-heading" tabindex="-1">${esc(m.title)}</h2></div><span class="badge">${done ? "✓ Dinilai" : pending ? "◷ Menunggu guru" : "Sedang dimainkan"}</span></div><div class="mission-progress"><span>Misi ${summary.completed}/15</span><span>Waktu <strong id="timer">${seconds(s.activeMs)}</strong></span><progress max="15" value="${summary.completed}" aria-label="Misi inti selesai"></progress></div><div class="instruction"><strong>Misi kita</strong><p>${esc(m.instructions)}</p></div><div class="activity" ${done || pending ? "inert" : ""}>${m.missionVersion === 2 ? v2ActivityHtml(m, draftState(s)) : activityHtml(m, s.state)}</div>${done ? `<p class="feedback" role="status">Nilai: <strong>${s.score}</strong></p>${scoreBreakdown(s)}` : pending ? `<p class="feedback" role="status">Jawabanmu sudah terkirim. Tunggu penilaian guru di Rapor.</p>` : `<p id="error" class="error" role="alert"></p>`}<div class="mission-controls">${done ? '<button class="primary" id="next">Lanjut</button><button id="replay">Ulang</button>' : pending ? '<button class="primary" data-nav="map">← Peta</button><button id="refresh-progress">Periksa</button><button data-nav="report">Rapor</button>' : `${!m.written ? '<button id="run">Coba</button>' : ""}<button class="primary" id="submit">Kirim</button><button id="hint">Petunjuk</button><button class="ghost" id="reset">Bersihkan</button>`}</div></section></div>${naraToast(m, naraState, naraState.mode === "hint" ? hint : done && s.score < 100 ? "Jawaban sudah dinilai. Kamu boleh mencoba lagi untuk memperbaikinya; nilai terbaik tetap tersimpan." : s.feedback)}`,
+    `<div class="topline"><button class="ghost small" data-nav="map">← Peta</button></div><div class="mission-layout"><section class="panel mission-panel"><div class="mission-title"><div><div class="eyebrow">${esc(m.islandName)} · ${m.enrichment ? "BOS OPSIONAL" : m.meeting + " · Misi " + Number(m.id.slice(-2)) + "/3"}</div><h2 id="mission-heading" tabindex="-1">${esc(m.title)}</h2></div><span class="badge">${done ? "✓ Dinilai" : pending ? "◷ Menunggu guru" : "Sedang dimainkan"}</span></div><div class="mission-progress"><span>Misi ${summary.completed}/15</span><span>Waktu <strong id="timer">${seconds(s.activeMs)}</strong></span><progress max="15" value="${summary.completed}" aria-label="Misi inti selesai"></progress></div><div class="instruction"><strong>Misi kita</strong><p>${esc(m.instructions)}</p></div><div class="activity" ${done || pending ? "inert" : ""}>${m.missionVersion === 2 ? v2ActivityHtml(m, draftState(s)) : activityHtml(m, s.state)}</div>${done ? `<p class="feedback" role="status">Nilai: <strong>${s.score}</strong></p>${scoreBreakdown(s)}` : pending ? `<p class="feedback" role="status">Jawabanmu sudah terkirim. Tunggu penilaian guru di Rapor.</p>` : `<p id="error" class="error" role="alert"></p>`}<div class="mission-controls">${done ? '<button class="primary" id="next">Next</button><button id="replay">Ulang</button>' : pending ? '<button class="primary" data-nav="map">← Peta</button><button id="refresh-progress">Periksa</button><button data-nav="report">Rapor</button>' : `${!m.written ? '<button id="run">Coba</button>' : ""}<button class="primary" id="submit">Kirim</button><button id="hint">Petunjuk</button><button class="ghost" id="reset">Bersihkan</button>`}</div></section></div>${naraToast(m, naraState, naraState.mode === "hint" ? hint : done && s.score < 100 ? "Jawaban sudah dinilai. Kamu boleh mencoba lagi untuk memperbaikinya; nilai terbaik tetap tersimpan." : s.feedback)}`,
   );
   if (focusedId)
     document.getElementById(focusedId)?.focus({ preventScroll: true });
