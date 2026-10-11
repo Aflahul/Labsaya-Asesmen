@@ -9,7 +9,7 @@ Repositori GitHub berisi kode aplikasi, proyek Vercel, proyek Neon development/p
 2. Gunakan database/branch Neon terpisah untuk Preview dan Production. Database pengujian jangan berisi identitas peserta nyata.
 3. Di mesin operator, salin `.env.example` menjadi `.env`, masukkan koneksi development/production yang dipilih secara sadar, lalu jalankan `npm ci` dan `npm run db:migrate`. Script mencatat migrasi yang telah diterapkan sehingga pengulangan tidak menerapkan ulang. Migrasi **tidak dijalankan otomatis saat build preview**.
 4. Jalankan `npm run teacher:create` di terminal interaktif. Masukkan username dan password minimal 10 karakter; password tidak ditampilkan. Tidak ada akun guru default. Gunakan target database yang sama dengan deployment.
-5. Import repositori ke Vercel, pilih framework Vite, build `npm run build`, output `dist`, runtime Node.js 24. `vercel.json` dan `api/[...path].js` menyediakan routing frontend dan API serverless same-origin.
+5. Import repositori ke Vercel, pilih framework Vite, build `npm run build`, output `dist`, runtime Node.js 24. `vercel.json` dan `api/index.js` menyediakan routing frontend dan API serverless same-origin.
 6. Deploy preview dan jalankan smoke test di bawah. Publish production dilakukan pengelola setelah memeriksa hasil.
 
 ## Smoke test wajib pada preview HTTPS
