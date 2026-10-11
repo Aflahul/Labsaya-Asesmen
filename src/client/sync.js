@@ -69,6 +69,7 @@ export async function syncProgress({ progress, api, onStatus = () => {} }) {
       });
       s.serverCreated = true;
       s.scoringConfig = created.scoringConfig;
+      s.countedSession = created.countedSession;
       if (s.status === "complete") {
         const { score, ...components } = scoreSession(s, s.scoringConfig);
         s.score = score;

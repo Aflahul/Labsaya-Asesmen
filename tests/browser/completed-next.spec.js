@@ -34,6 +34,23 @@ test("completed missions reopen with Next and only Ulang creates a new attempt",
   expect(await count()).toBe(2);
   await fillMission(page, MISSIONS[0]);
   await page.locator("#submit").click();
+  await waitForSaved(page);
+  await expect(page.locator(".score-breakdown")).toContainText(
+    "Nilai akhir: 99",
+  );
+  await expect(page.locator(".score-breakdown")).toContainText(
+    "Sesi terbaik 100 − 1 poin (1 kali Ulang)",
+  );
+  await page.reload();
+  await page.getByRole("button", { name: "Lanjut", exact: true }).click();
+  await page.locator("#nara-close").click();
+  await page.locator('.island-art[data-island="1"]').click();
+  await page.locator(`[data-mission="${MISSIONS[0].id}"]`).click();
+  await enterMission(page, MISSIONS[0]);
+  await expect(page.locator(".score-breakdown")).toContainText(
+    "Nilai akhir: 99",
+  );
+  expect(await count()).toBe(2);
   await page.locator("#next").click();
   await enterMission(page, MISSIONS[1]);
 });

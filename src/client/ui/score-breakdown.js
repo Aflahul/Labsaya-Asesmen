@@ -1,7 +1,7 @@
 const secondsLabel = (ms) =>
   `${Math.floor(ms / 60000)}:${String(Math.floor(ms / 1000) % 60).padStart(2, "0")}`;
 
-export function scoreBreakdown(s) {
+export function scoreBreakdown(s, grade) {
   const c = s.components;
   if (!c) return "";
   const rows = [
@@ -16,5 +16,5 @@ export function scoreBreakdown(s) {
       `${secondsLabel(s.activeMs)} · acuan ${secondsLabel((s.scoringConfig?.timeBudgetSeconds || 300) * 1000)}`,
     ],
   ];
-  return `<section class="score-breakdown" aria-label="Rincian nilai akhir"><h3>Nilai akhir: ${s.score}</h3><dl>${rows.map(([label, key, weight, note]) => `<div><dt>${label} <small>${weight}% · ${note}</small></dt><dd>${c[key] ?? "—"}<small>${c[key] === undefined ? "—" : ((c[key] * weight) / 100).toFixed(2)} poin</small></dd></div>`).join("")}</dl><p class="notice">Ketepatan 60%; petunjuk, percobaan, kesalahan, dan waktu masing-masing 10%. Nilai terbaik tiap misi masuk rata-rata 15 misi inti. Bos pengayaan terbuka mulai 90.</p></section>`;
+  return `<section class="score-breakdown" aria-label="Rincian nilai akhir"><h3>Nilai akhir: ${grade?.score ?? s.score}</h3>${grade ? `<p class="notice">Sesi terbaik ${grade.bestScore} − ${grade.replayPenalty} poin (${grade.replayCount} kali Ulang) = nilai misi ${grade.score}. Rincian berikut adalah sesi yang sedang dibuka, bernilai ${s.score}.</p>` : ""}<dl>${rows.map(([label, key, weight, note]) => `<div><dt>${label} <small>${weight}% · ${note}</small></dt><dd>${c[key] ?? "—"}<small>${c[key] === undefined ? "—" : ((c[key] * weight) / 100).toFixed(2)} poin</small></dd></div>`).join("")}</dl><p class="notice">Ketepatan 60%; petunjuk, percobaan, kesalahan, dan waktu masing-masing 10%. Nilai sesi terbaik dikurangi 1 poin per Ulang (minimal 0). Nilai pulau adalah rata-rata 3 misi; nilai akhir adalah rata-rata 5 pulau. Bos pengayaan terbuka mulai 90.</p></section>`;
 }

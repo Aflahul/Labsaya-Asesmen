@@ -32,6 +32,7 @@ export function newSession(
     participantId,
     missionId: m.id,
     missionVersion: m.missionVersion,
+    countedSession: m.missionVersion === 2,
     scoringConfig: {
       ...config,
       elements: m.elements,
