@@ -101,6 +101,7 @@ test("each mission has a task-specific time target with decreasing overtime poin
     expect(points(1)).toBe(100);
     expect(points(1.5)).toBe(75);
     expect(points(2)).toBe(50);
+    expect(points(2.5)).toBe(25);
     expect(points(3)).toBe(0);
     expect(points(4)).toBe(0);
   }
