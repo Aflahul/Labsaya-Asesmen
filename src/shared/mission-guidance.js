@@ -16,13 +16,13 @@ export const GUIDANCE = {
     [
       "Tentukan posisi Kayu pada rak awal.",
       "Pilih perintah untuk mengganti Kayu, menghapus Batu, lalu menambahkan Obat.",
-      "Lihat rak hasil pilihanmu dan cocokkan dengan urutan barang yang diminta.",
+      "Perhatikan perubahan isi rak, lalu cocokkan dengan urutan barang yang diminta.",
     ],
-    "Indeks adalah nomor posisi dalam list (daftar). Gambar rak berubah saat kamu memilih perintah; kamu bisa melihat perubahan rak sebelum menekan Kirim.",
+    "Indeks menunjukkan posisi barang dalam list (daftar). Isi rak akan berubah sesuai perintah yang kamu pilih. Periksa hasilnya sebelum menekan Kirim.",
     "Ikuti perintah satu per satu. Menghapus barang dapat menggeser posisi barang setelahnya.",
   ),
   v2p01m03: guide(
-    "Putuskan perjalanan mana yang sudah memenuhi syarat berangkat.",
+    "Bantu aku menentukan pengiriman mana yang boleh berangkat.",
     [
       "Baca tiga syarat keberangkatan.",
       "Periksa berat, energi, dan status siap pada setiap perjalanan A–D.",
@@ -32,7 +32,7 @@ export const GUIDANCE = {
     "Jangan berhenti setelah satu syarat terpenuhi. Periksa ketiganya, termasuk angka yang tepat di batas.",
   ),
   v2p02m01: guide(
-    "Bantu aku menyusun jalur keputusan gerbang pesanan.",
+    "Bantu aku membuat diagram alur untuk memeriksa pesanan.",
     [
       "Pilih langkah setelah Mulai dan bentuk simbolnya.",
       "Pilih kondisi yang harus diperiksa gerbang.",
@@ -42,7 +42,7 @@ export const GUIDANCE = {
     "YA berarti kondisi pada gerbang benar; TIDAK berarti kondisi itu tidak terpenuhi.",
   ),
   v2p02m02: guide(
-    "Cari tahu ke mana setiap pesanan diarahkan oleh gerbang.",
+    "Ikuti diagram alurnya untuk menentukan apakah pesanan diterima atau ditunda.",
     [
       "Baca kondisi pada diagram.",
       "Bandingkan stok dengan pesanan pada setiap kasus.",
@@ -78,8 +78,8 @@ export const GUIDANCE = {
       "Lengkapi kondisi IF pada rancangan langkah.",
       "Hitung biaya untuk jarak 2 km, 5 km, dan 8 km.",
     ],
-    "IF berarti jika; ELSE berarti selain itu. Untuk menjawab, gunakan kotak pilihan di bawah potongan langkah.",
-    "Jarak tepat 5 km perlu diperiksa dengan teliti: aturan menyertakan atau mengecualikan batas itu?",
+    "IF berarti jika; ELSE berarti selain itu. Lengkapi pseudocode melalui kotak pilihan di bawahnya.",
+    "Baca lagi aturan untuk jarak 5 km. Biaya mana yang berlaku pada jarak tersebut?",
   ),
   v2p03m03: guide(
     "Temukan mengapa pengendali mencoba menampilkan hasil yang belum dihitung.",
@@ -129,12 +129,12 @@ export const GUIDANCE = {
       "Tekan Coba, baca hasil tiap pengujian, lalu perbaiki sebelum mengirim.",
     ],
     "Saat kamu menekan Coba, program dijalankan dengan beberapa daftar berisi lima nilai. Buat perhitungan yang tetap benar ketika angka dalam daftar berubah.",
-    "Rata-rata membandingkan jumlah seluruh nilai dengan banyaknya nilai. Cocokkan pembagi dengan data yang digunakan.",
+    "Perhatikan jumlah nilai dan banyaknya nilai dalam daftar. Apakah pembagi yang dipakai sudah sesuai?",
   ),
   v2p05m02: guide(
-    "Perbaiki program kargo agar barang yang benar tetap berada di daftar.",
+    "Bantu aku memperbaiki program agar daftar kargo sesuai pesanan.",
     [
-      "Pilih penyebab Air hilang dan prediksi isi posisi yang ditanyakan setelah perbaikan.",
+      "Tentukan mengapa Air terhapus. Setelah kode diperbaiki, barang apa yang menempati posisi yang ditanyakan?",
       "Edit perintah yang salah pada kode.",
       "Tekan Coba, lalu cocokkan daftar hasilnya dengan daftar yang diminta.",
     ],
@@ -142,7 +142,7 @@ export const GUIDANCE = {
     "Periksa posisi setiap barang tepat sebelum pop dijalankan. Gunakan keadaan daftar saat itu, bukan keadaan awal.",
   ),
   v2p05m03: guide(
-    "Bantu aku memilih solusi rata-rata yang dapat diandalkan.",
+    "Bantu aku memilih program yang menghitung rata-rata dengan benar untuk berbagai daftar nilai.",
     [
       "Hitung hasil A dan B satu per satu untuk ketiga daftar yang tersedia.",
       "Tulis hasil masing-masing rancangan, lalu tentukan pilihanmu.",
