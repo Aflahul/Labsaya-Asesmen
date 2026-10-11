@@ -1,3 +1,4 @@
+import { MISSION_TIMING } from "./mission-timing.js";
 import { GUIDANCE } from "./mission-guidance.js";
 import { MISSIONS as LEGACY } from "./legacy/missions.js";
 export const ISLANDS = [
@@ -72,8 +73,8 @@ const make = (
     narrative: `Pulihkan layanan ${i.name}. Setiap solusi yang kamu bangun membantu menyambungkan jaringan Menara Awan.`,
     instructions,
     guidance: GUIDANCE[`v2p0${island}m0${n}`],
-    timeBudgetSeconds:
-      { C3: 180, C4: 300, C5: 600, C6: 900 }[bloom] + fields.length * 30,
+    timeBudgetSeconds: MISSION_TIMING[`v2p0${island}m0${n}`].seconds,
+    timeBudgetReason: MISSION_TIMING[`v2p0${island}m0${n}`].reason,
     prop: {
       1: ["cargo-crate", "cargo-crate", "airship"],
       2: ["beacon", "airship", "beacon"],
