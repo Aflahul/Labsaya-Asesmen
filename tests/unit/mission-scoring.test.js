@@ -41,7 +41,7 @@ test("hints, failed attempts, errors and time contribute independently", () => {
   const oneBadRun = play({ badRuns: 1 });
   expect(oneBadRun.attempts).toBe(2);
   expect(oneBadRun.errors).toBe(1);
-  expect(oneBadRun.score).toBe(96);
+  expect(oneBadRun.score).toBe(97);
   const s = play({ badRuns: 2 });
   expect(s.errors).toBe(2);
   expect(s.components.E).toBeLessThan(100);
@@ -122,4 +122,39 @@ test("a saved session keeps its original time allowance", async () => {
       { timeBudgetSeconds: 90 },
     ).W,
   ).toBe(50);
+});
+
+test("Coba and Bersihkan each have one free use then cost one point", () => {
+  const s = {
+    ...newSession(m, "p"),
+    firstAccuracy: 100,
+    components: { K: 100 },
+  };
+  const score = (attempts, resets) =>
+    scoreSession({ ...s, attempts, resets }, s.scoringConfig).score;
+  expect(score(1, 0)).toBe(100);
+  expect(score(1, 1)).toBe(100);
+  expect(score(2, 0)).toBe(99);
+  expect(score(1, 2)).toBe(99);
+  expect(score(2, 2)).toBe(98);
+  expect(score(100, 100)).toBe(90);
+});
+
+test("version 2 history receives the new attempt rule without changing its time budget", async () => {
+  const { upgradeScoring } = await import("../../src/shared/assessment.js");
+  const old = play({ badRuns: 1 });
+  old.scoringConfig = {
+    ...old.scoringConfig,
+    formulaVersion: 2,
+    timeBudgetSeconds: 300,
+  };
+  old.score = 96;
+  old.components.P = 80;
+  const updated = upgradeScoring(old);
+  expect(updated.scoringConfig.formulaVersion).toBe(3);
+  expect(updated.scoringConfig.timeBudgetSeconds).toBe(300);
+  expect(updated.score).toBe(97);
+  expect(updated.events).toEqual(old.events);
+  expect(upgradeScoring(updated)).toBe(updated);
+  expect(old.score).toBe(96);
 });

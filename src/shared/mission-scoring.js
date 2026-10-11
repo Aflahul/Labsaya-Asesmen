@@ -11,8 +11,8 @@ export function scoreMission(
   const H = clamp(100 - 25 * (session.hints || 0));
   const P = clamp(
     100 -
-      20 * Math.max(0, (session.attempts || 0) - 1) -
-      10 * (session.resets || 0),
+      10 * Math.max(0, (session.attempts || 0) - 1) -
+      10 * Math.max(0, (session.resets || 0) - 1),
   );
   const E = clamp(100 - 20 * (session.errors || 0));
   const W = clamp(

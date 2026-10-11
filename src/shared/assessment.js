@@ -37,7 +37,7 @@ export function newSession(
       ...config,
       elements: m.elements,
       ...(m.missionVersion === 2
-        ? { timeBudgetSeconds: m.timeBudgetSeconds, formulaVersion: 2 }
+        ? { timeBudgetSeconds: m.timeBudgetSeconds, formulaVersion: 3 }
         : {}),
     },
     events: [],
@@ -115,12 +115,17 @@ export function reduceSession(old, e, m) {
 export function upgradeScoring(session) {
   if (
     session.missionVersion !== 2 ||
-    session.scoringConfig?.formulaVersion === 2 ||
+    session.scoringConfig?.formulaVersion === 3 ||
     !session.events?.length
   )
     return session;
   const m = getMission(session.missionId);
   let replay = newSession(m, session.participantId);
+  replay.scoringConfig = {
+    ...replay.scoringConfig,
+    ...session.scoringConfig,
+    formulaVersion: 3,
+  };
   for (const event of session.events) replay = reduceV2(replay, event, m);
   const result = {
     ...session,
