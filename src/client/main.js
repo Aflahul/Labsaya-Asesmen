@@ -212,7 +212,7 @@ function shell(content) {
 function home() {
   world.reset();
   shell(
-    `<section class="home game-home"><div class="hero"><div class="eyebrow">EKSPEDISI MENARA AWAN · INFORMATIKA KELAS X</div><h1>Hidupkan kembali<br><em>Menara Awan.</em></h1><p>Lima pulau kehilangan koneksi. Bersama Nara, gunakan data, algoritma, dan program untuk menyambungkan dunia ini kembali.</p><div class="actions"><button class="primary" data-nav="${auth?.role === "participant" ? "map" : "register"}">${auth?.role === "participant" ? "Lanjut" : "Daftar"}</button>${!auth ? '<button data-nav="login">Masuk</button>' : ""}</div><div class="hero-foot"><span>5 PULAU<br>SATU PERJALANAN</span><span>15 MISI INTI<br>1 BOS RAHASIA</span><span>CARA BERMAIN<br>BACA · COBA · PERBAIKI</span></div><p class="notice">Buat akun sebelum misi pertama. Petunjuk dan waktu bermain tidak mengurangi nilai.</p></div><img class="hero-island" src="/game-assets/island-menara-program.webp" alt="Menara Program melayang di atas awan"><div class="nara-greeting"><img src="/game-assets/character-nara-idle.webp" alt="Nara, robot pemandu"><p>“Kita mulai dari satu koneksi kecil. Siap?”<small>NARA · PEMANDU EKSPEDISI</small></p></div></section>`,
+    `<section class="home game-home"><div class="hero"><div class="eyebrow">EKSPEDISI MENARA AWAN · INFORMATIKA KELAS X</div><h1>Hidupkan kembali<br><em>Menara Awan.</em></h1><p>Lima pulau kehilangan koneksi. Bersama Nara, gunakan data, algoritma, dan program untuk menyambungkan dunia ini kembali.</p><div class="actions"><button class="primary" data-nav="${auth?.role === "participant" ? "map" : "register"}">${auth?.role === "participant" ? "Lanjut" : "Daftar"}</button>${!auth ? '<button data-nav="login">Masuk</button>' : ""}</div><p class="notice">Buat akun sebelum misi pertama. Petunjuk dan waktu bermain tidak mengurangi nilai.</p></div><img class="hero-island" src="/game-assets/island-menara-program.webp" alt="Menara Program melayang di atas awan"><div class="nara-greeting"><img src="/game-assets/character-nara-idle.webp" alt="Nara, robot pemandu"><p>“Kita mulai dari satu koneksi kecil. Siap?”<small>NARA · PEMANDU EKSPEDISI</small></p></div></section>`,
   );
 }
 function authForm(kind) {
@@ -252,30 +252,17 @@ function map() {
     CORE_MISSIONS.find((m) => !summary.bestByMission[m.id]) || CORE_MISSIONS[0];
   const selected =
     ISLANDS.find((i) => i.id === (selectedIsland || next.island)) || ISLANDS[0];
-  const selectedMissions = CORE_MISSIONS.filter(
-      (m) => m.island === selected.id,
-    ),
-    selectedOpen = unlocked(selectedMissions[0], summary);
   shell(
     `<div class="topline map-heading"><div><div class="eyebrow">EKSPEDISI ${esc(auth.user.alias)}</div><h2>Pulihkan jalur antarpulau.</h2><p>${summary.completed}/15 misi inti selesai${summary.pendingReview ? " · " + summary.pendingReview + " karya menunggu guru" : ""}</p></div><button class="ghost" data-nav="report">Rapor</button></div><p class="map-guide">Klik sebuah pulau, lalu tekan tombol Masuk yang muncul di dekatnya.</p><div class="map-stage"><div class="island-grid constellation"><svg class="map-links" viewBox="0 0 1000 620" preserveAspectRatio="none" aria-hidden="true"><path d="M170 140 Q330 40 500 140 T830 140 Q930 420 650 460 Q480 550 340 460"/></svg>${ISLANDS.map(
       (i) => {
         const ms = CORE_MISSIONS.filter((m) => m.island === i.id),
           done = ms.filter((m) => summary.bestByMission[m.id]).length,
           open = unlocked(ms[0], summary);
-        return `<section class="island-card ${open ? "" : "locked"} ${selected.id === i.id ? "selected" : ""}"><button class="island-art" data-island="${i.id}" aria-pressed="${selected.id === i.id}" aria-label="Pilih ${esc(i.name)}${open ? "" : " · terkunci"}"><img src="/game-assets/island-${i.slug}.webp" alt=""></button><div class="island-label"><small>${done === 3 ? "✓ PULIH" : open ? "JALUR TERBUKA" : "TERKUNCI"} · ${done}/3</small><button class="island-name" data-island="${i.id}">${esc(i.name)}</button></div>${selectedIsland === i.id ? `<div class="island-entry">${open ? `<button class="primary" data-enter-island="${i.id}">Masuk</button><small>${esc((ms.find((m) => !summary.bestByMission[m.id]) || ms[0]).title)}</small>` : `<p>Selesaikan tiga misi pulau sebelumnya untuk membuka pulau ini.</p>`}</div>` : ""}</section>`;
+        return `<section class="island-card ${open ? "" : "locked"} ${selected.id === i.id ? "selected" : ""}"><button class="island-art" data-island="${i.id}" aria-pressed="${selected.id === i.id}" aria-label="Pilih ${esc(i.name)}${open ? "" : " · terkunci"}"><img src="/game-assets/island-${i.slug}.webp" alt=""></button><div class="island-label"><small>${done === 3 ? "✓ PULIH" : open ? "JALUR TERBUKA" : "TERKUNCI"} · ${done}/3</small><button class="island-name" data-island="${i.id}">${esc(i.name)}</button></div>${selectedIsland === i.id ? `<div class="island-entry" role="region" aria-label="Informasi ${esc(i.name)}"><div class="island-entry-heading"><strong>${esc(i.name)}</strong><button class="ghost small" data-close-island="${i.id}" aria-label="Tutup informasi pulau">×</button></div><p>${esc(i.topic)}</p>${open ? `<button class="primary" data-enter-island="${i.id}">Masuk</button><div class="mission-list">${ms.map((m, n) => `<article class="mission-choice"><div><strong>${n + 1}. ${esc(m.title)}</strong><small>${summary.bestByMission[m.id] ? "Nilai " + summary.bestByMission[m.id].score : progress.sessions.some((s) => s.missionId === m.id && s.status === "pending_review") ? "Menunggu guru" : "Belum selesai"}</small></div><button class="small" data-mission="${m.id}" aria-label="Buka ${esc(m.title)}">Buka</button></article>`).join("")}</div>` : `<p>Selesaikan tiga misi pulau sebelumnya untuk membuka pulau ini.</p>`}</div>` : ""}</section>`;
       },
     ).join(
       "",
-    )}</div><section class="panel mission-dock" id="mission-dock"><div class="eyebrow">PULAU 0${selected.id} · ${esc(selected.meeting)}</div><h3>${esc(selected.name)}</h3><p>${esc(selected.topic)}</p><div class="mission-list">${selectedMissions
-      .map((m, n) => {
-        const pending = progress.sessions.some(
-          (x) => x.missionId === m.id && x.status === "pending_review",
-        );
-        return `<article class="mission-choice"><div><strong>${n + 1}. ${esc(m.title)}</strong><small>${summary.bestByMission[m.id] ? "Nilai " + summary.bestByMission[m.id].score : pending ? "Menunggu guru" : "Belum selesai"}</small></div><button data-mission="${m.id}" aria-label="Buka ${esc(m.title)}" ${selectedOpen ? "" : "disabled"}>Buka</button></article>`;
-      })
-      .join(
-        "",
-      )}</div><img class="dock-nara" src="/game-assets/character-nara-idle.webp" alt="Nara"><p class="notice">${selectedOpen ? "Mulai dari misi yang kamu pilih. Petunjuk boleh digunakan tanpa mengurangi nilai." : "Selesaikan tiga misi pulau sebelumnya untuk membuka jalur ini."}</p></section></div>${summary.completed === 15 ? `<section class="panel ending-card"><img src="/game-assets/ending-network-restored.webp" alt="Jaringan antarpulau kembali bercahaya"><div><div class="eyebrow">EKSPEDISI INTI SELESAI</div><h2>Menara Awan kembali menyala.</h2><p>Nilai inti: <strong>${summary.score}</strong>. Semua bukti belajar tersimpan di rapormu.</p>${summary.bossUnlocked ? `<p>Sebuah portal terbuka. Ruang Arsitek menantangmu membuat solusi sendiri.</p><button class="primary" data-mission="${BOSS.id}">Tantang</button><p class="notice">Hasil bos terpisah dan tidak dapat mengurangi nilai inti.</p>` : '<p class="notice">Kamu boleh mengulang misi untuk memperkuat pemahaman. Nilai terbaik setiap misi digunakan.</p>'}</div></section>` : ""}${summary.legacyCount ? `<p class="panel notice">${summary.legacyCount} sesi versi lama tetap tersimpan dalam riwayat rapor. Ekspedisi lima pulau memakai penilaian baru.</p>` : ""}`,
+    )}</div></div>${summary.completed === 15 ? `<section class="panel ending-card"><img src="/game-assets/ending-network-restored.webp" alt="Jaringan antarpulau kembali bercahaya"><div><div class="eyebrow">EKSPEDISI INTI SELESAI</div><h2>Menara Awan kembali menyala.</h2><p>Nilai inti: <strong>${summary.score}</strong>. Semua bukti belajar tersimpan di rapormu.</p>${summary.bossUnlocked ? `<p>Sebuah portal terbuka. Ruang Arsitek menantangmu membuat solusi sendiri.</p><button class="primary" data-mission="${BOSS.id}">Tantang</button><p class="notice">Hasil bos terpisah dan tidak dapat mengurangi nilai inti.</p>` : '<p class="notice">Kamu boleh mengulang misi untuk memperkuat pemahaman. Nilai terbaik setiap misi digunakan.</p>'}</div></section>` : ""}${summary.legacyCount ? `<p class="panel notice">${summary.legacyCount} sesi versi lama tetap tersimpan dalam riwayat rapor. Ekspedisi lima pulau memakai penilaian baru.</p>` : ""}`,
   );
 }
 async function travel(m) {
@@ -568,6 +555,17 @@ app.addEventListener("click", async (e) => {
       );
       const summary = summarizeProgress(progress);
       travel(ms.find((m) => !summary.bestByMission[m.id]) || ms[0]);
+      return;
+    }
+    if (b.dataset.closeIsland) {
+      const id = b.dataset.closeIsland;
+      selectedIsland = null;
+      const position = window.scrollY;
+      map();
+      document
+        .querySelector(`.island-art[data-island="${id}"]`)
+        ?.focus({ preventScroll: true });
+      window.scrollTo({ top: position, behavior: "instant" });
       return;
     }
     if (b.dataset.island) {
