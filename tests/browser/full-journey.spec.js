@@ -42,6 +42,7 @@ test("15 core missions, real teacher review, optional boss and unchanged main gr
       expect(size.events).toBeLessThan(30);
       await page.reload();
       await page.getByRole("button", { name: "Lanjut", exact: true }).click();
+      await page.locator(`.island-art[data-island="${m.island}"]`).click();
       await page.locator(`[data-mission="${m.id}"]`).click();
       await enterMission(page, m);
       await expect(page.locator("[data-answer=evidence]")).toHaveValue(

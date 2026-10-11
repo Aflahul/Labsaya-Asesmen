@@ -1406,3 +1406,180 @@ body[data-route="mission"] .side-panel {
     width: 160px;
   }
 }
+/* Each island owns its label and its contextual mission menu. */
+.map-stage {
+  display: block;
+}
+.constellation {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 80px 45px;
+  height: auto;
+  min-height: 0;
+  padding: 25px 20px 100px;
+}
+.constellation .island-card {
+  position: relative;
+  inset: auto !important;
+  width: 100%;
+  grid-column: auto;
+  margin: 0 !important;
+}
+.constellation .island-card:nth-of-type(4) {
+  grid-column: 2;
+}
+.constellation .island-card:nth-of-type(5) {
+  grid-column: 1;
+  grid-row: 2;
+}
+.constellation .island-art {
+  max-width: 280px;
+  margin: auto;
+  aspect-ratio: 1.2;
+}
+.constellation .island-label {
+  max-width: 250px;
+  margin: 8px auto 0;
+  padding: 8px 12px;
+}
+.island-entry {
+  top: 45px;
+  left: 82%;
+  transform: none;
+  width: 290px;
+  max-width: none;
+  text-align: left;
+  padding: 16px;
+  z-index: 10;
+}
+.island-card:nth-of-type(3) .island-entry {
+  left: auto;
+  right: 82%;
+}
+.island-entry-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.island-entry-heading > strong {
+  flex: 1;
+}
+.island-entry-heading > button {
+  width: auto;
+}
+.island-entry > p {
+  margin-bottom: 12px;
+}
+.island-entry .mission-choice button {
+  width: auto;
+}
+.island-entry .mission-choice:last-child {
+  border-bottom: 0;
+}
+/* The character floats outside a comic thought balloon. */
+.nara-toast {
+  padding: 0 0 105px;
+  width: 355px;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+.nara-bubble {
+  position: relative;
+  padding: 18px;
+  border: 1px solid #e5c585;
+  border-radius: 32px;
+  background: #102f40;
+  box-shadow: 0 12px 35px #031c3980;
+}
+.nara-bubble::before,
+.nara-bubble::after {
+  content: "";
+  position: absolute;
+  border: 1px solid #e5c585;
+  background: #102f40;
+  border-radius: 50%;
+}
+.nara-bubble::before {
+  width: 18px;
+  height: 14px;
+  bottom: -23px;
+  right: 70px;
+}
+.nara-bubble::after {
+  width: 10px;
+  height: 8px;
+  bottom: -38px;
+  right: 57px;
+}
+.nara-toast > .nara-live {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 105px;
+  height: 85px;
+  object-fit: contain;
+  animation: nara-hover 3.5s ease-in-out infinite;
+}
+.nara-toast-message {
+  max-height: min(26dvh, 230px);
+}
+@media (max-width: 800px) {
+  .constellation {
+    gap: 45px 24px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 16px 0 50px;
+  }
+  .constellation .island-card:nth-of-type(n) {
+    grid-column: auto;
+    grid-row: auto;
+  }
+  .island-entry,
+  .island-card:nth-of-type(3) .island-entry {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    margin-top: 14px;
+  }
+  .island-entry .mission-choice {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .island-entry .mission-choice button {
+    justify-self: start;
+  }
+}
+@media (max-width: 540px) {
+  .constellation {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .constellation .island-art {
+    max-width: 260px;
+  }
+  .island-entry {
+    max-width: 330px;
+    margin: 14px auto 0;
+  }
+  .island-entry .mission-choice {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .nara-toast {
+    width: calc(100vw - 24px);
+    padding: 0 0 85px;
+  }
+  .nara-bubble {
+    padding: 14px 16px;
+  }
+  .nara-toast > .nara-live {
+    height: 65px;
+    width: 85px;
+  }
+  .nara-toast-message {
+    max-height: 22dvh;
+  }
+  body[data-route="mission"].nara-is-open main {
+    padding-bottom: calc(50dvh + 100px);
+  }
+}
