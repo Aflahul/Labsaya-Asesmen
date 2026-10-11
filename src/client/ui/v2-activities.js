@@ -11,7 +11,7 @@ function simulation(m, a) {
     if (a.append === 'rak.append("Obat")') list.push("Obat");
     else if (a.append === 'rak[0] = "Obat"') list[0] = "Obat";
     else if (a.append) list.splice(2, 1);
-    return `<div class="sim-caption">Isi rak setelah perintah pilihanmu</div><div class="machine-row">${list.map((v, i) => chip("indeks " + i, v)).join("")}</div>`;
+    return `<div class="sim-caption">Isi rak setelah perintah pilihanmu</div><div class="machine-row">${list.map((v) => `<div class="machine-cell"><strong>${esc(v)}</strong></div>`).join("")}</div>`;
   }
   if (["flow", "flow-trace", "boundary"].includes(m.kind))
     return `<div class="flow-preview" aria-label="Pratinjau diagram alur"><span>Mulai</span><b>↓</b><span class="flow-input ${a.symbol === "Belah ketupat" ? "shape-diamond" : a.symbol === "Persegi panjang" ? "shape-rectangle" : m.kind === "flow" && !a.symbol ? "shape-unselected" : "shape-input"}">${esc(a.first || (m.kind === "flow" ? "Pilih langkah pertama" : "Input stok, pesanan"))}</span><b>↓</b><span class="decision">${esc(a.condition || (m.kind === "flow" ? "Pilih kondisi" : "stok " + (a.operator || (m.kind === "boundary" ? ">" : "≥")) + " pesanan"))}?</span><div class="flow-branches"><span>YA → ${esc(a.yes || (m.kind === "flow" ? "Pilih keluaran" : "Terima"))}</span><span>TIDAK → ${esc(a.no || (m.kind === "flow" ? "Pilih keluaran" : "Tunda"))}</span></div><b>↓</b><span>Selesai</span></div>`;
