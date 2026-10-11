@@ -1,3 +1,4 @@
+import { waitForSaved } from "./helpers.js";
 import { test, expect } from "@playwright/test";
 import { MISSIONS, CORE_MISSIONS, BOSS } from "../../src/shared/missions.js";
 import { solution } from "../fixtures/solutions.js";
@@ -56,17 +57,14 @@ test("15 core missions, real teacher review, optional boss and unchanged main gr
     }
     await page.locator("#run").click();
     await expect(page.locator("#submit")).toBeVisible();
-    await expect(page.locator(".feedback")).toContainText("Semua hasil");
+    await expect(page.locator("#nara-toast")).toContainText("Semua hasil");
     await page.locator("#submit").click();
     await expect(page.locator(".badge")).toContainText("Dinilai");
     await page.locator("#next").click();
   }
   await page.getByRole("button", { name: "Peta", exact: true }).click();
   await expect(page.locator('[data-mission="' + BOSS.id + '"]')).toHaveCount(0);
-  await expect(page.locator("[data-sync]").first()).toContainText(
-    "Tersinkron",
-    { timeout: 15000 },
-  );
+  await waitForSaved(page);
   const context = await browser.newContext();
   const teacher = await context.newPage();
   await teacher.goto("/");
@@ -98,10 +96,7 @@ test("15 core missions, real teacher review, optional boss and unchanged main gr
   await fillMission(page, BOSS);
   await page.locator("#submit").click();
   await expect(page.locator(".badge")).toContainText("Menunggu guru");
-  await expect(page.locator("[data-sync]").first()).toContainText(
-    "Tersinkron",
-    { timeout: 15000 },
-  );
+  await waitForSaved(page);
   await teacher.getByRole("button", { name: "← Kembali", exact: true }).click();
   await teacher.getByPlaceholder("Nama asli / samaran").fill(alias);
   await teacher.getByRole("button", { name: "Buka" }).click();
