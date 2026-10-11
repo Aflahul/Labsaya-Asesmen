@@ -11,14 +11,14 @@ function simulation(m, a) {
     if (a.append === 'rak.append("Obat")') list.push("Obat");
     else if (a.append === 'rak[0] = "Obat"') list[0] = "Obat";
     else if (a.append) list.splice(2, 1);
-    return `<div class="sim-caption">Isi rak setelah perintah pilihanmu</div><div class="machine-row">${list.map((v) => `<div class="machine-cell"><strong>${esc(v)}</strong></div>`).join("")}</div>`;
+    return `<div class="sim-caption">Isi rak saat ini</div><div class="machine-row">${list.map((v) => `<div class="machine-cell"><strong>${esc(v)}</strong></div>`).join("")}</div>`;
   }
   if (["flow", "flow-trace", "boundary"].includes(m.kind))
     return `<div class="flow-preview" aria-label="Pratinjau diagram alur"><span>Mulai</span><b>↓</b><span class="flow-input ${a.symbol === "Belah ketupat" ? "shape-diamond" : a.symbol === "Persegi panjang" ? "shape-rectangle" : m.kind === "flow" && !a.symbol ? "shape-unselected" : "shape-input"}">${esc(a.first || (m.kind === "flow" ? "Pilih langkah pertama" : "Input stok, pesanan"))}</span><b>↓</b><span class="decision">${esc(a.condition || (m.kind === "flow" ? "Pilih kondisi" : "stok " + (a.operator || (m.kind === "boundary" ? ">" : "≥")) + " pesanan"))}?</span><div class="flow-branches"><span>YA → ${esc(a.yes || (m.kind === "flow" ? "Pilih keluaran" : "Terima"))}</span><span>TIDAK → ${esc(a.no || (m.kind === "flow" ? "Pilih keluaran" : "Tunda"))}</span></div><b>↓</b><span>Selesai</span></div>`;
   if (m.kind === "cpu")
     return `<div class="machine-path">Data masuk → Disimpan → Instruksi diatur → Dihitung → Hasil ditampilkan</div>`;
   if (["memory", "memory-debug"].includes(m.kind))
-    return `<div class="sim-caption">Data awal RAM · kotak hasil mengikuti pilihanmu</div><div class="machine-row">${chip("RAM [10]", 12)}${chip("RAM [11]", 8)}${chip("Akumulator", a.add || a.load || 0)}${chip("RAM [12]", a.store || "kosong")}</div><div class="machine-path">INPUT → RAM ↔ CU / ALU → OUTPUT ${esc(a.out || "")}</div>`;
+    return `<div class="sim-caption">Isi RAM dan hasil sementara</div><div class="machine-row">${chip("RAM [10]", 12)}${chip("RAM [11]", 8)}${chip("Akumulator", a.add || a.load || 0)}${chip("RAM [12]", a.store || "kosong")}</div><div class="machine-path">INPUT → RAM ↔ CU / ALU → OUTPUT ${esc(a.out || "")}</div>`;
   if (m.kind === "pseudocode" && !m.snippet)
     return `<pre class="trace">${esc([a.one || "① Pilih input", a.two || "② Pilih proses", a.three || "③ Pilih output"].join("\n"))}</pre>`;
   return "";
