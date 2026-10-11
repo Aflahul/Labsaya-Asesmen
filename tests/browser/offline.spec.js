@@ -1,3 +1,4 @@
+import { waitForSaved } from "./helpers.js";
 import { test, expect } from "@playwright/test";
 import { register, enterMission } from "./helpers.js";
 import { MISSIONS } from "../../src/shared/missions.js";
@@ -29,8 +30,5 @@ test("production assets and answer draft reload offline, then synchronize", asyn
   await expect(page.locator("[data-answer=phone]")).toHaveValue("String");
   await page.locator("[data-answer=count]").selectOption("3");
   await context.setOffline(false);
-  await expect(page.locator("[data-sync]").first()).toContainText(
-    "Tersinkron",
-    { timeout: 20000 },
-  );
+  await waitForSaved(page);
 });

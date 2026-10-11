@@ -31,6 +31,7 @@ for (const [name, width, height] of [
     });
     await register(page, "Responsif " + name);
     await enterMission(page, MISSIONS[0]);
+    await page.screenshot({ path: `test-results/scene-${name}.png` });
     await page.locator("[data-answer=phone]").focus();
     await page.keyboard.press("s");
     await page.keyboard.press("Enter");

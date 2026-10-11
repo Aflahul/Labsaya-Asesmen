@@ -1,3 +1,4 @@
+import { waitForSaved } from "./helpers.js";
 import { test, expect } from "@playwright/test";
 import { register, enterMission } from "./helpers.js";
 import { MISSIONS } from "../../src/shared/missions.js";
@@ -7,7 +8,7 @@ test("incomplete answer stays active, keyboard choices and drafts survive naviga
   await register(page);
   await enterMission(page, MISSIONS[0]);
   await page.locator("#submit").click();
-  await expect(page.locator(".feedback")).toContainText("Lengkapi");
+  await expect(page.locator("#nara-toast")).toContainText("Lengkapi");
   await page.locator("[data-answer=phone]").selectOption("String");
   await page.getByRole("button", { name: "Peta", exact: true }).click();
   await page.locator('[data-mission="v2p01m01"]').click();
@@ -34,10 +35,7 @@ test("cancelled logout resumes active timer and corrupt cache stays recoverable"
   await expect.poll(time, { timeout: 10000 }).toBeGreaterThan(before + 1000);
   await context.setOffline(false);
   await page.locator(".brand").click();
-  await expect(page.locator("[data-sync]").first()).toContainText(
-    "Tersinkron",
-    { timeout: 15000 },
-  );
+  await waitForSaved(page);
   await page.evaluate(() => {
     const a = JSON.parse(localStorage.getItem("pulau:last-account"));
     localStorage.setItem(

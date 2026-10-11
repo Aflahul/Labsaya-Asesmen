@@ -1330,3 +1330,79 @@ body[data-route="mission"] .side-panel {
   width: auto;
   padding: 10px 14px;
 }
+
+/* The scene keeps its aircraft while the mission uses a single readable panel. */
+.mission-layout {
+  display: block;
+  width: min(100%, 760px);
+}
+.mission-progress {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.85rem;
+  margin: 12px 0 20px;
+  color: #d4e9ef;
+}
+.mission-progress progress {
+  width: 100%;
+  height: 8px;
+  accent-color: #69e2c5;
+}
+.resident-plane {
+  display: none;
+  position: absolute;
+  width: clamp(190px, 28vw, 420px);
+  right: 1vw;
+  top: 29vh;
+  filter: drop-shadow(0 25px 18px #03172666);
+}
+.plane-present .resident-plane {
+  display: block;
+}
+#world[data-phase="dock"] .resident-plane {
+  animation: plane-dock 1.6s ease-out both;
+}
+#world[data-phase="dock"] .arrival-island,
+#world[data-phase="dock"] .travel-ship {
+  display: none;
+}
+@keyframes plane-dock {
+  from {
+    transform: translate(110%, -45%) scale(0.55);
+    opacity: 0;
+  }
+  to {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+}
+@media (max-width: 1100px) and (min-width: 801px) {
+  .mission-layout {
+    width: 68%;
+  }
+}
+@media (max-width: 800px) {
+  body[data-route="mission"] .mission-layout {
+    width: 100%;
+    padding-top: 130px;
+  }
+  .resident-plane {
+    position: absolute;
+    top: 170px;
+    right: 8%;
+    width: 180px;
+  }
+}
+.reduced-motion .resident-plane,
+.low-effects .resident-plane {
+  animation: none !important;
+}
+
+@media (max-width: 520px) {
+  .resident-plane {
+    top: 280px;
+    width: 160px;
+  }
+}

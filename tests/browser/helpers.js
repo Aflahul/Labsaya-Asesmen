@@ -62,3 +62,26 @@ export async function expectShortButtons(page) {
     );
   expect(long, "Visible buttons should use at most two words").toEqual([]);
 }
+
+export async function waitForSaved(page) {
+  await expect
+    .poll(
+      () =>
+        page.evaluate(() => {
+          const account = JSON.parse(
+            localStorage.getItem("pulau:last-account"),
+          );
+          const progress = JSON.parse(
+            localStorage.getItem(`pulau:progress:v1:${account.user.id}`),
+          );
+          return (
+            !!progress?.sessions.length &&
+            progress.sessions.every(
+              (s) => s.serverCreated && s.syncedCount === s.events.length,
+            )
+          );
+        }),
+      { timeout: 15000 },
+    )
+    .toBe(true);
+}

@@ -4,9 +4,9 @@ export const GUIDANCE = {
   v2p01m01: guide(
     "Bantu aku mencatat data kargo agar tidak salah dibaca komputer.",
     [
-      "Baca kebutuhan setiap data pada soal.",
+      "Baca pertanyaan di atas setiap kotak jawaban.",
       "Pilih tipe data atau nilai yang sesuai pada keempat kotak.",
-      "Periksa pilihanmu, lalu uji jawabannya.",
+      "Setelah keempat kotak terisi, tekan Coba untuk memeriksa jawabanmu.",
     ],
     "Kamu cukup memilih jawaban. Tidak perlu mengetik nomor telepon atau menulis program.",
     "Perhatikan data yang perlu dihitung dan data yang harus tetap ditulis persis seperti aslinya.",
@@ -18,8 +18,8 @@ export const GUIDANCE = {
       "Pilih perintah untuk mengganti Kayu, menghapus Batu, lalu menambahkan Obat.",
       "Lihat rak hasil pilihanmu dan cocokkan dengan urutan barang yang diminta.",
     ],
-    "Indeks adalah nomor posisi dalam list (daftar). Gambar rak berubah saat kamu memilih perintah; itu pratinjau, belum penilaian.",
-    "Ikuti operasi sesuai urutan. Menghapus barang dapat menggeser posisi barang setelahnya.",
+    "Indeks adalah nomor posisi dalam list (daftar). Gambar rak berubah saat kamu memilih perintah; kamu bisa melihat perubahan rak sebelum menekan Kirim.",
+    "Ikuti perintah satu per satu. Menghapus barang dapat menggeser posisi barang setelahnya.",
   ),
   v2p01m03: guide(
     "Putuskan perjalanan mana yang sudah memenuhi syarat berangkat.",
@@ -56,16 +56,16 @@ export const GUIDANCE = {
     [
       "Baca contoh kegagalan dan pilih penyebabnya.",
       "Pilih tanda pembanding untuk memperbaiki kondisi gerbang.",
-      "Prediksi keluaran tiga kasus setelah perbaikan, lalu uji jawabanmu.",
+      "Tentukan hasil untuk ketiga contoh setelah diperbaiki, lalu tekan Coba.",
     ],
-    "Diagram mula-mula menunjukkan kondisi yang salah. Setelah kamu memilih operator, diagram menampilkan rancangan perbaikanmu.",
+    "Diagram mula-mula menunjukkan kondisi yang salah. Setelah kamu memilih operator, diagram menampilkan kondisi yang kamu pilih.",
     "Periksa tiga keadaan: stok kurang, stok tepat cukup, dan stok lebih banyak daripada pesanan.",
   ),
   v2p03m01: guide(
     "Susun langkah pengendali untuk menghitung energi pengiriman.",
     [
       "Pilih isi baris pertama, kedua, dan ketiga.",
-      "Jalankan urutan itu dalam pikiran untuk x = 3 dan x = 7.",
+      "Ikuti urutan itu satu per satu untuk x = 3 dan x = 7.",
       "Pilih hasil yang akan ditampilkan untuk kedua masukan.",
     ],
     "x menyimpan jumlah paket, y menyimpan kebutuhan energi. INPUT membaca data; OUTPUT menampilkan hasil; ← berarti memberi nilai.",
@@ -78,7 +78,7 @@ export const GUIDANCE = {
       "Lengkapi kondisi IF pada rancangan langkah.",
       "Hitung biaya untuk jarak 2 km, 5 km, dan 8 km.",
     ],
-    "IF berarti jika; ELSE berarti selain itu. Pilih jawaban melalui kotak pilihan, bukan dengan mengedit cuplikan.",
+    "IF berarti jika; ELSE berarti selain itu. Untuk menjawab, gunakan kotak pilihan di bawah potongan langkah.",
     "Jarak tepat 5 km perlu diperiksa dengan teliti: aturan menyertakan atau mengecualikan batas itu?",
   ),
   v2p03m03: guide(
@@ -98,7 +98,7 @@ export const GUIDANCE = {
       "Pilih komponen yang bekerja pada setiap tahap pengolahan.",
       "Periksa urutan penyimpanan data, pengaturan instruksi, perhitungan, dan tampilan hasil.",
     ],
-    "RAM, CU, dan ALU adalah nama komponen komputer yang telah kamu pelajari. Diagram hanya menunjukkan tahapan pekerjaan, bukan kunci jawabannya.",
+    "RAM, CU, dan ALU adalah nama komponen komputer yang telah kamu pelajari. Gunakan urutan kerja pada diagram untuk menentukan komponen yang sesuai.",
     "Cocokkan pekerjaan pada setiap tahap dengan fungsi komponen. Tempat menyimpan data berbeda dari unit yang menghitung.",
   ),
   v2p04m02: guide(
@@ -128,7 +128,7 @@ export const GUIDANCE = {
       "Ubah kode di editor. Pertahankan nama daftar nilai dan tampilkan satu hasil dengan print.",
       "Tekan Coba, baca hasil tiap pengujian, lalu perbaiki sebelum mengirim.",
     ],
-    "Penguji memakai beberapa daftar berisi lima nilai. Program harus menghitung dari daftar yang diberikan, bukan mencetak angka jawaban tetap.",
+    "Saat kamu menekan Coba, program dijalankan dengan beberapa daftar berisi lima nilai. Buat perhitungan yang tetap benar ketika angka dalam daftar berubah.",
     "Rata-rata membandingkan jumlah seluruh nilai dengan banyaknya nilai. Cocokkan pembagi dengan data yang digunakan.",
   ),
   v2p05m02: guide(
@@ -136,7 +136,7 @@ export const GUIDANCE = {
     [
       "Pilih penyebab Air hilang dan prediksi isi posisi yang ditanyakan setelah perbaikan.",
       "Edit perintah yang salah pada kode.",
-      "Uji program dan cocokkan daftar hasil dengan target.",
+      "Tekan Coba, lalu cocokkan daftar hasilnya dengan daftar yang diminta.",
     ],
     "Data uji dapat mengganti barang pertama. Pertahankan barang pertama itu; ganti Kayu menjadi Air, hapus Batu, lalu tambahkan Obat.",
     "Periksa posisi setiap barang tepat sebelum pop dijalankan. Gunakan keadaan daftar saat itu, bukan keadaan awal.",
@@ -144,11 +144,11 @@ export const GUIDANCE = {
   v2p05m03: guide(
     "Bantu aku memilih solusi rata-rata yang dapat diandalkan.",
     [
-      "Telusuri rancangan A dan B secara manual untuk ketiga daftar yang diberikan.",
+      "Hitung hasil A dan B satu per satu untuk ketiga daftar yang tersedia.",
       "Tulis hasil masing-masing rancangan, lalu tentukan pilihanmu.",
-      "Jelaskan alasan berdasarkan ketiga syarat dan baca rubrik sebelum mengirim.",
+      "Jelaskan bagaimana pilihanmu memenuhi ketiga syarat. Buka Yang dinilai untuk memeriksa kelengkapan jawabanmu.",
     ],
-    "Cuplikan ini adalah rancangan langkah (pseudocode), bukan editor yang bisa dijalankan. Tulis hasil perhitungan atau pesan yang dihasilkan. Guru akan menilai bukti dan alasanmu.",
+    "A dan B ditulis dalam pseudocode. Baca langkahnya, lalu tulis hasil hitungan atau pesan yang muncul pada kotak jawaban. Guru akan membaca hasil dan alasanmu.",
     "Bandingkan semua kasus, bukan hanya contoh lima murid. Jelaskan juga apa arti hasil ketika daftar kosong.",
   ),
   v2p05m04: guide(
@@ -158,7 +158,7 @@ export const GUIDANCE = {
       "Tulis algoritma, pseudocode, atau Python buatanmu sendiri.",
       "Buat kasus uji beserta hasil yang diharapkan, lalu jelaskan alasan rancanganmu.",
     ],
-    "Tuliskan rancangan pada empat kotak. Tidak ada eksekusi otomatis; guru menilai dengan rubrik. Nilai tantangan ini terpisah dan tidak mengurangi nilai inti.",
-    "Pastikan rancanganmu menjelaskan keputusan ketika stok cukup, stok kurang, atau masukan tidak valid. Ujilah juga saat stok tepat sama dengan permintaan.",
+    "Isi keempat kotak dengan idemu sendiri. Kode yang kamu tulis di sini akan dibaca guru. Tantangan ini pilihan saja; hasilnya tidak mengurangi nilai inti.",
+    "Pastikan rancanganmu menjelaskan keputusan ketika stok cukup, stok kurang, atau data berupa angka negatif. Ujilah juga saat stok tepat sama dengan permintaan.",
   ),
 };
