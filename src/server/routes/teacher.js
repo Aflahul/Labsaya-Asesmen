@@ -1,3 +1,4 @@
+import { upgradeScoring } from "../../shared/assessment.js";
 import { getMission } from "../../shared/missions.js";
 import { gradeReview } from "../../shared/v2-evaluator.js";
 import { summarizeProgress } from "../../shared/progress.js";
@@ -52,7 +53,7 @@ export async function teacherRoutes(app) {
       let graded;
       try {
         graded = gradeReview(
-          old,
+          upgradeScoring(old),
           getMission(old.missionId),
           req.body?.marks,
           req.body?.comment,

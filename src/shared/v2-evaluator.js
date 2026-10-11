@@ -1,3 +1,4 @@
+import { scoreMission } from "./mission-scoring.js";
 import { runPython } from "./python.js";
 export function initialV2(m) {
   return {
@@ -141,7 +142,11 @@ export function reduceV2(old, e, m) {
   }
   if (["run", "submit"].includes(e.type)) {
     const r = evaluateV2(m, s.state);
-    s.attempts++;
+    const newAttempt = e.type === "run" || !s.state.tested;
+    if (newAttempt) {
+      s.attempts++;
+      if (!r.ready || (!r.pending && r.accuracy < 100)) s.errors++;
+    }
     s.feedback = r.feedback;
     s.state.trace = r.runs || null;
     s.state.tested = true;
@@ -150,8 +155,11 @@ export function reduceV2(old, e, m) {
       s.status = r.pending ? "pending_review" : "complete";
       s.submittedAt = new Date().toISOString();
       s.completedAt = r.pending ? null : s.submittedAt;
-      s.score = r.accuracy;
-      s.components = r.pending ? null : { K: r.accuracy };
+      if (!r.pending) {
+        const { score, ...components } = scoreMission(s, r.accuracy);
+        s.score = score;
+        s.components = components;
+      }
     }
   }
   return s;
@@ -166,12 +174,14 @@ export function gradeReview(session, m, marks, comment, teacherId) {
   for (const [key, , max] of m.rubric)
     if (!Number.isFinite(marks[key]) || marks[key] < 0 || marks[key] > max)
       throw Error("Skor rubrik di luar rentang");
-  const score = m.rubric.reduce((n, [key]) => n + marks[key], 0);
+  const accuracy = m.rubric.reduce((n, [key]) => n + marks[key], 0);
+  const { score, ...components } = scoreMission(session, accuracy);
   return {
     ...session,
     status: "complete",
     score,
-    components: { K: score },
+    firstAccuracy: accuracy,
+    components,
     completedAt: new Date().toISOString(),
     review: {
       teacherId,

@@ -1,3 +1,5 @@
+import { connectIslands } from "./ui/map-links.js";
+import { scoreBreakdown } from "./ui/score-breakdown.js";
 import "./styles.css";
 import "./game.css";
 import { updateDraft, drainDrafts, draftState } from "./drafts.js";
@@ -46,7 +48,47 @@ let auth = null,
   pendingMission = null,
   naraState = { open: true, page: 0, mode: "guide" },
   cacheWarning = "",
-  displayedFingerprint = "";
+  displayedFingerprint = "",
+  disconnectMap = () => {};
+const pageNara = {
+  home: { open: true, page: 0, mode: "guide" },
+  map: { open: true, page: 0, mode: "guide" },
+};
+function pageGuide(page) {
+  return naraToast(
+    {
+      guidance:
+        page === "home"
+          ? {
+              goal: "Kita mulai dari satu koneksi kecil. Siap? Daftar untuk memulai, atau Masuk untuk melanjutkan perjalananmu.",
+              steps: [
+                "Daftar dengan identitasmu.",
+                "Jelajahi lima pulau dan selesaikan misinya.",
+                "Lihat rincian nilai di Rapor.",
+              ],
+              help: "Ketepatan bernilai 60%. Petunjuk, percobaan, kesalahan, dan waktu masing-masing 10%. Selesaikan 15 misi dengan rata-rata minimal 90 untuk membuka bos pengayaan.",
+            }
+          : {
+              goal: "Pilih pulau, lalu tekan Masuk.",
+              steps: [
+                "Pilih pulau yang terbuka.",
+                "Tekan Masuk di samping pulau.",
+                "Selesaikan tiga misi untuk membuka pulau berikutnya.",
+              ],
+              help: "Nilai akhir terbaik setiap misi masuk rata-rata. Setelah 15 misi dinilai dan rata-ratanya minimal 90, portal Ruang Arsitek terbuka.",
+            },
+    },
+    pageNara[page],
+  );
+}
+function redrawNara() {
+  if (route === "home") home();
+  else if (route === "map") map();
+  else renderMission();
+}
+function activeNaraState() {
+  return pageNara[route] || naraState;
+}
 const $ = (s) => document.querySelector(s);
 const seconds = (ms) => {
   const n = Math.floor(ms / 1000);
@@ -202,24 +244,26 @@ function pause() {
   }
 }
 function shell(content) {
+  disconnectMap();
+  disconnectMap = () => {};
   document.body.dataset.route = route;
   document.body.classList.toggle(
     "nara-is-open",
-    route === "mission" && naraState.open,
+    ["home", "map", "mission"].includes(route) && activeNaraState().open,
   );
   app.innerHTML = `<header><button class="brand" data-nav="home"><span class="brand-mark">✧</span><span>Pulau Logika</span></button><nav>${auth?.role === "participant" ? '<button class="navbtn" data-nav="map">Peta</button><button class="navbtn" data-nav="report">Rapor</button>' : ""}${auth?.role === "teacher" ? '<button class="navbtn" data-nav="teacher">Guru</button>' : ""}<button class="navbtn" data-nav="leaderboard">Peringkat</button><button class="navbtn" data-nav="${auth?.role === "teacher" ? "teacher" : "teacher-login"}">Guru</button><button class="small ghost" id="mute" aria-label="${audio.muted ? "Aktifkan suara" : "Matikan suara"}">${audio.muted ? "♪ Off" : "♪ On"}</button><button class="small ghost" data-nav="settings" aria-label="Pengaturan">⚙</button>${auth ? '<button class="small ghost" id="logout">Keluar</button>' : ""}</nav></header><main>${cacheWarning ? `<p class="panel error" role="alert">${esc(cacheWarning)}</p>` : ""}${content}</main><footer class="footer">ASESMEN INFORMATIKA · FASE E ${route === "mission" || route === "travel" ? "" : `<span style="float:right" data-sync>${esc(syncStatus)}</span>`}</footer>`;
 }
 function home() {
   world.reset();
   shell(
-    `<section class="home game-home"><div class="hero"><div class="eyebrow">EKSPEDISI MENARA AWAN · INFORMATIKA KELAS X</div><h1>Hidupkan kembali<br><em>Menara Awan.</em></h1><p>Lima pulau kehilangan koneksi. Bersama Nara, gunakan data, algoritma, dan program untuk menyambungkan dunia ini kembali.</p><div class="actions"><button class="primary" data-nav="${auth?.role === "participant" ? "map" : "register"}">${auth?.role === "participant" ? "Lanjut" : "Daftar"}</button>${!auth ? '<button data-nav="login">Masuk</button>' : ""}</div><p class="notice">Buat akun sebelum misi pertama. Petunjuk dan waktu bermain tidak mengurangi nilai.</p></div><img class="hero-island" src="/game-assets/island-menara-program.webp" alt="Menara Program melayang di atas awan"><div class="nara-greeting"><img src="/game-assets/character-nara-idle.webp" alt="Nara, robot pemandu"><p>“Kita mulai dari satu koneksi kecil. Siap?”<small>NARA · PEMANDU EKSPEDISI</small></p></div></section>`,
+    `<section class="home game-home"><div class="hero"><div class="eyebrow">EKSPEDISI MENARA AWAN · INFORMATIKA KELAS X</div><h1>Hidupkan kembali<br><em>Menara Awan.</em></h1><p>Lima pulau kehilangan koneksi. Bersama Nara, gunakan data, algoritma, dan program untuk menyambungkan dunia ini kembali.</p><div class="actions"><button class="primary" data-nav="${auth?.role === "participant" ? "map" : "register"}">${auth?.role === "participant" ? "Lanjut" : "Daftar"}</button>${!auth ? '<button data-nav="login">Masuk</button>' : ""}</div><p class="notice">Buat akun sebelum misi pertama. Lihat rincian nilai akhir di setiap penyelesaian misi.</p></div><img class="hero-island" src="/game-assets/island-menara-program.webp" alt="Menara Program melayang di atas awan"></section>${pageGuide("home")}`,
   );
 }
 function authForm(kind) {
   const register = kind === "register",
     teacher = kind === "teacher-login";
   shell(
-    `<section class="panel auth-panel"><div class="eyebrow">${teacher ? "Ruang pendidik" : "Identitas penjelajah"}</div><h2 style="margin-top:12px">${register ? "Mulai ekspedisimu" : teacher ? "Masuk halaman guru" : "Selamat datang kembali"}</h2><p>${teacher ? "Lihat bukti belajar dan perkembangan peserta." : register ? "Gunakan nama asli untuk rapor dan nama samaran untuk papan peringkat." : "Masuk dengan nama asli dan nama samaran yang sama saat mendaftar."}</p><form id="auth-form" data-kind="${kind}">${teacher ? '<label for="username">Username guru</label><input id="username" name="username" required autocomplete="username"><label for="password">Kata sandi</label><input id="password" name="password" type="password" required autocomplete="current-password">' : '<label for="realName">Nama asli</label><input id="realName" name="realName" maxlength="100" required autocomplete="name"><label for="alias">Nama samaran</label><input id="alias" name="alias" maxlength="100" required autocomplete="username">'}${register ? '<label for="className">Kelas / rombel</label><input id="className" name="className" maxlength="50" required placeholder="Contoh: X RPL 1"><label for="attendance">Nomor absen</label><input id="attendance" name="attendance" type="number" min="1" max="999" required aria-describedby="attendance-help"><p id="attendance-help" class="notice">Masukkan nomor absenmu. Untuk absen 01, cukup tulis 1.</p>' : ""}<p id="error" role="alert" class="error"></p>${!teacher ? '<p class="notice">Nama asli dan nama samaran dipakai untuk masuk. Siapa pun yang mengetahui keduanya dapat mengakses akun ini. Jangan gunakan kata sandi akun lain sebagai nama samaran.</p>' : ""}<div class="actions"><button class="primary" type="submit">${register ? "Daftar" : "Masuk"}</button><button type="button" class="ghost" data-nav="home">Kembali</button></div></form><p class="notice">${teacher ? "Akun guru disediakan oleh pengelola aplikasi." : "Simpan nama yang kamu gunakan agar bisa melanjutkan di perangkat lain."}</p></section>`,
+    `<section class="panel auth-panel"><div class="eyebrow">${teacher ? "Ruang pendidik" : "Identitas penjelajah"}</div><h2 style="margin-top:12px">${register ? "Mulai ekspedisimu" : teacher ? "Masuk halaman guru" : "Selamat datang kembali"}</h2><p>${teacher ? "Masuk dengan akun guru yang dibuat administrator sekolah. Akun murid tidak dapat digunakan di sini." : register ? "Gunakan nama asli untuk rapor dan nama samaran untuk papan peringkat." : "Masuk dengan nama asli dan nama samaran yang sama saat mendaftar."}</p><form id="auth-form" data-kind="${kind}">${teacher ? '<label for="username">Username guru</label><input id="username" name="username" required autocomplete="username"><label for="password">Kata sandi</label><input id="password" name="password" type="password" required autocomplete="current-password">' : '<label for="realName">Nama asli</label><input id="realName" name="realName" maxlength="100" required autocomplete="name"><label for="alias">Nama samaran</label><input id="alias" name="alias" maxlength="100" required autocomplete="username">'}${register ? '<label for="className">Kelas / rombel</label><input id="className" name="className" maxlength="50" required placeholder="Contoh: X RPL 1"><label for="attendance">Nomor absen</label><input id="attendance" name="attendance" type="number" min="1" max="999" required aria-describedby="attendance-help"><p id="attendance-help" class="notice">Masukkan nomor absenmu. Untuk absen 01, cukup tulis 1.</p>' : ""}<p id="error" role="alert" class="error"></p>${!teacher ? '<p class="notice">Nama asli dan nama samaran dipakai untuk masuk. Siapa pun yang mengetahui keduanya dapat mengakses akun ini. Jangan gunakan kata sandi akun lain sebagai nama samaran.</p>' : ""}<div class="actions"><button class="primary" type="submit">${register ? "Daftar" : "Masuk"}</button><button type="button" class="ghost" data-nav="home">Kembali</button></div></form><p class="notice">${teacher ? "Akun guru disediakan oleh pengelola aplikasi." : "Simpan nama yang kamu gunakan agar bisa melanjutkan di perangkat lain."}</p></section>`,
   );
 }
 async function activate(data) {
@@ -253,7 +297,7 @@ function map() {
   const selected =
     ISLANDS.find((i) => i.id === (selectedIsland || next.island)) || ISLANDS[0];
   shell(
-    `<div class="topline map-heading"><div><div class="eyebrow">EKSPEDISI ${esc(auth.user.alias)}</div><h2>Pulihkan jalur antarpulau.</h2><p>${summary.completed}/15 misi inti selesai${summary.pendingReview ? " · " + summary.pendingReview + " karya menunggu guru" : ""}</p></div><button class="ghost" data-nav="report">Rapor</button></div><p class="map-guide">Klik sebuah pulau, lalu tekan tombol Masuk yang muncul di dekatnya.</p><div class="map-stage"><div class="island-grid constellation"><svg class="map-links" viewBox="0 0 1000 620" preserveAspectRatio="none" aria-hidden="true"><path d="M170 140 Q330 40 500 140 T830 140 Q930 420 650 460 Q480 550 340 460"/></svg>${ISLANDS.map(
+    `<div class="topline map-heading"><div><div class="eyebrow">EKSPEDISI ${esc(auth.user.alias)}</div><h2>Pulihkan jalur antarpulau.</h2><p>${summary.completed}/15 misi inti selesai${summary.pendingReview ? " · " + summary.pendingReview + " karya menunggu guru" : ""}</p></div><button class="ghost" data-nav="report">Rapor</button></div><div class="map-stage"><div class="island-grid constellation"><svg class="map-links" viewBox="0 0 1000 620" preserveAspectRatio="none" aria-hidden="true"><path/></svg>${ISLANDS.map(
       (i) => {
         const ms = CORE_MISSIONS.filter((m) => m.island === i.id),
           done = ms.filter((m) => summary.bestByMission[m.id]).length,
@@ -264,6 +308,8 @@ function map() {
       "",
     )}</div></div>${summary.completed === 15 ? `<section class="panel ending-card"><img src="/game-assets/ending-network-restored.webp" alt="Jaringan antarpulau kembali bercahaya"><div><div class="eyebrow">EKSPEDISI INTI SELESAI</div><h2>Menara Awan kembali menyala.</h2><p>Nilai inti: <strong>${summary.score}</strong>. Semua bukti belajar tersimpan di rapormu.</p>${summary.bossUnlocked ? `<p>Sebuah portal terbuka. Ruang Arsitek menantangmu membuat solusi sendiri.</p><button class="primary" data-mission="${BOSS.id}">Tantang</button><p class="notice">Hasil bos terpisah dan tidak dapat mengurangi nilai inti.</p>` : '<p class="notice">Kamu boleh mengulang misi untuk memperkuat pemahaman. Nilai terbaik setiap misi digunakan.</p>'}</div></section>` : ""}${summary.legacyCount ? `<p class="panel notice">${summary.legacyCount} sesi versi lama tetap tersimpan dalam riwayat rapor. Ekspedisi lima pulau memakai penilaian baru.</p>` : ""}`,
   );
+  app.querySelector("main").insertAdjacentHTML("beforeend", pageGuide("map"));
+  disconnectMap = connectIslands($(".constellation"));
 }
 async function travel(m) {
   if (!unlocked(m, summarizeProgress(progress))) return;
@@ -290,7 +336,7 @@ async function travel(m) {
           ? "Portal Ruang Arsitek terbuka"
           : "Memasuki " + m.islandName;
   shell(
-    `<section class="travel arrival" data-transition="${kind}"><div class="panel arrival-card"><div class="eyebrow">${kind === "task" ? "Masih di " + esc(m.islandName) : kind === "island" ? "Perjalanan antarpulau" : kind === "boss" ? "Pengayaan opsional" : "Mendarat di pulau"}</div><h2 tabindex="-1" id="arrival-heading">${esc(heading)}</h2><div class="arrival-nara"><img src="/game-assets/character-nara-idle.webp" alt=""><div><strong>Nara · pemandumu</strong><p>${esc(m.guidance.goal)}</p></div></div><p>Misi berikutnya: <strong>${esc(m.title)}</strong></p><p class="notice">Pesawat kita akan bersiap di sini. Setelah tiba, tekan Mulai saat kamu siap.</p><div id="arrival-actions"><button id="skip">Lewati</button></div><button class="ghost" data-nav="map">← Peta</button></div></section>`,
+    `<section class="travel arrival" data-transition="${kind}"><div class="panel arrival-card"><div class="eyebrow">${kind === "task" ? "Masih di " + esc(m.islandName) : kind === "island" ? "Perjalanan antarpulau" : kind === "boss" ? "Pengayaan opsional" : "Mendarat di pulau"}</div><h2 tabindex="-1" id="arrival-heading">${esc(heading)}</h2><div class="arrival-nara"><img src="/game-assets/character-nara-idle.webp" alt=""><div><strong>Nara · pemandumu</strong><p>${esc(m.guidance.goal)} Setelah tiba, tekan Mulai saat kamu siap.</p></div></div><p>Misi berikutnya: <strong>${esc(m.title)}</strong></p><div id="arrival-actions"><button id="skip">Lewati</button></div><button class="ghost" data-nav="map">← Peta</button></div></section>`,
   );
   $("#arrival-heading").focus({ preventScroll: true });
   await world.travelTo(m.scene || m.slug, kind);
@@ -357,8 +403,9 @@ function renderMission() {
     done = s.status === "complete",
     pending = s.status === "pending_review";
   world.setScene(m.scene || m.slug);
+  world.setProp(m.prop);
   shell(
-    `<div class="topline"><button class="ghost small" data-nav="map">← Peta</button></div><div class="mission-layout"><section class="panel mission-panel"><div class="mission-title"><div><div class="eyebrow">${esc(m.islandName)} · ${m.enrichment ? "BOS OPSIONAL" : m.meeting + " · Misi " + Number(m.id.slice(-2)) + "/3"}</div><h2 id="mission-heading" tabindex="-1">${esc(m.title)}</h2></div><span class="badge">${done ? "✓ Dinilai" : pending ? "◷ Menunggu guru" : "Sedang dimainkan"}</span></div><div class="mission-progress"><span>Misi ${summary.completed}/15</span><span>Waktu <strong id="timer">${seconds(s.activeMs)}</strong></span><progress max="15" value="${summary.completed}" aria-label="Misi inti selesai"></progress></div><div class="instruction"><strong>Misi kita</strong><p>${esc(m.instructions)}</p></div><div class="activity" ${done || pending ? "inert" : ""}>${m.missionVersion === 2 ? v2ActivityHtml(m, draftState(s)) : activityHtml(m, s.state)}</div>${done ? `<p class="feedback" role="status">Nilai: <strong>${s.score}</strong></p>` : pending ? `<p class="feedback" role="status">Jawabanmu sudah terkirim. Tunggu penilaian guru di Rapor.</p>` : `<p id="error" class="error" role="alert"></p>`}<div class="mission-controls">${done ? '<button class="primary" id="next">Lanjut</button><button id="replay">Ulang</button>' : pending ? '<button class="primary" data-nav="map">← Peta</button><button id="refresh-progress">Periksa</button><button data-nav="report">Rapor</button>' : `${!m.written ? '<button id="run">Coba</button>' : ""}<button class="primary" id="submit">Kirim</button><button id="hint">Petunjuk</button><button class="ghost" id="reset">Bersihkan</button>`}</div></section></div>${naraToast(m, naraState, naraState.mode === "hint" ? hint : done && s.score < 100 ? "Jawaban sudah dinilai. Kamu boleh mencoba lagi untuk memperbaikinya; nilai terbaik tetap tersimpan." : s.feedback)}`,
+    `<div class="topline"><button class="ghost small" data-nav="map">← Peta</button></div><div class="mission-layout"><section class="panel mission-panel"><div class="mission-title"><div><div class="eyebrow">${esc(m.islandName)} · ${m.enrichment ? "BOS OPSIONAL" : m.meeting + " · Misi " + Number(m.id.slice(-2)) + "/3"}</div><h2 id="mission-heading" tabindex="-1">${esc(m.title)}</h2></div><span class="badge">${done ? "✓ Dinilai" : pending ? "◷ Menunggu guru" : "Sedang dimainkan"}</span></div><div class="mission-progress"><span>Misi ${summary.completed}/15</span><span>Waktu <strong id="timer">${seconds(s.activeMs)}</strong></span><progress max="15" value="${summary.completed}" aria-label="Misi inti selesai"></progress></div><div class="instruction"><strong>Misi kita</strong><p>${esc(m.instructions)}</p></div><div class="activity" ${done || pending ? "inert" : ""}>${m.missionVersion === 2 ? v2ActivityHtml(m, draftState(s)) : activityHtml(m, s.state)}</div>${done ? `<p class="feedback" role="status">Nilai: <strong>${s.score}</strong></p>${scoreBreakdown(s)}` : pending ? `<p class="feedback" role="status">Jawabanmu sudah terkirim. Tunggu penilaian guru di Rapor.</p>` : `<p id="error" class="error" role="alert"></p>`}<div class="mission-controls">${done ? '<button class="primary" id="next">Lanjut</button><button id="replay">Ulang</button>' : pending ? '<button class="primary" data-nav="map">← Peta</button><button id="refresh-progress">Periksa</button><button data-nav="report">Rapor</button>' : `${!m.written ? '<button id="run">Coba</button>' : ""}<button class="primary" id="submit">Kirim</button><button id="hint">Petunjuk</button><button class="ghost" id="reset">Bersihkan</button>`}</div></section></div>${naraToast(m, naraState, naraState.mode === "hint" ? hint : done && s.score < 100 ? "Jawaban sudah dinilai. Kamu boleh mencoba lagi untuk memperbaikinya; nilai terbaik tetap tersimpan." : s.feedback)}`,
   );
   if (focusedId)
     document.getElementById(focusedId)?.focus({ preventScroll: true });
@@ -373,7 +420,7 @@ function report(p = progress, identity = auth?.user) {
   reportIdentity = identity;
   const r = buildReport(p);
   shell(
-    `<section class="panel"><div class="topline"><div><div class="eyebrow">Bukti belajar · Rapor ekspedisi</div><h2 style="margin-top:12px">${esc(identity?.realName || identity?.real_name || "Penjelajah")}</h2><p>${esc(identity?.className || identity?.class_name || "")} · ${esc(identity?.alias || "")} · absen ${esc(identity?.attendance || "")}</p></div><button class="ghost" data-nav="${auth?.role === "teacher" ? "teacher" : "map"}">← Kembali</button></div><div class="summary-grid"><div class="summary-card"><small>Misi inti selesai</small><strong>${r.completed}/15</strong></div><div class="summary-card"><small>Nilai inti terbaik</small><strong>${r.score ?? "Belum lengkap"}</strong></div><div class="summary-card"><small>Ketepatan jawaban</small><strong>${r.accuracy ?? "—"}</strong></div><div class="summary-card"><small>Total waktu aktif</small><strong>${seconds(r.totals.activeMs)}</strong></div></div><div class="competencies">${r.competencies.map((c) => `<div class="competency">${esc(c.name)}<strong>${c.score ?? "Belum lengkap"}</strong></div>`).join("")}</div><p class="notice">Nilai intimu adalah rata-rata nilai terbaik dari 15 misi. Tantangan bos tidak mengurangi nilai ini. Waktu bermain tidak menentukan nilai.</p><p class="notice">Rekap berisi tabel nilai. Cadangan menyimpan bukti lengkap; gunakan Pulihkan untuk membacanya kembali.</p><div class="actions"><button id="csv">Rekap</button><button id="json">Cadangan</button>${auth?.role === "participant" ? '<button id="import-json" class="ghost">Pulihkan</button><input id="json-file" type="file" accept="application/json" hidden>' : ""}</div>${auth?.role === "teacher" ? reviewHtml({ sessions: p.sessions.map((s) => ({ ...s, mission: getMission(s.missionId) })) }) : ""}${
+    `<section class="panel"><div class="topline"><div><div class="eyebrow">Bukti belajar · Rapor ekspedisi</div><h2 style="margin-top:12px">${esc(identity?.realName || identity?.real_name || "Penjelajah")}</h2><p>${esc(identity?.className || identity?.class_name || "")} · ${esc(identity?.alias || "")} · absen ${esc(identity?.attendance || "")}</p></div><button class="ghost" data-nav="${auth?.role === "teacher" ? "teacher" : "map"}">← Kembali</button></div><div class="summary-grid"><div class="summary-card"><small>Misi inti selesai</small><strong>${r.completed}/15</strong></div><div class="summary-card"><small>Nilai inti terbaik</small><strong>${r.score ?? "Belum lengkap"}</strong></div><div class="summary-card"><small>Ketepatan jawaban</small><strong>${r.accuracy ?? "—"}</strong></div><div class="summary-card"><small>Total waktu aktif</small><strong>${seconds(r.totals.activeMs)}</strong></div></div><div class="competencies">${r.competencies.map((c) => `<div class="competency">${esc(c.name)}<strong>${c.score ?? "Belum lengkap"}</strong></div>`).join("")}</div><p class="notice">Nilai intimu adalah rata-rata nilai terbaik dari 15 misi. Tantangan bos tidak mengurangi nilai ini. Ketepatan 60%; petunjuk, percobaan, kesalahan, dan waktu aktif masing-masing 10%. Bos pengayaan terbuka setelah 15 misi dinilai dengan rata-rata minimal 90.</p><p class="notice">Rekap berisi tabel nilai. Cadangan menyimpan bukti lengkap; gunakan Pulihkan untuk membacanya kembali.</p><div class="actions"><button id="csv">Rekap</button><button id="json">Cadangan</button>${auth?.role === "participant" ? '<button id="import-json" class="ghost">Pulihkan</button><input id="json-file" type="file" accept="application/json" hidden>' : ""}</div>${auth?.role === "teacher" ? reviewHtml({ sessions: p.sessions.map((s) => ({ ...s, mission: getMission(s.missionId) })) }) : ""}${
       p.sessions.some((s) => s.review)
         ? `<section class="review-feedback"><h3>Umpan balik guru</h3>${p.sessions
             .filter((s) => s.review)
@@ -383,7 +430,7 @@ function report(p = progress, identity = auth?.user) {
             )
             .join("")}</section>`
         : ""
-    }<h3 style="margin-top:30px">Rincian per misi</h3>${table(auth?.role === "teacher" ? r.rows : r.rows.map(({ Misi, Jenis, Status, Nilai }) => ({ Misi, Jenis, Status, Nilai })))}${auth?.role === "teacher" ? `<h3 style="margin-top:30px">Riwayat sesi dan bukti tindakan</h3>${p.conflicts?.length ? `<p class="error">${p.conflicts.length} konflik perangkat dicadangkan. Ekspor JSON untuk bukti lokal yang belum menjadi nilai server; lanjutkan dari keadaan server atau mainkan ulang.</p>` : ""}<p class="notice">Total ${r.totals.attempts} pemeriksaan · ${r.totals.errors} kesalahan · ${r.totals.resets} ulang · ${r.totals.hints} petunjuk. Metrik ini kumulatif, bukan metrik sesi terbaik.</p>${p.sessions.map((s) => `<details><summary class="notice">${esc(getMission(s.missionId).title)} · ${s.status === "complete" ? `Nilai ${s.score}` : s.status === "pending_review" ? "Menunggu penilaian guru" : "Belum selesai"} · ${seconds(s.activeMs)} · ${s.errors} kesalahan · ${s.source === "offline" ? "bukti offline" : "bukti perangkat"}${r.bestByMission[s.missionId]?.id === s.id ? " · terbaik" : ""}</summary><pre class="trace">${esc(JSON.stringify({ sessionId: s.id, firstAccuracy: s.firstAccuracy, components: s.components, answer: s.state, events: s.events }, null, 2))}</pre></details>`).join("")}<p class="notice">${r.rows.filter((x) => x.Status !== "Selesai").length} misi belum memiliki bukti penyelesaian. Tugas dengan bantuan/kesalahan berulang layak dikonfirmasi kembali melalui asesmen kinerja guru. C5 dan C6 dinilai guru melalui rubrik. Keterampilan pada perangkat nyata dapat dikonfirmasi melalui praktik.</p>` : ""}</section>`,
+    }<h3 style="margin-top:30px">Rincian per misi</h3>${table(auth?.role === "teacher" ? r.rows : r.rows.map(({ Misi, Jenis, Status, Nilai, K, H, P, E, W }) => ({ Misi, Jenis, Status, "Nilai akhir": Nilai, "Ketepatan (60%)": K, "Petunjuk (10%)": H, "Percobaan (10%)": P, "Kesalahan (10%)": E, "Waktu (10%)": W })))}${auth?.role === "teacher" ? `<h3 style="margin-top:30px">Riwayat sesi dan bukti tindakan</h3>${p.conflicts?.length ? `<p class="error">${p.conflicts.length} konflik perangkat dicadangkan. Ekspor JSON untuk bukti lokal yang belum menjadi nilai server; lanjutkan dari keadaan server atau mainkan ulang.</p>` : ""}<p class="notice">Total ${r.totals.attempts} pemeriksaan · ${r.totals.errors} kesalahan · ${r.totals.resets} ulang · ${r.totals.hints} petunjuk. Metrik ini kumulatif, bukan metrik sesi terbaik.</p>${p.sessions.map((s) => `<details><summary class="notice">${esc(getMission(s.missionId).title)} · ${s.status === "complete" ? `Nilai ${s.score}` : s.status === "pending_review" ? "Menunggu penilaian guru" : "Belum selesai"} · ${seconds(s.activeMs)} · ${s.errors} kesalahan · ${s.source === "offline" ? "bukti offline" : "bukti perangkat"}${r.bestByMission[s.missionId]?.id === s.id ? " · terbaik" : ""}</summary><pre class="trace">${esc(JSON.stringify({ sessionId: s.id, firstAccuracy: s.firstAccuracy, components: s.components, answer: s.state, events: s.events }, null, 2))}</pre></details>`).join("")}<p class="notice">${r.rows.filter((x) => x.Status !== "Selesai").length} misi belum memiliki bukti penyelesaian. Tugas dengan bantuan/kesalahan berulang layak dikonfirmasi kembali melalui asesmen kinerja guru. C5 dan C6 dinilai guru melalui rubrik. Keterampilan pada perangkat nyata dapat dikonfirmasi melalui praktik.</p>` : ""}</section>`,
   );
 }
 async function teacher() {
@@ -420,7 +467,7 @@ function teacherTable() {
 function renderTeacher() {
   const scores = teacherRows.filter((p) => p.summary.score !== null);
   shell(
-    `<section class="panel"><div class="eyebrow">Ruang pendidik</div><h2 style="margin-top:12px">Perjalanan belajar, terlihat.</h2><p>Amati hasil dan bukti tindakan peserta. Data yang belum disinkron dari perangkat peserta belum tercantum di sini.</p><div class="summary-grid"><div class="summary-card"><small>Peserta terdaftar</small><strong>${teacherRows.length}</strong></div><div class="summary-card"><small>Inti tuntas</small><strong>${scores.length}</strong></div><div class="summary-card"><small>Kelas</small><strong>${new Set(teacherRows.map((p) => p.class_name)).size}</strong></div><div class="summary-card"><small>Rata-rata nilai tuntas</small><strong>${scores.length ? Math.round(scores.reduce((a, p) => a + p.summary.score, 0) / scores.length) : "—"}</strong></div></div><div class="inline-form"><label>Kelas<select id="teacher-class"><option value="">Semua kelas</option>${[...new Set(teacherRows.map((p) => p.class_name))].map((c) => `<option>${esc(c)}</option>`).join("")}</select></label><label>Cari peserta<input id="teacher-query" placeholder="Nama asli / samaran"></label><label><input id="teacher-complete" type="checkbox" style="width:auto"> Inti tuntas saja</label></div><div class="actions"><button id="teacher-csv">Unduh</button><button id="teacher-refresh">Segarkan</button></div><div id="teacher-table"></div><details style="margin-top:25px"><summary>Kalibrasi waktu versi lama</summary><p class="notice">Pengaturan ini hanya untuk misi versi lama. Ekspedisi lima pulau tidak memberi bobot pada waktu.</p><div class="inline-form"><label>Pengali waktu<input id="baseline" type="number" min="0.5" max="3" step="0.1" value="1"></label><button id="calibrate">Simpan</button></div><p id="error" role="alert"></p></details></section>`,
+    `<section class="panel"><div class="eyebrow">Ruang pendidik</div><h2 style="margin-top:12px">Perjalanan belajar, terlihat.</h2><p>Amati hasil dan bukti tindakan peserta. Data yang belum disinkron dari perangkat peserta belum tercantum di sini.</p><div class="summary-grid"><div class="summary-card"><small>Peserta terdaftar</small><strong>${teacherRows.length}</strong></div><div class="summary-card"><small>Inti tuntas</small><strong>${scores.length}</strong></div><div class="summary-card"><small>Kelas</small><strong>${new Set(teacherRows.map((p) => p.class_name)).size}</strong></div><div class="summary-card"><small>Rata-rata nilai tuntas</small><strong>${scores.length ? Math.round(scores.reduce((a, p) => a + p.summary.score, 0) / scores.length) : "—"}</strong></div></div><div class="inline-form"><label>Kelas<select id="teacher-class"><option value="">Semua kelas</option>${[...new Set(teacherRows.map((p) => p.class_name))].map((c) => `<option>${esc(c)}</option>`).join("")}</select></label><label>Cari peserta<input id="teacher-query" placeholder="Nama asli / samaran"></label><label><input id="teacher-complete" type="checkbox" style="width:auto"> Inti tuntas saja</label></div><div class="actions"><button id="teacher-csv">Unduh</button><button id="teacher-refresh">Segarkan</button></div><div id="teacher-table"></div><details style="margin-top:25px"><summary>Kalibrasi waktu versi lama</summary><p class="notice">Pengaturan ini hanya untuk misi versi lama. Ekspedisi lima pulau memakai acuan waktu per misi dengan bobot 10%.</p><div class="inline-form"><label>Pengali waktu<input id="baseline" type="number" min="0.5" max="3" step="0.1" value="1"></label><button id="calibrate">Simpan</button></div><p id="error" role="alert"></p></details></section>`,
   );
   teacherTable();
 }
@@ -595,23 +642,27 @@ app.addEventListener("click", async (e) => {
         break;
       case "nara-close":
       case "nara-dismiss":
-        naraState.open = false;
-        renderMission();
+        activeNaraState().open = false;
+        redrawNara();
         $("#nara-open")?.focus({ preventScroll: true });
         break;
       case "nara-open":
       case "nara-guide":
-        naraState = { open: true, page: 0, mode: "guide" };
-        renderMission();
+        Object.assign(activeNaraState(), {
+          open: true,
+          page: 0,
+          mode: "guide",
+        });
+        redrawNara();
         $("#nara-close")?.focus({ preventScroll: true });
         break;
       case "nara-next":
       case "nara-back":
-        naraState.page = Math.max(
+        activeNaraState().page = Math.max(
           0,
-          Math.min(2, naraState.page + (b.id === "nara-next" ? 1 : -1)),
+          Math.min(2, activeNaraState().page + (b.id === "nara-next" ? 1 : -1)),
         );
-        renderMission();
+        redrawNara();
         if (!document.activeElement?.id)
           $("#nara-dismiss")?.focus({ preventScroll: true });
         break;

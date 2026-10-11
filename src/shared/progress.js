@@ -1,6 +1,8 @@
+import { upgradeScoring } from "./assessment.js";
 import { MISSIONS, CORE_MISSIONS, ISLANDS } from "./missions.js";
 const valid = new Set(MISSIONS.map((m) => m.id));
 export function summarizeProgress({ sessions = [] }) {
+  sessions = sessions.map(upgradeScoring);
   const latestByMission = {},
     bestByMission = {};
   for (const s of sessions) {
@@ -38,8 +40,21 @@ export function summarizeProgress({ sessions = [] }) {
     coreCount: CORE_MISSIONS.length,
     rawScore,
     score: rawScore === null ? null : Math.round(rawScore * 100) / 100,
-    accuracy: mean(done.map((m) => bestByMission[m.id])),
-    bossUnlocked: rawScore !== null && rawScore > 95,
+    accuracy: done.length
+      ? Math.round(
+          (done.reduce(
+            (sum, m) =>
+              sum +
+              (bestByMission[m.id].components?.K ??
+                bestByMission[m.id].firstAccuracy ??
+                bestByMission[m.id].score),
+            0,
+          ) /
+            done.length) *
+            100,
+        ) / 100
+      : null,
+    bossUnlocked: rawScore !== null && rawScore >= 90,
     pendingReview: sessions.filter(
       (s) => valid.has(s.missionId) && s.status === "pending_review",
     ).length,

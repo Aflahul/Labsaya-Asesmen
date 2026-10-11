@@ -1583,3 +1583,56 @@ body[data-route="mission"] .side-panel {
     padding-bottom: calc(50dvh + 100px);
   }
 }
+
+/* Paths share the grid coordinates and always stay behind island art. */
+.constellation {
+  isolation: isolate;
+}
+.constellation .map-links {
+  z-index: -1;
+}
+.map-links path {
+  vector-effect: non-scaling-stroke;
+  stroke-width: 3;
+}
+.score-breakdown {
+  margin: 20px 0;
+  padding: 18px;
+  background: #0b293b;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+.score-breakdown h3 {
+  margin: 0 0 14px;
+}
+.score-breakdown dl {
+  margin: 0;
+}
+.score-breakdown dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+.score-breakdown dd {
+  text-align: right;
+  margin: 0;
+  font-weight: bold;
+}
+.score-breakdown small {
+  display: block;
+  font-size: 12px;
+  font-weight: normal;
+  color: var(--muted);
+}
+body[data-route="home"].nara-is-open main,
+body[data-route="map"].nara-is-open main {
+  padding-bottom: 320px;
+}
+@media (max-width: 540px) {
+  body[data-route="home"].nara-is-open main,
+  body[data-route="map"].nara-is-open main {
+    padding-bottom: calc(45dvh + 100px);
+  }
+}

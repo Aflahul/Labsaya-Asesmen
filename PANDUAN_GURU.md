@@ -15,8 +15,11 @@ Asesmen formatif Informatika kelas X/Fase E. Ada 15 misi inti: 10 C3/AKM L2, 4 C
 
 - Setiap misi inti berbobot sama. Rapor/leaderboard memakai rata-rata **nilai terbaik** dari 15 misi yang sudah dinilai. Belum lengkap berarti belum ada nilai inti, bukan nol.
 - Misi objektif menggunakan proporsi bukti benar. Analisis C4 berbobot sebab 30, perbaikan 40, dan pengujian 30. Pada Perbaiki Daftar, kode bernilai 40, sebab 30, dan prediksi uji 30.
-- Waktu, petunjuk, kesalahan kontrol, reset, dan jumlah pengujian dicatat tanpa penalti skor. **Uji solusi** tidak mengakhiri percobaan; **Kirim jawaban** mengakhirinya.
-- Bos terbuka hanya setelah 15 misi dinilai dan rata-rata mentah **>95**. Angka tepat 95 tidak cukup. Nilai tampilan dibulatkan dua desimal, tetapi penguncian memakai nilai sebelum pembulatan.
+- Nilai akhir setiap misi = **60% ketepatan + 10% petunjuk + 10% percobaan + 10% kesalahan + 10% waktu aktif**. Rubrik guru menjadi komponen ketepatan untuk C5/C6.
+- Komponen petunjuk dimulai dari 100 dan turun 25 per petunjuk. Percobaan turun 20 untuk setiap percobaan setelah yang pertama, serta 10 per Bersihkan. Kesalahan turun 20 per tindakan tidak valid atau pengujian gagal/tidak lengkap. Semua komponen dibatasi 0–100.
+- Coba menghitung satu percobaan. Kirim tanpa perubahan setelah Coba tidak dihitung ulang. Panduan umum Nara tidak dihitung sebagai Petunjuk.
+- Acuan waktu: C3 180 detik, C4 300, C5 600, C6 900; ditambah 30 detik per isian terstruktur. Komponen waktu tetap 100 sampai acuan terlewati, lalu turun linier menjadi 0 pada tiga kali acuan. Waktu hanya saat misi aktif; tab tersembunyi dan menunggu guru tidak dihitung.
+- Bos terbuka hanya setelah 15 misi dinilai dan rata-rata mentah **≥90**. Angka tepat 90 membuka bos. Nilai tampilan dibulatkan dua desimal, tetapi penguncian memakai nilai sebelum pembulatan.
 - Bos opsional. Nilainya terpisah dari nilai inti, kompetensi inti, dan leaderboard, termasuk bila memperoleh 0.
 
 ## Menilai C5 dan C6
@@ -33,6 +36,12 @@ Penilaian yang tersimpan tidak dapat diedit melalui UI saat ini. Peserta dapat m
 
 Misi menggunakan konfigurasi terstruktur, pratinjau rak/diagram/RAM, dan interpreter Python terbatas untuk list satu dimensi, assignment, sum, len, append, pop, print, serta aritmetika. Interpreter bukan Python lengkap; tidak mendukung import, perulangan, atau akses sistem. Karya C6 dinilai guru dan tidak dieksekusi oleh interpreter.
 
-Gunakan bersama observasi guru. Pengulangan dan bantuan merupakan bagian pembelajaran; nilai terbaik menggambarkan capaian setelah latihan, bukan pengukuran tanpa bantuan. Pemilihan jenis data dan unit mesin memakai pilihan terstruktur, sehingga bukti kinerja perlu dilengkapi praktik langsung bila diperlukan.
+Gunakan bersama observasi guru. Pengulangan dan bantuan merupakan bagian pembelajaran; nilai terbaik menggambarkan hasil terbaik beserta proses pengerjaannya. Pemilihan jenis data dan unit mesin memakai pilihan terstruktur, sehingga bukti kinerja perlu dilengkapi praktik langsung bila diperlukan.
 
 Dashboard hanya memuat data tersinkron. Identitas nama + alias bukan autentikasi dengan rahasia. Versi lama tetap dipertahankan dengan ID/rumus lama, tidak dihitung sebagai penyelesaian versi lima pulau. Kalibrasi waktu hanya berlaku pada sesi baru **versi lama**. Lihat [panduan versi lama](docs/legacy/PANDUAN_GURU_V1.md) bila memeriksa arsip.
+
+Sesi lima pulau yang sudah tersimpan dihitung ulang dari bukti event saat dibaca, dengan riwayat jawaban dan waktu penyelesaian tetap dipertahankan.
+
+## Akun guru
+
+Akun produksi dibuat administrator melalui `npm run teacher:create` setelah `DATABASE_URL` dikonfigurasi. Tidak ada akun guru bawaan untuk produksi. Akun `guru` dengan kata sandi `test-password-only` hanya tersedia pada server pengujian `node tests/server.js` dan datanya sementara.

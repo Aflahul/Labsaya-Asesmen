@@ -1,3 +1,4 @@
+import { upgradeScoring } from "./assessment.js";
 import { MISSIONS, getMission } from "./missions.js";
 import { summarizeProgress } from "./progress.js";
 export const buildReport = (progress) => ({
@@ -12,7 +13,9 @@ export const buildReport = (progress) => ({
       ),
     ).map(getMission),
   ].map((m) => {
-    const ss = progress.sessions.filter((s) => s.missionId === m.id);
+    const ss = progress.sessions
+      .map(upgradeScoring)
+      .filter((s) => s.missionId === m.id);
     const s =
       ss
         .filter((s) => s.status === "complete")
@@ -36,6 +39,7 @@ export const buildReport = (progress) => ({
       W: s?.components?.W ?? "",
       P: s?.components?.P ?? "",
       H: s?.components?.H ?? "",
+      E: s?.components?.E ?? "",
       Detik: Math.round((s?.activeMs || 0) / 1000),
       Percobaan: s?.attempts || 0,
       Kesalahan: s?.errors || 0,

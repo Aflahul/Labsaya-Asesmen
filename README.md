@@ -22,4 +22,4 @@ Tidak ada kredensial atau akun guru bawaan di aplikasi production. Login guru di
 
 Sebanyak 26 aset dari folder Drive yang disetujui disimpan sebagai WebP di `public/game-assets/`. `manifest.json` mencatat nama, ukuran, hash sumber, dan folder asal. Ekspor ulang master PNG dengan `python scripts/prepare-game-assets.py PATH_MASTERS` (Pillow diperlukan). Master asli tidak diubah.
 
-Nilai inti tidak memakai penalti waktu/petunjuk. C5/C6 menunggu penilaian guru. ID misi versi lama tetap dikenali agar riwayat dan cadangan tidak rusak.
+Nilai akhir misi berbobot ketepatan 60%, petunjuk 10%, percobaan 10%, kesalahan 10%, dan waktu aktif 10%. Rata-rata nilai akhir terbaik dari seluruh 15 misi minimal 90 membuka bos pengayaan. C5/C6 menunggu penilaian guru. ID misi versi lama tetap dikenali agar riwayat dan cadangan tidak rusak.

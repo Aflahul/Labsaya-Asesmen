@@ -3,7 +3,11 @@ import {
   unlocked as legacyUnlocked,
 } from "../../shared/legacy/progress.js";
 import { getMission } from "../../shared/missions.js";
-import { newSession, reduceSession } from "../../shared/assessment.js";
+import {
+  newSession,
+  reduceSession,
+  upgradeScoring,
+} from "../../shared/assessment.js";
 import { summarizeProgress, unlocked } from "../../shared/progress.js";
 import { validateEvent, canonicalJson } from "../../shared/contracts.js";
 import { fail } from "../auth.js";
@@ -12,7 +16,10 @@ export async function loadProgress(db, id) {
     "SELECT document FROM mission_sessions WHERE participant_id=$1 ORDER BY updated_at",
     [id],
   );
-  return { participantId: id, sessions: rows.map((r) => r.document) };
+  return {
+    participantId: id,
+    sessions: rows.map((r) => upgradeScoring(r.document)),
+  };
 }
 export async function progressRoutes(app) {
   app.get("/api/progress", async (req) => {
@@ -37,7 +44,7 @@ export async function progressRoutes(app) {
     if (existing.rows[0]) {
       if (existing.rows[0].participant_id !== a.user_id)
         fail(403, "Sesi bukan milik Anda");
-      return { data: existing.rows[0].document };
+      return { data: upgradeScoring(existing.rows[0].document) };
     }
     const progress = await loadProgress(app.db, a.user_id);
     if (
@@ -74,7 +81,7 @@ export async function progressRoutes(app) {
       if (!rows[0]) fail(404, "Sesi tidak ditemukan");
       if (rows[0].participant_id !== a.user_id)
         fail(403, "Sesi bukan milik Anda");
-      let s = rows[0].document;
+      let s = upgradeScoring(rows[0].document);
       const m = getMission(s.missionId);
       let changed = false;
       for (const e of events) {

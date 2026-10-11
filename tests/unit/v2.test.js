@@ -24,11 +24,13 @@ test("five islands cover 15 core and one optional C6, with L2 majority", () => {
     island: 5,
   });
 });
-test("boss requires all assessed scores and raw mean strictly above 95", () => {
+test("boss requires all assessed scores and raw mean at least 90", () => {
   const boss = MISSIONS.at(-1);
-  const sessions = complete(95);
+  const sessions = complete(89.99);
   expect(unlocked(boss, summarizeProgress({ sessions }))).toBe(false);
-  sessions[0].score = 96;
+  sessions.forEach((s) => {
+    s.score = 90;
+  });
   expect(unlocked(boss, summarizeProgress({ sessions }))).toBe(true);
   sessions[14].status = "pending_review";
   expect(unlocked(boss, summarizeProgress({ sessions }))).toBe(false);
@@ -50,7 +52,7 @@ test("boss poor result never reduces main score; archived scores do not count", 
   ).toBe(0);
   expect(getMission("p01m01").missionVersion).toBe(1);
 });
-test("objective assessment score is independent of time and hints; run is not final", () => {
+test("objective assessment includes time and hints; run is not final", () => {
   const m = MISSIONS[0];
   let s = newSession(m, "p");
   let n = 0;
@@ -67,7 +69,8 @@ test("objective assessment score is independent of time and hints; run is not fi
   expect(s.status).toBe("active");
   send("submit");
   expect(s.status).toBe("complete");
-  expect(s.score).toBe(100);
+  expect(s.components.K).toBe(100);
+  expect(s.score).toBeLessThan(100);
 });
 test("C5 waits for teacher; student cannot forge a review event", () => {
   const m = MISSIONS.find((m) => m.bloom === "C5");

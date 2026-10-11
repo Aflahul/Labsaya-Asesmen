@@ -10,12 +10,19 @@ export function createWorld(container) {
     setScene(slug) {
       background.style.backgroundImage = `url("/game-assets/${slug === "ending" ? "ending-network-restored" : slug ? "scene-" + slug : "world-sky"}.webp")`;
     },
+    setProp(prop = "airship") {
+      container.querySelector(".resident-plane").src =
+        `/game-assets/prop-${prop}.webp`;
+      container.dataset.prop = prop;
+      container.classList.add("plane-present");
+    },
     reset() {
       api.setScene();
       container.classList.remove("plane-present");
     },
     travelTo(slug, kind = "enter") {
       api.skip();
+      api.setProp("airship");
       const flying = kind === "enter" || kind === "island";
       api.setScene(flying ? null : slug);
       if (flying) container.classList.remove("plane-present");

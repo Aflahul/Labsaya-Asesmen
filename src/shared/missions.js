@@ -72,6 +72,15 @@ const make = (
     narrative: `Pulihkan layanan ${i.name}. Setiap solusi yang kamu bangun membantu menyambungkan jaringan Menara Awan.`,
     instructions,
     guidance: GUIDANCE[`v2p0${island}m0${n}`],
+    timeBudgetSeconds:
+      { C3: 180, C4: 300, C5: 600, C6: 900 }[bloom] + fields.length * 30,
+    prop: {
+      1: ["cargo-crate", "cargo-crate", "airship"],
+      2: ["beacon", "airship", "beacon"],
+      3: ["drone", "cargo-crate", "drone"],
+      4: ["beacon", "beacon", "cargo-crate"],
+      5: ["beacon", "cargo-crate", "drone", "drone"],
+    }[island][n - 1],
     elements: fields.length,
     canonicalSteps: fields.length,
     hints: [

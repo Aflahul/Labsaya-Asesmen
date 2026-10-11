@@ -1,3 +1,5 @@
+import { getMission } from "./missions.js";
+import { scoreMission } from "./mission-scoring.js";
 import { initialV2, reduceV2 } from "./v2-evaluator.js";
 import { initialState, applyAction, evaluate } from "./evaluators/index.js";
 const clamp = (x) => Math.max(0, Math.min(100, Math.round(x)));
@@ -5,10 +7,11 @@ export const weightedScore = ({ K, W, P, H }) =>
   Math.round(0.4 * K + 0.25 * W + 0.2 * P + 0.15 * H);
 export function scoreSession(m, c) {
   if (m.missionVersion === 2)
-    return {
-      K: m.score ?? m.firstAccuracy ?? 0,
-      score: m.score ?? m.firstAccuracy ?? 0,
-    };
+    return scoreMission(
+      m,
+      m.components?.K ?? m.firstAccuracy ?? m.score ?? 0,
+      c,
+    );
   const baseline =
     Math.max(45, 30 + 12 * c.elements) * (c.baselineMultiplier || 1);
   const K = clamp(0.6 * (m.firstAccuracy ?? 0) + 40),
@@ -29,7 +32,13 @@ export function newSession(
     participantId,
     missionId: m.id,
     missionVersion: m.missionVersion,
-    scoringConfig: { ...config, elements: m.elements },
+    scoringConfig: {
+      ...config,
+      elements: m.elements,
+      ...(m.missionVersion === 2
+        ? { timeBudgetSeconds: m.timeBudgetSeconds, formulaVersion: 2 }
+        : {}),
+    },
     events: [],
     state: m.missionVersion === 2 ? initialV2(m) : initialState(m),
     firstAccuracy: null,
@@ -99,4 +108,34 @@ export function reduceSession(old, e, m) {
     } else s.errors++;
   }
   return s;
+}
+
+// Upgrade only recorded v2 sessions; preserve original evidence and timestamps.
+export function upgradeScoring(session) {
+  if (
+    session.missionVersion !== 2 ||
+    session.scoringConfig?.formulaVersion === 2 ||
+    !session.events?.length
+  )
+    return session;
+  const m = getMission(session.missionId);
+  let replay = newSession(m, session.participantId);
+  for (const event of session.events) replay = reduceV2(replay, event, m);
+  const result = {
+    ...session,
+    scoringConfig: replay.scoringConfig,
+    attempts: replay.attempts,
+    errors: replay.errors,
+    resets: replay.resets,
+    hints: replay.hints,
+    activeMs: replay.activeMs,
+  };
+  if (session.status === "complete") {
+    const accuracy = m.written
+      ? (session.components?.K ?? session.firstAccuracy ?? session.score)
+      : (replay.components?.K ?? session.firstAccuracy ?? session.score);
+    const { score, ...components } = scoreMission(result, accuracy);
+    Object.assign(result, { score, components, firstAccuracy: accuracy });
+  }
+  return result;
 }

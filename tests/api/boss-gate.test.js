@@ -2,7 +2,7 @@ import { test, expect } from "vitest";
 import { setup } from "./helpers.js";
 import { CORE_MISSIONS, BOSS } from "../../src/shared/missions.js";
 import { newSession } from "../../src/shared/assessment.js";
-test("server rejects exactly95 and pending review, allows raw >95, ignores boss score in leaderboard", async () => {
+test("server rejects below90 and pending review, allows exactly90, ignores boss score in leaderboard", async () => {
   const app = await setup();
   const reg = await app.inject({
     method: "POST",
@@ -23,7 +23,7 @@ test("server rejects exactly95 and pending review, allows raw >95, ignores boss 
   const sessions = CORE_MISSIONS.map((m) => ({
     ...newSession(m, p),
     status: "complete",
-    score: 95,
+    score: 89.99,
     completedAt: new Date().toISOString(),
   }));
   for (const s of sessions)
@@ -50,7 +50,7 @@ test("server rejects exactly95 and pending review, allows raw >95, ignores boss 
   await update();
   expect((await createBoss()).statusCode).toBe(403);
   s.status = "complete";
-  s.score = 95.5;
+  s.score = 90.14;
   await update();
   const boss = await createBoss();
   expect(boss.statusCode).toBe(201);
@@ -71,6 +71,6 @@ test("server rejects exactly95 and pending review, allows raw >95, ignores boss 
     await app.inject({ method: "GET", url: "/api/leaderboard" })
   ).json().data;
   expect(after).toEqual(before);
-  expect(after[0].score).toBeCloseTo(95.03);
+  expect(after[0].score).toBeCloseTo(90);
   await app.close();
 });

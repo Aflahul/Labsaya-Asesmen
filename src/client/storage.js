@@ -1,3 +1,4 @@
+import { upgradeScoring } from "../shared/assessment.js";
 export function createProgressStore(storage, id) {
   const key = `pulau:progress:v1:${id}`;
   let blocked = false,
@@ -20,6 +21,7 @@ export function createProgressStore(storage, id) {
           "Data lokal rusak. Penulisan dihentikan; unduh data asli dari Pengaturan sebelum pemulihan.",
         );
       }
+      p.sessions = p.sessions.map(upgradeScoring);
       return p;
     },
     save(p) {
