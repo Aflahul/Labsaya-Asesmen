@@ -7,6 +7,7 @@ import {
   hash,
   fail,
 } from "../auth.js";
+import { randomUUID } from "node:crypto";
 const pub = (r) => ({
   id: r.id,
   realName: r.real_name,
@@ -18,8 +19,45 @@ export async function authRoutes(app) {
   const limited = {
     config: { rateLimit: { max: 10, timeWindow: "1 minute" } },
   };
-  app.post("/api/register", limited, async () => {
-    fail(403, "Akun murid dibuat oleh guru. Minta akses kepada gurumu.");
+  app.post("/api/register", limited, async (req, reply) => {
+    const b = req.body || {};
+    const realName = requiredText(b.realName);
+    const alias = requiredText(b.alias);
+    const className = requiredText(b.className, 50);
+    const password = b.password;
+    if (
+      !Number.isInteger(b.attendance) ||
+      b.attendance < 1 ||
+      b.attendance > 999
+    )
+      fail(400, "Nomor absen harus 1–999");
+    if (
+      typeof password !== "string" ||
+      password.length < 12 ||
+      password.length > 200
+    )
+      fail(400, "Kata sandi harus 12–200 karakter");
+    let rows;
+    try {
+      ({ rows } = await app.db.query(
+        "INSERT INTO participants(id,real_name,alias,alias_key,class_name,attendance,password_hash) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING id,real_name,alias,class_name,attendance",
+        [
+          randomUUID(),
+          realName,
+          alias,
+          normalize(alias),
+          className,
+          b.attendance,
+          passwordHash(password),
+        ],
+      ));
+    } catch (e) {
+      if (e.code === "23505") fail(409, "Nama samaran sudah digunakan");
+      throw e;
+    }
+    const csrf = await issueSession(app, rows[0], "participant", reply);
+    reply.code(201);
+    return { data: { user: pub(rows[0]), role: "participant", csrf } };
   });
   app.post("/api/login", limited, async (req, reply) => {
     const b = req.body || {},

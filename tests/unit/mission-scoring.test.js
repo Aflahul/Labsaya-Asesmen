@@ -30,9 +30,23 @@ test("a correct preview followed by unchanged submission counts once and earns 1
   expect(s.attempts).toBe(1);
   expect(s.score).toBe(100);
 });
+test("first hint is free in new sessions while old scoring remains reproducible", () => {
+  const first = play({ hints: 1 });
+  const second = play({ hints: 2 });
+  expect(first.scoringConfig.formulaVersion).toBe(4);
+  expect(first.components.H).toBe(100);
+  expect(first.score).toBe(100);
+  expect(second.components.H).toBe(75);
+  expect(second.score).toBe(97.5);
+  const old = scoreSession(
+    { ...first, scoringConfig: { ...first.scoringConfig, formulaVersion: 3 } },
+    { ...first.scoringConfig, formulaVersion: 3 },
+  );
+  expect(old.score).toBe(97.5);
+});
 test("hints, failed attempts, errors and time contribute independently", () => {
   const clean = play();
-  for (const options of [{ hints: 1 }, { badRuns: 1 }, { activeMs: 3600000 }]) {
+  for (const options of [{ hints: 2 }, { badRuns: 1 }, { activeMs: 3600000 }]) {
     const s = play(options);
     expect(s.components.K).toBe(100);
     expect(s.score).toBeLessThan(clean.score);
@@ -78,8 +92,21 @@ test("existing completed sessions are recalculated from their event evidence onc
     components: { K: 100 },
   };
   const upgraded = upgradeScoring(old);
-  expect(upgraded.score).toBe(original.score);
-  expect(upgraded.components).toEqual(original.components);
+  const legacy = scoreSession(
+    {
+      ...original,
+      scoringConfig: { ...original.scoringConfig, formulaVersion: 3 },
+    },
+    { ...original.scoringConfig, formulaVersion: 3 },
+  );
+  expect(upgraded.score).toBe(legacy.score);
+  expect(upgraded.components).toMatchObject({
+    K: legacy.K,
+    H: legacy.H,
+    P: legacy.P,
+    E: legacy.E,
+    W: legacy.W,
+  });
   expect(upgraded.events).toEqual(old.events);
   expect(upgraded.completedAt).toBe(old.completedAt);
   expect(upgradeScoring(upgraded)).toBe(upgraded);

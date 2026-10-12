@@ -8,7 +8,7 @@ KKTP final menetapkan status TP dari seluruh indikator esensial (skor 0–4), bu
 
 - Lima pulau, tiga misi inti per pulau; nilai pulau adalah rerata tiga misi dan nilai akhir rerata lima pulau. Bos pengayaan terpisah dan terbuka bila kelima belas misi sudah dinilai dengan nilai akhir sebelum pembulatan ≥90.
 - Nilai kompetensi misi memakai ketepatan jawaban terbaik atau rubrik guru terbaik, tanpa potongan proses. Nilai pulau adalah rata-rata tiga misi; nilai akhir adalah rata-rata lima pulau. Portal bos memakai nilai kompetensi sebelum pembulatan. Skor permainan tetap terpisah dan memakai sesi dengan skor permainan tertinggi, dikurangi satu poin per pengulangan. Rekap guru menampilkan kedua nilai beserta sumber sesinya.
-- Akun murid dibuat guru dengan kata sandi acak. Rapor/rekap guru memakai nama lengkap, leaderboard publik hanya nama samaran.
+- Murid dapat mendaftar sendiri dengan nama lengkap, kelas, nomor absen, nama samaran, dan kata sandi. Guru tetap dapat membuat akun dengan kata sandi acak atau mereset kata sandi. Nama lengkap, kelas, dan nomor absen pendaftaran mandiri perlu dicocokkan guru sebelum rapor dipakai sebagai nilai sumatif; leaderboard publik hanya memakai nama samaran.
 
 ## Temuan dan tindakan per misi
 
@@ -34,7 +34,7 @@ Kolom “bukti” merujuk tindakan yang benar-benar dinilai sekarang. Kaitan den
 
 ## Kebijakan skor sumatif yang diputuskan
 
-Kebijakan `competency-v1`: nilai sumatif game memakai K (ketepatan jawaban atau rubrik guru) terbaik per misi. Rata-rata 15 misi inti menentukan nilai akhir dan syarat bos. Formula lama K 60%, petunjuk 10%, percobaan 10%, kesalahan 10%, waktu 10%, lalu potongan 1 poin per pengulangan, tetap dihitung sebagai **skor permainan**, bukan nilai sumatif. Rapor dan ekspor menampilkan keduanya. Sesi historis tidak diubah; nilai kompetensi dihitung ulang dari komponen K yang tersimpan. Jika bukti K tidak tersedia pada format lama, sistem memakai ketepatan pertama atau skor sesi sebagai fallback historis. Statistik proses membantu guru memeriksa bukti, bukan mengurangi nilai kompetensi. Nilai game ini tetap tidak otomatis menetapkan status TP menurut KKTP.
+Kebijakan `competency-v1`: nilai sumatif game memakai K (ketepatan jawaban atau rubrik guru) terbaik per misi. Rata-rata 15 misi inti menentukan nilai akhir dan syarat bos. Formula K 60%, petunjuk 10%, percobaan 10%, kesalahan 10%, waktu 10%, lalu potongan 1 poin per pengulangan, tetap dihitung sebagai **skor permainan**, bukan nilai sumatif. Pada sesi baru (rumus versi 4), petunjuk pertama gratis dan petunjuk berikutnya masing-masing mengurangi komponen H sebanyak 25. Sesi dengan rumus versi 3 mempertahankan aturan petunjuk sebelumnya. Rapor dan ekspor menampilkan keduanya. Sesi historis tidak diubah; nilai kompetensi dihitung ulang dari komponen K yang tersimpan. Jika bukti K tidak tersedia pada format lama, sistem memakai ketepatan pertama atau skor sesi sebagai fallback historis. Statistik proses membantu guru memeriksa bukti, bukan mengurangi nilai kompetensi. Nilai game ini tetap tidak otomatis menetapkan status TP menurut KKTP.
 
 ## Perbaikan butir yang telah diterapkan
 

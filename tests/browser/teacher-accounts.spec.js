@@ -16,7 +16,7 @@ test("teacher creates a student and resets access without exposing stored hashes
   await page.goto("/");
   await expect(
     page.getByRole("button", { name: "Daftar", exact: true }),
-  ).toHaveCount(0);
+  ).toBeVisible();
   await page.locator('[data-nav="teacher-login"]').click();
   await page.getByLabel("Username guru").fill("guru");
   await page.getByLabel("Kata sandi").fill("test-password-only");

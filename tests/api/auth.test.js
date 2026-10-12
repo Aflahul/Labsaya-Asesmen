@@ -1,6 +1,56 @@
 import { test, expect } from "vitest";
 import { setup } from "./helpers.js";
-test("only a teacher creates student accounts; student login requires the issued password", async () => {
+test("student self-registers with a password and can immediately use a private session", async () => {
+  const app = await setup();
+  const payload = {
+    realName: "Dewi Larasati",
+    alias: "Awan Baru",
+    className: "X RPL 1",
+    attendance: 8,
+    password: "rahasia-murid-2026",
+  };
+  const weak = await app.inject({
+    method: "POST",
+    url: "/api/register",
+    payload: { ...payload, password: "pendek" },
+  });
+  expect(weak.statusCode).toBe(400);
+  const registered = await app.inject({
+    method: "POST",
+    url: "/api/register",
+    payload,
+  });
+  expect(registered.statusCode).toBe(201);
+  expect(registered.json().data.user).toMatchObject({
+    realName: payload.realName,
+    alias: payload.alias,
+    className: payload.className,
+    attendance: 8,
+  });
+  expect(registered.body).not.toContain(payload.password);
+  expect(registered.headers["set-cookie"]).toContain("HttpOnly");
+  const cookie = registered.headers["set-cookie"].split(";")[0];
+  const me = await app.inject({
+    method: "GET",
+    url: "/api/me",
+    headers: { cookie },
+  });
+  expect(me.json().data.user.id).toBe(registered.json().data.user.id);
+  const duplicate = await app.inject({
+    method: "POST",
+    url: "/api/register",
+    payload: { ...payload, alias: "  AWAN BARU " },
+  });
+  expect(duplicate.statusCode).toBe(409);
+  const login = await app.inject({
+    method: "POST",
+    url: "/api/login",
+    payload: { alias: payload.alias, password: payload.password },
+  });
+  expect(login.statusCode).toBe(200);
+  await app.close();
+});
+test("teacher can still create student accounts with an issued password", async () => {
   const app = await setup();
   const payload = {
     realName: "Ayu Putri",
@@ -11,7 +61,7 @@ test("only a teacher creates student accounts; student login requires the issued
   expect(
     (await app.inject({ method: "POST", url: "/api/register", payload }))
       .statusCode,
-  ).toBe(403);
+  ).toBe(400);
   expect(
     (
       await app.inject({

@@ -6,7 +6,12 @@ export function scoreBreakdown(s, competencyGrade, gameGrade) {
   if (!c) return "";
   const rows = [
     ["Ketepatan", "K", 60, "Jawaban / rubrik guru"],
-    ["Petunjuk", "H", 10, `${s.hints} petunjuk`],
+    [
+      "Petunjuk",
+      "H",
+      10,
+      `${s.hints} petunjuk${s.scoringConfig?.formulaVersion >= 4 ? " · pertama gratis" : ""}`,
+    ],
     ["Percobaan", "P", 10, `${s.attempts} percobaan · ${s.resets} bersihkan`],
     ["Kesalahan", "E", 10, `${s.errors} kesalahan`],
     [

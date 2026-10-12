@@ -61,9 +61,9 @@ function pageGuide(page) {
       guidance:
         page === "home"
           ? {
-              goal: "Aku Nara, teman perjalananmu. Siap menjelajahi pulau pertama? Minta akun kepada gurumu, lalu Masuk untuk memulai perjalanan.",
+              goal: "Aku Nara, teman perjalananmu. Siap menjelajahi pulau pertama? Daftar sendiri atau Masuk dengan akun yang sudah kamu punya.",
               steps: [
-                "Gunakan nama samaran dan kata sandi yang diberikan guru.",
+                "Buat akun dengan nama lengkap sesuai daftar kelas, atau gunakan akun dari guru.",
                 "Jelajahi lima pulau dan selesaikan misinya.",
                 "Lihat rincian nilai di Rapor.",
               ],
@@ -257,13 +257,18 @@ function shell(content) {
 function home() {
   world.reset();
   shell(
-    `<section class="home game-home"><div class="hero"><div class="eyebrow">EKSPEDISI MENARA AWAN · INFORMATIKA KELAS X</div><h1>Hidupkan kembali<br><em>Menara Awan.</em></h1><p>Jaringan penghubung lima pulau terputus. Bantu Nara menyambungkannya kembali dengan menyelesaikan tantangan data, algoritma, dan pemrograman.</p><div class="actions"><button class="primary" data-nav="${auth?.role === "participant" ? "map" : "login"}">${auth?.role === "participant" ? "Lanjut" : "Masuk"}</button></div><p class="notice">${auth?.role === "participant" ? "Lanjutkan perjalananmu dari peta." : "Minta akun dan kata sandi kepada gurumu untuk memulai."}</p></div><img class="hero-island" src="/game-assets/island-menara-program.webp" alt="Menara Program melayang di atas awan"></section>${pageGuide("home")}`,
+    `<section class="home game-home"><div class="hero"><div class="eyebrow">EKSPEDISI MENARA AWAN · INFORMATIKA KELAS X</div><h1>Hidupkan kembali<br><em>Menara Awan.</em></h1><p>Jaringan penghubung lima pulau terputus. Bantu Nara menyambungkannya kembali dengan menyelesaikan tantangan data, algoritma, dan pemrograman.</p><div class="actions"><button class="primary" data-nav="${auth?.role === "participant" ? "map" : "login"}">${auth?.role === "participant" ? "Lanjut" : "Masuk"}</button>${auth?.role === "participant" ? "" : '<button class="ghost" data-nav="register">Daftar</button>'}</div><p class="notice">${auth?.role === "participant" ? "Lanjutkan perjalananmu dari peta." : "Belum punya akun? Daftar sendiri atau minta dibuatkan guru."}</p></div><img class="hero-island" src="/game-assets/island-menara-program.webp" alt="Menara Program melayang di atas awan"></section>${pageGuide("home")}`,
   );
 }
 function authForm(kind) {
   const teacher = kind === "teacher-login";
   shell(
-    `<section class="panel auth-panel"><div class="eyebrow">${teacher ? "Ruang pendidik" : "Identitas penjelajah"}</div><h2 style="margin-top:12px">${teacher ? "Masuk halaman guru" : "Selamat datang kembali"}</h2><p>${teacher ? "Masuk dengan akun guru yang dibuat administrator sekolah." : "Gunakan nama samaran dan kata sandi yang diberikan gurumu."}</p><form id="auth-form" data-kind="${kind}">${teacher ? '<label for="username">Username guru</label><input id="username" name="username" required autocomplete="username">' : '<label for="alias">Nama samaran</label><input id="alias" name="alias" maxlength="100" required autocomplete="username">'}<label for="password">Kata sandi</label><input id="password" name="password" type="password" required autocomplete="current-password"><p id="error" role="alert" class="error"></p><div class="actions"><button class="primary" type="submit">Masuk</button><button type="button" class="ghost" data-nav="home">Kembali</button></div></form>${teacher ? "" : '<p class="notice">Belum punya akun atau lupa kata sandi? Hubungi gurumu. Hanya guru yang dapat membuat atau mengatur ulang akun murid.</p>'}</section>`,
+    `<section class="panel auth-panel"><div class="eyebrow">${teacher ? "Ruang pendidik" : "Identitas penjelajah"}</div><h2 style="margin-top:12px">${teacher ? "Masuk halaman guru" : "Selamat datang kembali"}</h2><p>${teacher ? "Masuk dengan akun guru yang dibuat administrator sekolah." : "Masuk dengan nama samaran dan kata sandimu."}</p><form id="auth-form" data-kind="${kind}">${teacher ? '<label for="username">Username guru</label><input id="username" name="username" required autocomplete="username">' : '<label for="alias">Nama samaran</label><input id="alias" name="alias" maxlength="100" required autocomplete="username">'}<label for="password">Kata sandi</label><input id="password" name="password" type="password" required autocomplete="current-password"><p id="error" role="alert" class="error"></p><div class="actions"><button class="primary" type="submit">Masuk</button><button type="button" class="ghost" data-nav="home">Kembali</button></div></form>${teacher ? "" : '<p class="notice">Belum punya akun? <button type="button" class="ghost small" data-nav="register">Daftar</button> Lupa kata sandi? Hubungi gurumu untuk mengatur ulang.</p>'}</section>`,
+  );
+}
+function registerForm() {
+  shell(
+    `<section class="panel auth-panel"><div class="eyebrow">Identitas penjelajah</div><h2 style="margin-top:12px">Buat akun murid</h2><p>Isi nama lengkap sesuai daftar kelas untuk rapor. Nama samaran dipakai untuk masuk dan tampil di papan peringkat.</p><form id="auth-form" data-kind="register"><label for="realName">Nama lengkap murid</label><input id="realName" name="realName" maxlength="100" autocomplete="name" required><label for="alias">Nama samaran</label><input id="alias" name="alias" maxlength="100" autocomplete="username" required><label for="className">Kelas</label><input id="className" name="className" maxlength="50" required><label for="attendance">Nomor absen</label><input id="attendance" name="attendance" type="number" min="1" max="999" required><label for="password">Kata sandi</label><input id="password" name="password" type="password" minlength="12" maxlength="200" autocomplete="new-password" required><label for="passwordConfirm">Ulangi kata sandi</label><input id="passwordConfirm" name="passwordConfirm" type="password" minlength="12" maxlength="200" autocomplete="new-password" required><p class="notice">Gunakan sedikitnya 12 karakter. Simpan kata sandimu; guru dapat mengatur ulang jika terlupa. Guru perlu mencocokkan identitasmu sebelum memakai rapor sebagai nilai sumatif.</p><p id="error" role="alert" class="error"></p><div class="actions"><button class="primary" type="submit">Daftar</button><button type="button" class="ghost" data-nav="login">Sudah punya akun?</button></div></form></section>`,
   );
 }
 async function activate(data) {
@@ -508,7 +513,7 @@ function showStudentCredential(result, title) {
 function renderTeacher() {
   const scores = teacherRows.filter((p) => p.summary.score !== null);
   shell(
-    `<section class="panel"><div class="eyebrow">Ruang pendidik</div><h2 style="margin-top:12px">Perkembangan belajar murid</h2><p>Lihat hasil misi dan jawaban murid. Jawaban yang belum terkirim dari perangkat murid belum muncul di halaman ini.</p><div class="summary-grid"><div class="summary-card"><small>Peserta terdaftar</small><strong>${teacherRows.length}</strong></div><div class="summary-card"><small>Inti tuntas</small><strong>${scores.length}</strong></div><div class="summary-card"><small>Kelas</small><strong>${new Set(teacherRows.map((p) => p.class_name)).size}</strong></div><div class="summary-card"><small>Rata-rata nilai kompetensi tuntas</small><strong>${scores.length ? Math.round(scores.reduce((a, p) => a + p.summary.score, 0) / scores.length) : "—"}</strong></div></div><div class="inline-form"><label>Kelas<select id="teacher-class"><option value="">Semua kelas</option>${[...new Set(teacherRows.map((p) => p.class_name))].map((c) => `<option>${esc(c)}</option>`).join("")}</select></label><label>Cari peserta<input id="teacher-query" placeholder="Nama lengkap / samaran"></label><label><input id="teacher-complete" type="checkbox" style="width:auto"> Inti tuntas saja</label></div><div class="actions"><button id="teacher-csv">Unduh</button><button id="teacher-refresh">Segarkan</button></div><details class="report-question"><summary>Buat akun murid</summary><p class="notice">Isi nama lengkap untuk rapor asesmen. Nama samaran digunakan untuk masuk dan tampil di papan peringkat publik. Sistem membuat kata sandi acak; berikan kepada murid secara pribadi.</p><form id="student-create-form"><label>Nama lengkap murid<input name="realName" required maxlength="100" autocomplete="name"></label><label>Nama samaran untuk peringkat<input name="alias" required maxlength="100"></label><label>Kelas<input name="className" required maxlength="50"></label><label>Nomor absen<input name="attendance" type="number" min="1" max="999" required></label><p role="alert" class="error"></p><button class="primary" type="submit">Buat akun</button></form></details><div id="student-credentials" class="hint" role="status" hidden></div><div id="teacher-table"></div><details style="margin-top:25px"><summary>Kalibrasi waktu versi lama</summary><p class="notice">Pengaturan ini hanya untuk misi versi lama. Ekspedisi lima pulau memakai acuan waktu per misi dengan bobot 10%.</p><div class="inline-form"><label>Pengali waktu<input id="baseline" type="number" min="0.5" max="3" step="0.1" value="1"></label><button id="calibrate">Simpan</button></div><p id="error" role="alert"></p></details></section>`,
+    `<section class="panel"><div class="eyebrow">Ruang pendidik</div><h2 style="margin-top:12px">Perkembangan belajar murid</h2><p>Lihat hasil misi dan jawaban murid. Cocokkan nama lengkap, kelas, dan nomor absen akun yang didaftarkan mandiri sebelum memakai rapor sebagai nilai sumatif. Jawaban yang belum terkirim dari perangkat murid belum muncul di halaman ini.</p><div class="summary-grid"><div class="summary-card"><small>Peserta terdaftar</small><strong>${teacherRows.length}</strong></div><div class="summary-card"><small>Inti tuntas</small><strong>${scores.length}</strong></div><div class="summary-card"><small>Kelas</small><strong>${new Set(teacherRows.map((p) => p.class_name)).size}</strong></div><div class="summary-card"><small>Rata-rata nilai kompetensi tuntas</small><strong>${scores.length ? Math.round(scores.reduce((a, p) => a + p.summary.score, 0) / scores.length) : "—"}</strong></div></div><div class="inline-form"><label>Kelas<select id="teacher-class"><option value="">Semua kelas</option>${[...new Set(teacherRows.map((p) => p.class_name))].map((c) => `<option>${esc(c)}</option>`).join("")}</select></label><label>Cari peserta<input id="teacher-query" placeholder="Nama lengkap / samaran"></label><label><input id="teacher-complete" type="checkbox" style="width:auto"> Inti tuntas saja</label></div><div class="actions"><button id="teacher-csv">Unduh</button><button id="teacher-refresh">Segarkan</button></div><details class="report-question"><summary>Buat akun murid</summary><p class="notice">Isi nama lengkap untuk rapor asesmen. Nama samaran digunakan untuk masuk dan tampil di papan peringkat publik. Sistem membuat kata sandi acak; berikan kepada murid secara pribadi.</p><form id="student-create-form"><label>Nama lengkap murid<input name="realName" required maxlength="100" autocomplete="name"></label><label>Nama samaran untuk peringkat<input name="alias" required maxlength="100"></label><label>Kelas<input name="className" required maxlength="50"></label><label>Nomor absen<input name="attendance" type="number" min="1" max="999" required></label><p role="alert" class="error"></p><button class="primary" type="submit">Buat akun</button></form></details><div id="student-credentials" class="hint" role="status" hidden></div><div id="teacher-table"></div><details style="margin-top:25px"><summary>Kalibrasi waktu versi lama</summary><p class="notice">Pengaturan ini hanya untuk misi versi lama. Ekspedisi lima pulau memakai acuan waktu per misi dengan bobot 10%.</p><div class="inline-form"><label>Pengali waktu<input id="baseline" type="number" min="0.5" max="3" step="0.1" value="1"></label><button id="calibrate">Simpan</button></div><p id="error" role="alert"></p></details></section>`,
   );
   teacherTable();
 }
@@ -543,6 +548,7 @@ function navigate(next) {
   route = next;
   if (next === "home") home();
   else if (["login", "teacher-login"].includes(next)) authForm(next);
+  else if (next === "register") registerForm();
   else if (next === "map") map();
   else if (next === "report") {
     if (auth?.role !== "participant") navigate("login");
@@ -610,11 +616,23 @@ app.addEventListener("submit", async (e) => {
   e.preventDefault();
   const kind = e.target.dataset.kind,
     b = Object.fromEntries(new FormData(e.target));
+  if (kind === "register") {
+    if (b.password !== b.passwordConfirm) {
+      showError("Kata sandi belum sama");
+      return;
+    }
+    delete b.passwordConfirm;
+    b.attendance = Number(b.attendance);
+  }
   const submit = e.target.querySelector("[type=submit]");
   submit.disabled = true;
   try {
     const data = await api(
-      kind === "teacher-login" ? "/teacher/login" : "/login",
+      kind === "teacher-login"
+        ? "/teacher/login"
+        : kind === "register"
+          ? "/register"
+          : "/login",
       b,
     );
     await activate(data);
