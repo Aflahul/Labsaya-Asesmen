@@ -281,8 +281,8 @@ export const MISSIONS = [
         "Mengapa pesanan ditolak saat stok dan jumlah pesanan sama?",
         [
           "Nilai sama tidak diterima oleh >",
-          "Input harus selalu negatif",
-          "Output selalu membutuhkan list",
+          "Nilai sama hanya diterima oleh == sehingga > sudah tepat",
+          "Batas sama perlu dibandingkan dengan <, bukan >",
         ],
         "Nilai sama tidak diterima oleh >",
         30,
@@ -408,8 +408,8 @@ export const MISSIONS = [
         "Mengapa nilai energi belum tersedia saat program mencoba menampilkannya?",
         [
           "Output terjadi sebelum assignment energi",
-          "Angka 3 tidak boleh menjadi input",
-          "Perkalian harus diganti penjumlahan",
+          "Nilai energi sudah dihitung, tetapi input belum dibaca",
+          "OUTPUT harus ditulis setelah INPUT, walau energi belum dihitung",
         ],
         "Output terjadi sebelum assignment energi",
         30,
@@ -552,10 +552,12 @@ export const MISSIONS = [
     "Pulihkan Pengolah Nilai",
     "C3",
     "python",
-    "Nara ingin menghitung rata-rata nilai lima murid. Program di bawah sudah menjumlahkan nilainya, tetapi rata-ratanya belum benar. Perbaiki perhitungannya dan tampilkan hasil dengan print.",
+    "Nara ingin menghitung rata-rata nilai murid. Jumlah murid dapat berubah. Program di bawah sudah menjumlahkan nilainya, tetapi rata-ratanya belum benar. Perbaiki perhitungannya dan tampilkan hasil dengan print.",
     [],
     {
       code: "nilai = [70, 80, 90, 60, 100]\ntotal = sum(nilai)\nrata = total / 4\nprint(rata)",
+      priorInstructions:
+        "Nara ingin menghitung rata-rata nilai lima murid. Program di bawah sudah menjumlahkan nilainya, tetapi rata-ratanya belum benar. Perbaiki perhitungannya dan tampilkan hasil dengan print.",
       expectedOutput: "80",
       reference:
         "Ingat: sum(nilai) menjumlahkan semua nilai, len(nilai) menghitung banyaknya nilai, dan / digunakan untuk membagi.",
@@ -567,7 +569,7 @@ export const MISSIONS = [
     "Perbaiki Daftar",
     "C4",
     "python-debug",
-    'Daftar kargo seharusnya menjadi ["Pangan", "Air", "Obat"], tetapi Air justru hilang. Cari penyebabnya, lalu perbaiki kode agar barang yang dibutuhkan tetap ada.',
+    'Pada contoh awal, daftar kargo seharusnya menjadi ["Pangan", "Air", "Obat"], tetapi Air justru hilang. Cari penyebabnya, lalu perbaiki kode agar barang lain yang mungkin ada dalam daftar tetap tersimpan.',
     [
       field(
         "cause",

@@ -33,7 +33,7 @@ export function actionV2(m, state, a) {
     errors: [],
   };
 }
-export function evaluateV2(m, state) {
+export function evaluateV2(m, state, assessmentRevision = 1) {
   const a = state.answers || {};
   if (m.written) {
     const ready = m.written.every(
@@ -64,11 +64,18 @@ export function evaluateV2(m, state) {
     ),
     runs = [];
   if (m.kind === "python") {
-    const samples = [
-      [70, 80, 90, 60, 100],
-      [50, 70, 60, 80, 90],
-      [20, 40, 60, 80, 100],
-    ];
+    const samples =
+      assessmentRevision >= 2
+        ? [
+            [70, 80, 90, 60, 100],
+            [60, 80, 100],
+            [30, 50, 70, 90],
+          ]
+        : [
+            [70, 80, 90, 60, 100],
+            [50, 70, 60, 80, 90],
+            [20, 40, 60, 80, 100],
+          ];
     runs = samples.map((nilai) => ({
       input: nilai,
       expected: nilai.reduce((a, b) => a + b) / nilai.length,
@@ -84,13 +91,19 @@ export function evaluateV2(m, state) {
       0,
     );
   } else if (m.kind === "python-debug") {
-    const inputs = [
-      ["Pangan", "Kayu", "Batu"],
-      ["Beras", "Kayu", "Batu"],
-    ];
+    const inputs =
+      assessmentRevision >= 2
+        ? [
+            ["Pangan", "Kayu", "Batu"],
+            ["Beras", "Kayu", "Batu", "Minyak"],
+          ]
+        : [
+            ["Pangan", "Kayu", "Batu"],
+            ["Beras", "Kayu", "Batu"],
+          ];
     runs = inputs.map((kargo) => ({
       input: kargo,
-      expected: [kargo[0], "Air", "Obat"],
+      expected: [kargo[0], "Air", ...kargo.slice(3), "Obat"],
       ...runPython(a.code || "", { kargo }),
     }));
     total += 40;
@@ -141,7 +154,7 @@ export function reduceV2(old, e, m) {
     s.state = initialV2(m);
   }
   if (["run", "submit"].includes(e.type)) {
-    const r = evaluateV2(m, s.state);
+    const r = evaluateV2(m, s.state, s.assessmentRevision);
     const newAttempt = e.type === "run" || !s.state.tested;
     if (newAttempt) {
       s.attempts++;

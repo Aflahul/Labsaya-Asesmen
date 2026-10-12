@@ -36,11 +36,20 @@ Kolom “bukti” merujuk tindakan yang benar-benar dinilai sekarang. Kaitan den
 
 Kebijakan `competency-v1`: nilai sumatif game memakai K (ketepatan jawaban atau rubrik guru) terbaik per misi. Rata-rata 15 misi inti menentukan nilai akhir dan syarat bos. Formula lama K 60%, petunjuk 10%, percobaan 10%, kesalahan 10%, waktu 10%, lalu potongan 1 poin per pengulangan, tetap dihitung sebagai **skor permainan**, bukan nilai sumatif. Rapor dan ekspor menampilkan keduanya. Sesi historis tidak diubah; nilai kompetensi dihitung ulang dari komponen K yang tersimpan. Jika bukti K tidak tersedia pada format lama, sistem memakai ketepatan pertama atau skor sesi sebagai fallback historis. Statistik proses membantu guru memeriksa bukti, bukan mengurangi nilai kompetensi. Nilai game ini tetap tidak otomatis menetapkan status TP menurut KKTP.
 
+## Perbaikan butir yang telah diterapkan
+
+- *Perbaiki Batas* dan *Lacak Gangguan*: pengecoh yang terlalu mudah dikenali diganti dengan dugaan kesalahan yang lebih dekat dengan kasus. Kunci jawaban tetap sama.
+- *Pulihkan Pengolah Nilai*: sesi baru diuji pada daftar berisi 5, 3, dan 4 nilai. Pembagi tetap `/ 5` tidak lagi mendapat nilai kompetensi penuh.
+- *Perbaiki Daftar*: sesi baru juga diuji pada daftar dengan satu barang tambahan yang harus tetap tersimpan; solusi yang hanya mengembalikan tiga barang tidak mendapat nilai penuh.
+- Revisi uji ditandai `assessmentRevision = 2` pada sesi baru dan tampil dalam rekap guru. Sesi yang sudah dimulai memakai aturan uji sebelumnya; dokumen sesi dan hasil yang tersimpan tidak dinilai ulang.
+
+Perbaikan lain pada tabel di atas masih merupakan agenda revisi instrumen. Penambahan butir baru, perubahan kunci, dan kenaikan level Bloom perlu paket misi baru beserta uji coba dan rubrik; revisi uji terbatas di atas belum mengubah label C3/C4/C5.
+
 ## Rencana komposisi kognitif C4 dan C5
 
 Pertahankan 15 misi dan bobot antarmisi setara. Kandidat: **7 C3, 6 C4, 2 C5** (sekarang 10/4/1). Naikkan *Jalankan Gerbang* dan *Pulihkan Pengolah Nilai* ke C4 setelah tugasnya menghasilkan diagnosis, perbaikan, dan uji yang nyata. Ubah *Atur Pengiriman* menjadi C5 hanya bila guru siap menilai evaluasi dua kebijakan tarif memakai rubrik. Sebelum penerapan, cocokkan dengan TP/KKTP sekolah, cek tingkat kesulitan, dan perkirakan beban penilaian tertulis guru. Mengganti label Bloom saja tanpa mengubah bukti tidak menaikkan level kognitif.
 
-Perubahan tugas/aturan jawaban harus diterbitkan sebagai revisi misi dengan identitas/versi baru. Sesi lama dan skor 15 misi yang sudah ada tidak boleh berubah akibat evaluasi ulang menggunakan kunci jawaban baru. Definisikan terlebih dahulu apakah kohor lama menyelesaikan versi lama atau memulai paket asesmen baru; jangan campurkan versi dalam satu nilai akhir tanpa keputusan guru.
+Perubahan tugas atau kunci jawaban yang lebih luas harus diterbitkan sebagai paket misi dengan identitas/versi baru. Revisi uji terbatas di atas tetap memakai identitas misi lama, tetapi versi uji disimpan per sesi. Sesi lama dan skor 15 misi yang sudah ada tidak boleh berubah akibat evaluasi ulang menggunakan kunci jawaban baru. Definisikan terlebih dahulu apakah kohor lama menyelesaikan versi lama atau memulai paket asesmen baru; jangan campurkan versi dalam satu nilai akhir tanpa keputusan guru.
 
 ## Bukti yang masih dibutuhkan sebelum dipakai sebagai nilai sumatif resmi
 

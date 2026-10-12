@@ -27,6 +27,7 @@ export const buildReport = (progress) => {
       return {
         Misi: m.title,
         Versi: m.missionVersion,
+        RevisiUji: s ? (s.assessmentRevision ?? 1) : "",
         Bloom: m.bloom || "Arsip",
         AKM: m.akm || "",
         Kompetensi: m.competency,

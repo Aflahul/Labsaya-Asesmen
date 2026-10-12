@@ -183,6 +183,7 @@ export async function teacherRoutes(app) {
         ...Object.fromEntries(
           CORE_MISSIONS.flatMap((m, index) => [
             [`Nilai misi: ${m.title}`, p.missionRows[index]?.Nilai ?? ""],
+            [`Revisi uji: ${m.title}`, p.missionRows[index]?.RevisiUji ?? ""],
             [`Skor game: ${m.title}`, p.missionRows[index]?.SkorGame ?? ""],
             [`Ketepatan: ${m.title}`, p.missionRows[index]?.K ?? ""],
           ]),

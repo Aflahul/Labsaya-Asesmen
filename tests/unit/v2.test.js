@@ -2,6 +2,7 @@ import { test, expect } from "vitest";
 import { MISSIONS, getMission } from "../../src/shared/missions.js";
 import { summarizeProgress, unlocked } from "../../src/shared/progress.js";
 import { newSession, reduceSession } from "../../src/shared/assessment.js";
+import { evaluateV2 } from "../../src/shared/v2-evaluator.js";
 const complete = (score = 100) =>
   MISSIONS.filter((m) => !m.enrichment).map((m) => ({
     id: m.id,
@@ -127,4 +128,41 @@ test("Python mean must generalize beyond visible data", () => {
     m,
   );
   expect(good.score).toBe(100);
+});
+test("new mean assessment catches fixed divisor without regrading an existing session", () => {
+  const m = MISSIONS.find((m) => m.kind === "python");
+  const answer =
+    "nilai = [70,80,90,60,100]\ntotal = sum(nilai)\nrata = total / 5\nprint(rata)";
+  const submit = (revision) => {
+    let s = { ...newSession(m, "p"), assessmentRevision: revision };
+    s = reduceSession(
+      s,
+      {
+        id: "a",
+        type: "action",
+        payload: { op: "answer", key: "code", value: answer },
+        activeMs: 0,
+      },
+      m,
+    );
+    return reduceSession(
+      s,
+      { id: "b", type: "submit", payload: {}, activeMs: 0 },
+      m,
+    );
+  };
+  expect(submit(1).components.K).toBe(100);
+  expect(submit(2).components.K).toBeLessThan(100);
+  expect(newSession(m, "p").assessmentRevision).toBe(2);
+});
+test("new list debugging assessment checks that extra cargo remains", () => {
+  const m = MISSIONS.find((m) => m.kind === "python-debug");
+  const state = {
+    answers: {
+      ...m.rules.answers,
+      code: 'kargo = ["Pangan", "Kayu", "Batu"]\nkargo = [kargo[0], "Air", "Obat"]\nprint(kargo)',
+    },
+  };
+  expect(evaluateV2(m, state, 1).accuracy).toBe(100);
+  expect(evaluateV2(m, state, 2).accuracy).toBeLessThan(100);
 });

@@ -109,7 +109,7 @@ test("filtered teacher export and leaderboard expose correct fields", async () =
   expect(r.body).toContain('"Skor permainan"');
   expect(r.body).toContain('"Skor game: Daftarkan Kargo"');
   expect(r.body).toContain('"Ketepatan: Daftarkan Kargo"');
-  expect(r.body).toContain('"70","82","70"');
+  expect(r.body).toContain('"70","1","82","70"');
   expect(
     (await app.inject({ method: "GET", url: "/api/leaderboard" })).body,
   ).not.toContain("Private");

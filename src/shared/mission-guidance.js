@@ -128,7 +128,7 @@ export const GUIDANCE = {
       "Ubah kode di editor. Pertahankan nama daftar nilai dan tampilkan satu hasil dengan print.",
       "Tekan Coba, baca hasil tiap pengujian, lalu perbaiki sebelum mengirim.",
     ],
-    "Saat kamu menekan Coba, program dijalankan dengan beberapa daftar berisi lima nilai. Buat perhitungan yang tetap benar ketika angka dalam daftar berubah.",
+    "Saat kamu menekan Coba, program diuji dengan beberapa daftar. Buat perhitungan yang tetap benar saat banyaknya nilai berubah.",
     "Perhatikan jumlah nilai dan banyaknya nilai dalam daftar. Apakah pembagi yang dipakai sudah sesuai?",
   ),
   v2p05m02: guide(
@@ -138,7 +138,7 @@ export const GUIDANCE = {
       "Edit perintah yang salah pada kode.",
       "Tekan Coba, lalu cocokkan daftar hasilnya dengan daftar yang diminta.",
     ],
-    "Data uji dapat mengganti barang pertama. Pertahankan barang pertama itu; ganti Kayu menjadi Air, hapus Batu, lalu tambahkan Obat.",
+    "Data uji dapat mengganti barang pertama dan menambahkan barang lain. Pertahankan barang yang tidak diminta untuk dihapus; ganti Kayu menjadi Air, hapus Batu, lalu tambahkan Obat.",
     "Periksa posisi setiap barang tepat sebelum pop dijalankan. Gunakan keadaan daftar saat itu, bukan keadaan awal.",
   ),
   v2p05m03: guide(
