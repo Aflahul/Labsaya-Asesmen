@@ -67,6 +67,23 @@ test("filtered teacher export and leaderboard expose correct fields", async () =
       ["p" + i, "Private " + i, "Alias" + i, "alias" + i, cls, i],
     );
   await app.db.query(
+    "INSERT INTO mission_sessions(id,participant_id,mission_id,document) VALUES($1,$2,$3,$4)",
+    [
+      "s1",
+      "p1",
+      "v2p01m01",
+      JSON.stringify({
+        id: "s1",
+        missionId: "v2p01m01",
+        missionVersion: 2,
+        status: "complete",
+        score: 82,
+        components: { K: 70 },
+        scoringConfig: { formulaVersion: 3, timeBudgetSeconds: 90 },
+      }),
+    ],
+  );
+  await app.db.query(
     "INSERT INTO teachers(id,username,password_hash) VALUES($1,$2,$3)",
     ["t", "guru", passwordHash("password-for-test")],
   );
@@ -84,6 +101,9 @@ test("filtered teacher export and leaderboard expose correct fields", async () =
   expect(r.statusCode).toBe(200);
   expect(r.body).toContain("Private 1");
   expect(r.body).not.toContain("Private 2");
+  expect(r.body).toContain('"Nilai misi: Daftarkan Kargo"');
+  expect(r.body).toContain('"Ketepatan: Daftarkan Kargo"');
+  expect(r.body).toContain('"82","70"');
   expect(
     (await app.inject({ method: "GET", url: "/api/leaderboard" })).body,
   ).not.toContain("Private");

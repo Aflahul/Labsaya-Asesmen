@@ -1,11 +1,11 @@
 import { upgradeScoring } from "../../shared/assessment.js";
-import { getMission } from "../../shared/missions.js";
+import { CORE_MISSIONS, getMission } from "../../shared/missions.js";
 import { gradeReview } from "../../shared/v2-evaluator.js";
 import { summarizeProgress } from "../../shared/progress.js";
-import { toCsv } from "../../shared/reports.js";
+import { buildReport, toCsv } from "../../shared/reports.js";
 import { loadProgress } from "./progress.js";
 import { fail } from "../auth.js";
-async function roster(db, query = {}) {
+async function roster(db, query = {}, includeMissionDetails = false) {
   const { rows } = await db.query(
     "SELECT * FROM participants ORDER BY class_name, attendance",
   );
@@ -21,10 +21,21 @@ async function roster(db, query = {}) {
   }
   return rows
     .map((p) => {
-      const { latestByMission, bestByMission, ...summary } = summarizeProgress({
-        sessions: byId.get(p.id) || [],
-      });
-      return { ...p, summary };
+      const sessions = byId.get(p.id) || [];
+      const report = includeMissionDetails
+        ? buildReport({ sessions })
+        : summarizeProgress({ sessions });
+      const {
+        latestByMission,
+        bestByMission,
+        rows: missionRows,
+        ...summary
+      } = report;
+      return {
+        ...p,
+        summary,
+        ...(includeMissionDetails ? { missionRows } : {}),
+      };
     })
     .filter(
       (p) =>
@@ -90,7 +101,7 @@ export async function teacherRoutes(app) {
   });
   app.get("/api/teacher/export", async (req, reply) => {
     app.requireRole(req, "teacher");
-    const rows = await roster(app.db, req.query);
+    const rows = await roster(app.db, req.query, true);
     reply
       .type("text/csv;charset=utf-8")
       .header("Content-Disposition", 'attachment; filename="rekap-kelas.csv"');
@@ -103,6 +114,12 @@ export async function teacherRoutes(app) {
         "Misi inti": p.summary.completed,
         "Nilai inti": p.summary.score ?? "Belum lengkap",
         Ketepatan: p.summary.accuracy ?? "",
+        ...Object.fromEntries(
+          CORE_MISSIONS.flatMap((m, index) => [
+            [`Nilai misi: ${m.title}`, p.missionRows[index]?.Nilai ?? ""],
+            [`Ketepatan: ${m.title}`, p.missionRows[index]?.K ?? ""],
+          ]),
+        ),
       })),
     );
   });

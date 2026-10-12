@@ -1,3 +1,4 @@
+import { MISSION_EVIDENCE } from "./mission-evidence.js";
 import { upgradeScoring } from "./assessment.js";
 import { MISSIONS, getMission } from "./missions.js";
 import { summarizeProgress } from "./progress.js";
@@ -29,6 +30,7 @@ export const buildReport = (progress) => {
         AKM: m.akm || "",
         Kompetensi: m.competency,
         Indikator: m.indicators.join(" "),
+        "Bukti yang diperiksa": MISSION_EVIDENCE[m.id] || "",
         Jenis: m.enrichment ? "Pengayaan" : "Inti",
         Status:
           s?.status === "complete"
