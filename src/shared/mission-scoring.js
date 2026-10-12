@@ -9,7 +9,10 @@ export function scoreMission(
   const baseline = config.timeBudgetSeconds || 300;
   const K = clamp(accuracy ?? 0);
   const freeHints = config.formulaVersion >= 4 ? 1 : 0;
-  const H = clamp(100 - 25 * Math.max(0, (session.hints || 0) - freeHints));
+  const hintCost = config.formulaVersion >= 5 ? 10 : 25;
+  const H = clamp(
+    100 - hintCost * Math.max(0, (session.hints || 0) - freeHints),
+  );
   const P = clamp(
     100 -
       10 * Math.max(0, (session.attempts || 0) - 1) -

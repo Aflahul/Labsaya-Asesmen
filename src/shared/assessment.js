@@ -38,7 +38,7 @@ export function newSession(
       ...config,
       elements: m.elements,
       ...(m.missionVersion === 2
-        ? { timeBudgetSeconds: m.timeBudgetSeconds, formulaVersion: 4 }
+        ? { timeBudgetSeconds: m.timeBudgetSeconds, formulaVersion: 5 }
         : {}),
     },
     events: [],

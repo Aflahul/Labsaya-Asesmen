@@ -33,11 +33,22 @@ test("a correct preview followed by unchanged submission counts once and earns 1
 test("first hint is free in new sessions while old scoring remains reproducible", () => {
   const first = play({ hints: 1 });
   const second = play({ hints: 2 });
-  expect(first.scoringConfig.formulaVersion).toBe(4);
+  const third = play({ hints: 3 });
+  expect(first.scoringConfig.formulaVersion).toBe(5);
   expect(first.components.H).toBe(100);
   expect(first.score).toBe(100);
-  expect(second.components.H).toBe(75);
-  expect(second.score).toBe(97.5);
+  expect(second.components.H).toBe(90);
+  expect(second.score).toBe(99);
+  expect(third.components.H).toBe(80);
+  expect(third.score).toBe(98);
+  const previous = scoreSession(
+    {
+      ...second,
+      scoringConfig: { ...second.scoringConfig, formulaVersion: 4 },
+    },
+    { ...second.scoringConfig, formulaVersion: 4 },
+  );
+  expect(previous.score).toBe(97.5);
   const old = scoreSession(
     { ...first, scoringConfig: { ...first.scoringConfig, formulaVersion: 3 } },
     { ...first.scoringConfig, formulaVersion: 3 },
