@@ -1,37 +1,38 @@
 import { expect } from "@playwright/test";
 import { solution } from "../fixtures/solutions.js";
+// Browser fixture: teacher provisions the account, then the student logs in.
 export async function register(
   page,
   name = "Murid Uji",
   alias = "Uji" + Date.now(),
 ) {
   await page.goto("/");
-  await page.getByRole("button", { name: "Daftar", exact: true }).click();
-  await expectShortButtons(page);
-  await page.getByLabel("Nama asli").fill(name);
-  await page.getByLabel("Nama samaran").fill(alias);
-  await page.getByLabel("Kelas / rombel").fill("X RPL");
-  await page.getByLabel("Nomor absen").fill("1");
-  // The complete browser suite can legitimately reach the production limit
-  // of ten registrations per minute. Honor Retry-After rather than weakening it.
+  let teacher;
   for (let attempt = 0; attempt < 2; attempt++) {
-    const responsePromise = page.waitForResponse(
-      (r) =>
-        r.url().endsWith("/api/register") && r.request().method() === "POST",
-    );
-    await page.getByRole("button", { name: "Daftar" }).click();
-    const response = await responsePromise;
-    if (response.status() !== 429 || attempt === 1) {
-      expect(response.ok(), `Registration returned ${response.status()}`).toBe(
-        true,
-      );
-      break;
-    }
-    const retry = Number(response.headers()["retry-after"]);
-    expect(retry).toBeGreaterThanOrEqual(0);
-    expect(retry).toBeLessThanOrEqual(60);
+    teacher = await page.request.post("/api/teacher/login", {
+      data: { username: "guru", password: "test-password-only" },
+    });
+    if (teacher.status() !== 429 || attempt === 1) break;
+    const retry = Number(teacher.headers()["retry-after"] || 1);
     await page.waitForTimeout(retry * 1000 + 250);
   }
+  expect(teacher.ok(), `Teacher login returned ${teacher.status()}`).toBe(true);
+  const { csrf } = (await teacher.json()).data;
+  const created = await page.request.post("/api/teacher/participants", {
+    headers: { "x-csrf-token": csrf },
+    data: { realName: name, alias, className: "X RPL", attendance: 1 },
+  });
+  expect(created.status()).toBe(201);
+  const { password } = (await created.json()).data;
+  await page.request.post("/api/logout", { headers: { "x-csrf-token": csrf } });
+  await page.goto("/");
+  await page.locator(".hero [data-nav=login]").click();
+  await page.getByLabel("Nama samaran").fill(alias);
+  await page.getByLabel("Kata sandi").fill(password);
+  await page.locator("#auth-form button[type=submit]").click();
+  await expect(page.locator(".island-card")).toHaveCount(5);
+  await page.locator('.island-art[data-island="1"]').click();
+  await page.locator('[data-mission="v2p01m01"]').click();
 }
 export async function enterMission(page, m) {
   await page

@@ -1,3 +1,5 @@
+import { randomUUID, randomBytes } from "node:crypto";
+import { normalize, passwordHash, requiredText } from "../auth.js";
 import { upgradeScoring } from "../../shared/assessment.js";
 import { CORE_MISSIONS, getMission } from "../../shared/missions.js";
 import { gradeReview } from "../../shared/v2-evaluator.js";
@@ -5,6 +7,7 @@ import { summarizeProgress } from "../../shared/progress.js";
 import { buildReport, toCsv } from "../../shared/reports.js";
 import { loadProgress } from "./progress.js";
 import { fail } from "../auth.js";
+const freshPassword = () => randomBytes(18).toString("base64url");
 async function roster(db, query = {}, includeMissionDetails = false) {
   const { rows } = await db.query(
     "SELECT * FROM participants ORDER BY class_name, attendance",
@@ -31,8 +34,10 @@ async function roster(db, query = {}, includeMissionDetails = false) {
         rows: missionRows,
         ...summary
       } = report;
+      const { password_hash, ...publicParticipant } = p;
       return {
-        ...p,
+        ...publicParticipant,
+        hasPassword: Boolean(password_hash),
         summary,
         ...(includeMissionDetails ? { missionRows } : {}),
       };
@@ -48,6 +53,65 @@ async function roster(db, query = {}, includeMissionDetails = false) {
     );
 }
 export async function teacherRoutes(app) {
+  app.post("/api/teacher/participants", async (req, reply) => {
+    app.requireRole(req, "teacher");
+    const b = req.body || {};
+    const real = requiredText(b.realName);
+    const alias = requiredText(b.alias);
+    const cls = requiredText(b.className, 50);
+    if (
+      !Number.isInteger(b.attendance) ||
+      b.attendance < 1 ||
+      b.attendance > 999
+    )
+      fail(400, "Nomor absen harus 1–999");
+    const password = freshPassword();
+    let rows;
+    try {
+      ({ rows } = await app.db.query(
+        "INSERT INTO participants(id,real_name,alias,alias_key,class_name,attendance,password_hash) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING id,real_name,alias,class_name,attendance",
+        [
+          randomUUID(),
+          real,
+          alias,
+          normalize(alias),
+          cls,
+          b.attendance,
+          passwordHash(password),
+        ],
+      ));
+    } catch (e) {
+      if (e.code === "23505") fail(409, "Nama samaran sudah digunakan");
+      throw e;
+    }
+    reply.code(201);
+    return { data: { participant: rows[0], password } };
+  });
+  app.post("/api/teacher/participants/:id/reset-password", async (req) => {
+    app.requireRole(req, "teacher");
+    const password = freshPassword();
+    const client = await app.db.connect();
+    try {
+      await client.query("BEGIN");
+      const { rows } = await client.query(
+        "UPDATE participants SET password_hash=$1 WHERE id=$2 RETURNING id,real_name,alias,class_name,attendance",
+        [passwordHash(password), req.params.id],
+      );
+      if (!rows[0]) fail(404, "Murid tidak ditemukan");
+      await client.query(
+        "DELETE FROM auth_sessions WHERE user_id=$1 AND role='participant'",
+        [req.params.id],
+      );
+      await client.query("COMMIT");
+      return { data: { participant: rows[0], password } };
+    } catch (e) {
+      await client.query("ROLLBACK");
+      throw e;
+    } finally {
+      client.release();
+    }
+  });
+
   app.post("/api/teacher/sessions/:id/review", async (req) => {
     const teacher = app.requireRole(req, "teacher");
     const client = await app.db.connect();
@@ -132,7 +196,9 @@ export async function teacherRoutes(app) {
     if (!rows[0]) fail(404, "Peserta tidak ditemukan");
     return {
       data: {
-        participant: rows[0],
+        participant: (({ password_hash, ...participant }) => participant)(
+          rows[0],
+        ),
         ...(await loadProgress(app.db, req.params.id)),
       },
     };

@@ -1,4 +1,3 @@
-import { randomUUID } from "node:crypto";
 import {
   normalize,
   requiredText,
@@ -19,41 +18,29 @@ export async function authRoutes(app) {
   const limited = {
     config: { rateLimit: { max: 10, timeWindow: "1 minute" } },
   };
-  app.post("/api/register", limited, async (req, reply) => {
-    const b = req.body || {},
-      real = requiredText(b.realName),
-      alias = requiredText(b.alias),
-      cls = requiredText(b.className, 50);
-    if (
-      !Number.isInteger(b.attendance) ||
-      b.attendance < 1 ||
-      b.attendance > 999
-    )
-      fail(400, "Nomor absen harus 1–999");
-    let rows;
-    try {
-      ({ rows } = await app.db.query(
-        "INSERT INTO participants(id,real_name,alias,alias_key,class_name,attendance) VALUES($1,$2,$3,$4,$5,$6) RETURNING *",
-        [randomUUID(), real, alias, normalize(alias), cls, b.attendance],
-      ));
-    } catch (e) {
-      if (e.code === "23505") fail(409, "Nama samaran sudah digunakan");
-      throw e;
-    }
-    const csrf = await issueSession(app, rows[0], "participant", reply);
-    reply.code(201);
-    return { data: { user: pub(rows[0]), role: "participant", csrf } };
+  app.post("/api/register", limited, async () => {
+    fail(403, "Akun murid dibuat oleh guru. Minta akses kepada gurumu.");
   });
   app.post("/api/login", limited, async (req, reply) => {
     const b = req.body || {},
       alias = requiredText(b.alias),
-      real = requiredText(b.realName);
+      password = b.password;
+    if (
+      typeof password !== "string" ||
+      !password.length ||
+      password.length > 200
+    )
+      fail(400, "Kata sandi tidak valid");
     const { rows } = await app.db.query(
       "SELECT * FROM participants WHERE alias_key=$1",
       [normalize(alias)],
     );
-    if (!rows[0] || normalize(rows[0].real_name) !== normalize(real))
-      fail(401, "Nama asli atau nama samaran tidak cocok");
+    const fallback = passwordHash("invalid-login-timing");
+    if (
+      !verifyPassword(password, rows[0]?.password_hash || fallback) ||
+      !rows[0]
+    )
+      fail(401, "Nama samaran atau kata sandi tidak cocok");
     const csrf = await issueSession(app, rows[0], "participant", reply);
     return { data: { user: pub(rows[0]), role: "participant", csrf } };
   });

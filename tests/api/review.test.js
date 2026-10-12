@@ -1,19 +1,15 @@
 import { test, expect } from "vitest";
-import { setup } from "./helpers.js";
+import { setup, loginSeededParticipant } from "./helpers.js";
 import { passwordHash } from "../../src/server/auth.js";
 import { MISSIONS } from "../../src/shared/missions.js";
 import { newSession } from "../../src/shared/assessment.js";
 test("only authenticated teacher grades pending work and unlocks boss from reviewed core", async () => {
   const app = await setup();
-  const reg = await app.inject({
-    method: "POST",
-    url: "/api/register",
-    payload: {
-      realName: "Review Test",
-      alias: "Review",
-      className: "X",
-      attendance: 1,
-    },
+  const reg = await loginSeededParticipant(app, {
+    realName: "Review Test",
+    alias: "Review",
+    className: "X",
+    attendance: 1,
   });
   const p = reg.json().data.user.id;
   const ph = {

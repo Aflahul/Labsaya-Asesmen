@@ -30,7 +30,10 @@ export async function buildApp({ db } = {}) {
     const token = req.cookies.pulau_session;
     if (token) {
       const { rows } = await app.db.query(
-        "SELECT * FROM auth_sessions WHERE token_hash=$1 AND expires_at > $2",
+        `SELECT a.* FROM auth_sessions a
+         LEFT JOIN participants p ON p.id=a.user_id AND a.role='participant'
+         WHERE a.token_hash=$1 AND a.expires_at > $2
+           AND (a.role<>'participant' OR p.password_hash IS NOT NULL)`,
         [hash(token), new Date()],
       );
       req.auth = rows[0];

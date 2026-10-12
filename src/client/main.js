@@ -61,9 +61,9 @@ function pageGuide(page) {
       guidance:
         page === "home"
           ? {
-              goal: "Aku Nara, teman perjalananmu. Siap menjelajahi pulau pertama? Daftar untuk memulai, atau Masuk untuk melanjutkan perjalananmu.",
+              goal: "Aku Nara, teman perjalananmu. Siap menjelajahi pulau pertama? Minta akun kepada gurumu, lalu Masuk untuk memulai perjalanan.",
               steps: [
-                "Daftar dengan identitasmu.",
+                "Gunakan nama samaran dan kata sandi yang diberikan guru.",
                 "Jelajahi lima pulau dan selesaikan misinya.",
                 "Lihat rincian nilai di Rapor.",
               ],
@@ -257,14 +257,13 @@ function shell(content) {
 function home() {
   world.reset();
   shell(
-    `<section class="home game-home"><div class="hero"><div class="eyebrow">EKSPEDISI MENARA AWAN · INFORMATIKA KELAS X</div><h1>Hidupkan kembali<br><em>Menara Awan.</em></h1><p>Jaringan penghubung lima pulau terputus. Bantu Nara menyambungkannya kembali dengan menyelesaikan tantangan data, algoritma, dan pemrograman.</p><div class="actions"><button class="primary" data-nav="${auth?.role === "participant" ? "map" : "register"}">${auth?.role === "participant" ? "Lanjut" : "Daftar"}</button>${!auth ? '<button data-nav="login">Masuk</button>' : ""}</div><p class="notice">${auth?.role === "participant" ? "Lanjutkan perjalananmu dari peta." : "Daftar untuk memulai petualangan bersama Nara."}</p></div><img class="hero-island" src="/game-assets/island-menara-program.webp" alt="Menara Program melayang di atas awan"></section>${pageGuide("home")}`,
+    `<section class="home game-home"><div class="hero"><div class="eyebrow">EKSPEDISI MENARA AWAN · INFORMATIKA KELAS X</div><h1>Hidupkan kembali<br><em>Menara Awan.</em></h1><p>Jaringan penghubung lima pulau terputus. Bantu Nara menyambungkannya kembali dengan menyelesaikan tantangan data, algoritma, dan pemrograman.</p><div class="actions"><button class="primary" data-nav="${auth?.role === "participant" ? "map" : "login"}">${auth?.role === "participant" ? "Lanjut" : "Masuk"}</button></div><p class="notice">${auth?.role === "participant" ? "Lanjutkan perjalananmu dari peta." : "Minta akun dan kata sandi kepada gurumu untuk memulai."}</p></div><img class="hero-island" src="/game-assets/island-menara-program.webp" alt="Menara Program melayang di atas awan"></section>${pageGuide("home")}`,
   );
 }
 function authForm(kind) {
-  const register = kind === "register",
-    teacher = kind === "teacher-login";
+  const teacher = kind === "teacher-login";
   shell(
-    `<section class="panel auth-panel"><div class="eyebrow">${teacher ? "Ruang pendidik" : "Identitas penjelajah"}</div><h2 style="margin-top:12px">${register ? "Mulai ekspedisimu" : teacher ? "Masuk halaman guru" : "Selamat datang kembali"}</h2><p>${teacher ? "Masuk dengan akun guru yang dibuat administrator sekolah. Akun murid tidak dapat digunakan di sini." : register ? "Gunakan nama asli untuk rapor dan nama samaran untuk papan peringkat." : "Masuk dengan nama asli dan nama samaran yang sama saat mendaftar."}</p><form id="auth-form" data-kind="${kind}">${teacher ? '<label for="username">Username guru</label><input id="username" name="username" required autocomplete="username"><label for="password">Kata sandi</label><input id="password" name="password" type="password" required autocomplete="current-password">' : '<label for="realName">Nama asli</label><input id="realName" name="realName" maxlength="100" required autocomplete="name"><label for="alias">Nama samaran</label><input id="alias" name="alias" maxlength="100" required autocomplete="username">'}${register ? '<label for="className">Kelas / rombel</label><input id="className" name="className" maxlength="50" required placeholder="Contoh: X RPL 1"><label for="attendance">Nomor absen</label><input id="attendance" name="attendance" type="number" min="1" max="999" required aria-describedby="attendance-help"><p id="attendance-help" class="notice">Masukkan nomor absenmu. Untuk absen 01, cukup tulis 1.</p>' : ""}<p id="error" role="alert" class="error"></p>${!teacher ? '<p class="notice">Nama asli dan nama samaran dipakai untuk masuk. Siapa pun yang mengetahui keduanya dapat mengakses akun ini. Jangan gunakan kata sandi akun lain sebagai nama samaran.</p>' : ""}<div class="actions"><button class="primary" type="submit">${register ? "Daftar" : "Masuk"}</button><button type="button" class="ghost" data-nav="home">Kembali</button></div></form><p class="notice">${teacher ? "Akun guru disediakan oleh pengelola aplikasi." : "Catat nama asli dan nama samaran yang kamu gunakan untuk masuk kembali."}</p></section>`,
+    `<section class="panel auth-panel"><div class="eyebrow">${teacher ? "Ruang pendidik" : "Identitas penjelajah"}</div><h2 style="margin-top:12px">${teacher ? "Masuk halaman guru" : "Selamat datang kembali"}</h2><p>${teacher ? "Masuk dengan akun guru yang dibuat administrator sekolah." : "Gunakan nama samaran dan kata sandi yang diberikan gurumu."}</p><form id="auth-form" data-kind="${kind}">${teacher ? '<label for="username">Username guru</label><input id="username" name="username" required autocomplete="username">' : '<label for="alias">Nama samaran</label><input id="alias" name="alias" maxlength="100" required autocomplete="username">'}<label for="password">Kata sandi</label><input id="password" name="password" type="password" required autocomplete="current-password"><p id="error" role="alert" class="error"></p><div class="actions"><button class="primary" type="submit">Masuk</button><button type="button" class="ghost" data-nav="home">Kembali</button></div></form>${teacher ? "" : '<p class="notice">Belum punya akun atau lupa kata sandi? Hubungi gurumu. Hanya guru yang dapat membuat atau mengatur ulang akun murid.</p>'}</section>`,
   );
 }
 async function activate(data) {
@@ -314,6 +313,7 @@ function map() {
 }
 async function travel(m) {
   if (!unlocked(m, summarizeProgress(progress))) return;
+  selectedIsland = null;
   const previous =
     route === "mission" && current() ? getMission(current().missionId) : null;
   const kind = m.enrichment
@@ -464,12 +464,26 @@ function filteredTeachers() {
 function teacherTable() {
   const rows = filteredTeachers();
   $("#teacher-table").innerHTML =
-    `<p class="notice">${rows.length} peserta sesuai filter · data terakhir dimuat ${new Date().toLocaleTimeString("id-ID")}</p><div class="table-wrap"><table><thead><tr><th>Nama asli</th><th>Nama samaran</th><th>Kelas</th><th>Absen</th><th>Inti</th><th>Ketepatan</th><th>Nilai inti</th><th>Rapor</th></tr></thead><tbody>${rows.map((p) => `<tr><td>${esc(p.real_name)}</td><td>${esc(p.alias)}</td><td>${esc(p.class_name)}</td><td>${p.attendance}</td><td>${p.summary.completed}/15</td><td>${p.summary.accuracy ?? "—"}</td><td>${p.summary.score ?? "Belum lengkap"}</td><td><button class="small" data-report="${esc(p.id)}">Buka</button></td></tr>`).join("")}</tbody></table></div>`;
+    `<p class="notice">${rows.length} peserta sesuai filter · data terakhir dimuat ${new Date().toLocaleTimeString("id-ID")}</p><div class="table-wrap"><table><thead><tr><th>Nama asli</th><th>Nama samaran</th><th>Kelas</th><th>Absen</th><th>Inti</th><th>Ketepatan</th><th>Nilai inti</th><th>Rapor</th><th>Akses</th></tr></thead><tbody>${rows.map((p) => `<tr><td>${esc(p.real_name)}</td><td>${esc(p.alias)}</td><td>${esc(p.class_name)}</td><td>${p.attendance}</td><td>${p.summary.completed}/15</td><td>${p.summary.accuracy ?? "—"}</td><td>${p.summary.score ?? "Belum lengkap"}</td><td><button class="small" data-report="${esc(p.id)}">Buka</button></td><td><button class="small" data-reset-password="${esc(p.id)}">${p.hasPassword ? "Atur ulang" : "Buat sandi"}</button></td></tr>`).join("")}</tbody></table></div>`;
+}
+function showStudentCredential(result, title) {
+  const box = $("#student-credentials");
+  if (!box) return;
+  box.hidden = false;
+  box.replaceChildren();
+  const heading = document.createElement("strong");
+  heading.textContent = title + " · " + result.participant.real_name;
+  const info = document.createElement("p");
+  info.textContent = `Nama samaran: ${result.participant.alias} · Kata sandi: ${result.password}`;
+  const note = document.createElement("p");
+  note.textContent =
+    "Salin sekarang dan berikan kepada murid secara pribadi. Kata sandi ini tidak ditampilkan lagi.";
+  box.append(heading, info, note);
 }
 function renderTeacher() {
   const scores = teacherRows.filter((p) => p.summary.score !== null);
   shell(
-    `<section class="panel"><div class="eyebrow">Ruang pendidik</div><h2 style="margin-top:12px">Perkembangan belajar murid</h2><p>Lihat hasil misi dan jawaban murid. Jawaban yang belum terkirim dari perangkat murid belum muncul di halaman ini.</p><div class="summary-grid"><div class="summary-card"><small>Peserta terdaftar</small><strong>${teacherRows.length}</strong></div><div class="summary-card"><small>Inti tuntas</small><strong>${scores.length}</strong></div><div class="summary-card"><small>Kelas</small><strong>${new Set(teacherRows.map((p) => p.class_name)).size}</strong></div><div class="summary-card"><small>Rata-rata nilai tuntas</small><strong>${scores.length ? Math.round(scores.reduce((a, p) => a + p.summary.score, 0) / scores.length) : "—"}</strong></div></div><div class="inline-form"><label>Kelas<select id="teacher-class"><option value="">Semua kelas</option>${[...new Set(teacherRows.map((p) => p.class_name))].map((c) => `<option>${esc(c)}</option>`).join("")}</select></label><label>Cari peserta<input id="teacher-query" placeholder="Nama asli / samaran"></label><label><input id="teacher-complete" type="checkbox" style="width:auto"> Inti tuntas saja</label></div><div class="actions"><button id="teacher-csv">Unduh</button><button id="teacher-refresh">Segarkan</button></div><div id="teacher-table"></div><details style="margin-top:25px"><summary>Kalibrasi waktu versi lama</summary><p class="notice">Pengaturan ini hanya untuk misi versi lama. Ekspedisi lima pulau memakai acuan waktu per misi dengan bobot 10%.</p><div class="inline-form"><label>Pengali waktu<input id="baseline" type="number" min="0.5" max="3" step="0.1" value="1"></label><button id="calibrate">Simpan</button></div><p id="error" role="alert"></p></details></section>`,
+    `<section class="panel"><div class="eyebrow">Ruang pendidik</div><h2 style="margin-top:12px">Perkembangan belajar murid</h2><p>Lihat hasil misi dan jawaban murid. Jawaban yang belum terkirim dari perangkat murid belum muncul di halaman ini.</p><div class="summary-grid"><div class="summary-card"><small>Peserta terdaftar</small><strong>${teacherRows.length}</strong></div><div class="summary-card"><small>Inti tuntas</small><strong>${scores.length}</strong></div><div class="summary-card"><small>Kelas</small><strong>${new Set(teacherRows.map((p) => p.class_name)).size}</strong></div><div class="summary-card"><small>Rata-rata nilai tuntas</small><strong>${scores.length ? Math.round(scores.reduce((a, p) => a + p.summary.score, 0) / scores.length) : "—"}</strong></div></div><div class="inline-form"><label>Kelas<select id="teacher-class"><option value="">Semua kelas</option>${[...new Set(teacherRows.map((p) => p.class_name))].map((c) => `<option>${esc(c)}</option>`).join("")}</select></label><label>Cari peserta<input id="teacher-query" placeholder="Nama asli / samaran"></label><label><input id="teacher-complete" type="checkbox" style="width:auto"> Inti tuntas saja</label></div><div class="actions"><button id="teacher-csv">Unduh</button><button id="teacher-refresh">Segarkan</button></div><details class="report-question"><summary>Buat akun murid</summary><p class="notice">Guru membuat akun dan sistem menghasilkan kata sandi acak. Berikan kata sandi secara pribadi kepada murid.</p><form id="student-create-form"><label>Nama asli<input name="realName" required maxlength="100"></label><label>Nama samaran<input name="alias" required maxlength="100"></label><label>Kelas<input name="className" required maxlength="50"></label><label>Nomor absen<input name="attendance" type="number" min="1" max="999" required></label><p role="alert" class="error"></p><button class="primary" type="submit">Buat akun</button></form></details><div id="student-credentials" class="hint" role="status" hidden></div><div id="teacher-table"></div><details style="margin-top:25px"><summary>Kalibrasi waktu versi lama</summary><p class="notice">Pengaturan ini hanya untuk misi versi lama. Ekspedisi lima pulau memakai acuan waktu per misi dengan bobot 10%.</p><div class="inline-form"><label>Pengali waktu<input id="baseline" type="number" min="0.5" max="3" step="0.1" value="1"></label><button id="calibrate">Simpan</button></div><p id="error" role="alert"></p></details></section>`,
   );
   teacherTable();
 }
@@ -499,8 +513,7 @@ function navigate(next) {
   world.reset();
   route = next;
   if (next === "home") home();
-  else if (["register", "login", "teacher-login"].includes(next))
-    authForm(next);
+  else if (["login", "teacher-login"].includes(next)) authForm(next);
   else if (next === "map") map();
   else if (next === "report") {
     if (auth?.role !== "participant") navigate("login");
@@ -546,25 +559,37 @@ app.addEventListener("submit", async (e) => {
     }
     return;
   }
+  if (e.target.id === "student-create-form") {
+    e.preventDefault();
+    const form = e.target;
+    const submit = form.querySelector("[type=submit]");
+    submit.disabled = true;
+    try {
+      const body = Object.fromEntries(new FormData(form));
+      body.attendance = Number(body.attendance);
+      const result = await api("/teacher/participants", body);
+      teacherRows = await api("/teacher/participants");
+      renderTeacher();
+      showStudentCredential(result, "Akun dibuat");
+    } catch (err) {
+      form.querySelector("[role=alert]").textContent = err.message;
+      submit.disabled = false;
+    }
+    return;
+  }
   if (e.target.id !== "auth-form") return;
   e.preventDefault();
   const kind = e.target.dataset.kind,
     b = Object.fromEntries(new FormData(e.target));
-  if (kind === "register") b.attendance = Number(b.attendance);
   const submit = e.target.querySelector("[type=submit]");
   submit.disabled = true;
   try {
     const data = await api(
-      kind === "teacher-login"
-        ? "/teacher/login"
-        : kind === "register"
-          ? "/register"
-          : "/login",
+      kind === "teacher-login" ? "/teacher/login" : "/login",
       b,
     );
     await activate(data);
     if (data.role === "teacher") navigate("teacher");
-    else if (kind === "register") travel(MISSIONS[0]);
     else navigate("map");
   } catch (err) {
     showError(err.message);
@@ -625,6 +650,23 @@ app.addEventListener("click", async (e) => {
         .querySelector(`[data-enter-island="${selectedIsland}"]`)
         ?.focus({ preventScroll: true });
       window.scrollTo({ top: position, behavior: "instant" });
+      return;
+    }
+    if (b.dataset.resetPassword) {
+      b.disabled = true;
+      try {
+        const result = await api(
+          `/teacher/participants/${b.dataset.resetPassword}/reset-password`,
+          {},
+        );
+        const row = teacherRows.find((p) => p.id === b.dataset.resetPassword);
+        if (row) row.hasPassword = true;
+        teacherTable();
+        showStudentCredential(result, "Kata sandi baru");
+      } catch (err) {
+        showError(err.message);
+        b.disabled = false;
+      }
       return;
     }
     if (b.dataset.report) {
@@ -734,23 +776,24 @@ app.addEventListener("click", async (e) => {
       case "import-json":
         $("#json-file").click();
         break;
-      case "teacher-csv":
+      case "teacher-csv": {
+        const params = new URLSearchParams();
+        const cls = $("#teacher-class")?.value || "";
+        const query = $("#teacher-query")?.value || "";
+        if (cls) params.set("class", cls);
+        if (query) params.set("query", query);
+        if ($("#teacher-complete")?.checked) params.set("complete", "true");
+        const response = await fetch("/api/teacher/export?" + params, {
+          credentials: "same-origin",
+        });
+        if (!response.ok) throw Error("Rekap kelas gagal diunduh");
         download(
           "rekap-kelas.csv",
-          toCsv(
-            filteredTeachers().map((p) => ({
-              "Nama asli": p.real_name,
-              "Nama samaran": p.alias,
-              Kelas: p.class_name,
-              Absen: p.attendance,
-              "Misi inti": p.summary.completed,
-              "Nilai inti": p.summary.score ?? "Belum lengkap",
-              Ketepatan: p.summary.accuracy ?? "",
-            })),
-          ),
+          await response.text(),
           "text/csv;charset=utf-8",
         );
         break;
+      }
       case "teacher-refresh":
         teacher();
         break;

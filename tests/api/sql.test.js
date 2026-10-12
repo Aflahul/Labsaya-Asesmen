@@ -2,28 +2,29 @@ import { test, expect } from "vitest";
 import { PGlite } from "@electric-sql/pglite";
 import fs from "node:fs/promises";
 import { buildApp } from "../../src/server/app.js";
+import { loginSeededParticipant } from "./helpers.js";
 import { MISSIONS } from "../../src/shared/missions.js";
 import { solution } from "../fixtures/solutions.js";
 test("real PostgreSQL SQL validates transaction rollback and JSON evidence", async () => {
   const sql = new PGlite();
-  for (const file of ["001_accounts.sql", "002_assessment.sql"])
+  for (const file of [
+    "001_accounts.sql",
+    "002_assessment.sql",
+    "003_participant_passwords.sql",
+  ])
     await sql.exec(await fs.readFile("migrations/" + file, "utf8"));
   const db = {
     query: (q, p) => sql.query(q, p),
     connect: async () => ({ query: (q, p) => sql.query(q, p), release() {} }),
   };
   const app = await buildApp({ db });
-  const reg = await app.inject({
-    method: "POST",
-    url: "/api/register",
-    payload: {
-      realName: "Postgres Uji",
-      alias: "SQL",
-      className: "X",
-      attendance: 1,
-    },
+  const reg = await loginSeededParticipant(app, {
+    realName: "Postgres Uji",
+    alias: "SQL",
+    className: "X",
+    attendance: 1,
   });
-  expect(reg.statusCode).toBe(201);
+  expect(reg.statusCode).toBe(200);
   const headers = {
       cookie: reg.headers["set-cookie"].split(";")[0],
       "x-csrf-token": reg.json().data.csrf,

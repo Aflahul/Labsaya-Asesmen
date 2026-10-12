@@ -1,13 +1,14 @@
 import { test, expect } from "vitest";
-import { setup } from "./helpers.js";
+import { setup, loginSeededParticipant } from "./helpers.js";
 import { MISSIONS } from "../../src/shared/missions.js";
 import { solution } from "../fixtures/solutions.js";
 test("server recalculates completion and handles duplicate events", async () => {
   const app = await setup();
-  const r = await app.inject({
-    method: "POST",
-    url: "/api/register",
-    payload: { realName: "Budi", alias: "Api", className: "X", attendance: 2 },
+  const r = await loginSeededParticipant(app, {
+    realName: "Budi",
+    alias: "Api",
+    className: "X",
+    attendance: 2,
   });
   const { csrf } = r.json().data;
   const cookie = r.headers["set-cookie"].split(";")[0];
@@ -57,10 +58,11 @@ test("server recalculates completion and handles duplicate events", async () => 
 test("participant cannot read or write another participant session", async () => {
   const app = await setup();
   const reg = async (alias) => {
-    const r = await app.inject({
-      method: "POST",
-      url: "/api/register",
-      payload: { realName: "Nama Sama", alias, className: "X", attendance: 1 },
+    const r = await loginSeededParticipant(app, {
+      realName: "Nama Sama",
+      alias,
+      className: "X",
+      attendance: 1,
     });
     return {
       cookie: r.headers["set-cookie"].split(";")[0],

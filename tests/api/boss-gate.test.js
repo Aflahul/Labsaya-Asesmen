@@ -1,18 +1,14 @@
 import { test, expect } from "vitest";
-import { setup } from "./helpers.js";
+import { setup, loginSeededParticipant } from "./helpers.js";
 import { CORE_MISSIONS, BOSS } from "../../src/shared/missions.js";
 import { newSession } from "../../src/shared/assessment.js";
 test("server rejects below90 and pending review, allows exactly90, ignores boss score in leaderboard", async () => {
   const app = await setup();
-  const reg = await app.inject({
-    method: "POST",
-    url: "/api/register",
-    payload: {
-      realName: "Bos Uji",
-      alias: "Bos",
-      className: "X",
-      attendance: 1,
-    },
+  const reg = await loginSeededParticipant(app, {
+    realName: "Bos Uji",
+    alias: "Bos",
+    className: "X",
+    attendance: 1,
   });
   const account = reg.json().data,
     p = account.user.id,

@@ -774,3 +774,6 @@ th {
   .footer { flex-direction: column; align-items: flex-start; }
   .footer-sync { margin-left: 0; }
 }
+
+#student-credentials[hidden] { display: none; }
+#student-credentials { margin: 16px 0; overflow-wrap: anywhere; }
