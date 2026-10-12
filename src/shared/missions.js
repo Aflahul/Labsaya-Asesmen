@@ -142,25 +142,25 @@ export const MISSIONS = [
       field(
         "index",
         "Pada indeks berapa Kayu berada di daftar awal?",
-        ["0", "1", "2"],
+        ["0", "1", "2", "3"],
         "1",
       ),
       field(
         "set",
         "Perintah mana yang mengganti Kayu dengan Air?",
-        ['rak[0] = "Air"', 'rak[1] = "Air"', 'rak[2] = "Air"'],
+        ['rak[0] = "Air"', 'rak[1] = "Air"', 'rak[2] = "Air"', 'rak[1] == "Air"'],
         'rak[1] = "Air"',
       ),
       field(
         "remove",
         "Setelah Kayu diganti dengan Air, perintah mana yang menghapus Batu?",
-        ["rak.pop(0)", "rak.pop(1)", "rak.pop(2)"],
+        ["rak.pop(0)", "rak.pop(1)", "rak.pop(2)", 'rak.remove("Air")'],
         "rak.pop(2)",
       ),
       field(
         "append",
         "Perintah mana yang menambahkan Obat di akhir daftar?",
-        ['rak.append("Obat")', 'rak[0] = "Obat"', "rak.pop(2)"],
+        ['rak.append("Obat")', 'rak[0] = "Obat"', "rak.pop(2)", 'rak.insert(0, "Obat")'],
         'rak.append("Obat")',
       ),
     ],
@@ -211,19 +211,19 @@ export const MISSIONS = [
       field(
         "first",
         "Langkah apa yang perlu dilakukan setelah Mulai?",
-        ["Input stok, pesanan", "Output Terima", "stok ≥ pesanan?"],
+        ["Input stok, pesanan", "Output Terima", "stok ≥ pesanan?", "Proses stok − pesanan"],
         "Input stok, pesanan",
       ),
       field(
         "symbol",
         "Simbol flowchart apa yang cocok untuk menerima data stok dan pesanan?",
-        ["Jajar genjang", "Belah ketupat", "Persegi panjang"],
+        ["Jajar genjang", "Belah ketupat", "Persegi panjang", "Oval"],
         "Jajar genjang",
       ),
       field(
         "condition",
         "Kondisi apa yang harus diperiksa untuk menentukan apakah stok cukup?",
-        ["stok ≥ pesanan", "stok > pesanan", "stok < pesanan"],
+        ["stok ≥ pesanan", "stok > pesanan", "stok < pesanan", "stok = pesanan"],
         "stok ≥ pesanan",
       ),
       field(
@@ -251,19 +251,19 @@ export const MISSIONS = [
       field(
         "a",
         "Jika stok 2 dan pesanan 3, cabang mana yang dilewati dan apa keputusannya?",
-        ["YA → Terima", "TIDAK → Tunda"],
+        ["YA → Terima", "TIDAK → Tunda", "YA → Tunda", "TIDAK → Terima"],
         "TIDAK → Tunda",
       ),
       field(
         "b",
         "Jika stok 3 dan pesanan 3, cabang mana yang dilewati dan apa keputusannya?",
-        ["YA → Terima", "TIDAK → Tunda"],
+        ["YA → Terima", "TIDAK → Tunda", "YA → Tunda", "TIDAK → Terima"],
         "YA → Terima",
       ),
       field(
         "c",
         "Jika stok 5 dan pesanan 3, cabang mana yang dilewati dan apa keputusannya?",
-        ["YA → Terima", "TIDAK → Tunda"],
+        ["YA → Terima", "TIDAK → Tunda", "YA → Tunda", "TIDAK → Terima"],
         "YA → Terima",
       ),
     ],
@@ -274,7 +274,7 @@ export const MISSIONS = [
     "Perbaiki Batas",
     "C4",
     "boundary",
-    "Gerbang memakai kondisi stok > pesanan. Saat stok 3 dan pesanan 3, pesanan justru ditolak. Bantu Nara memperbaikinya agar stok yang tepat cukup juga diterima.",
+    "Gerbang memakai kondisi stok > pesanan dan menolak pesanan saat stok tepat cukup. Bandingkan usulan mengganti tanda menjadi == atau >=. Cari kelemahan usulan ==, lalu uji perbaikan yang memenuhi seluruh keadaan.",
     [
       field(
         "cause",
@@ -296,21 +296,21 @@ export const MISSIONS = [
       ),
       field(
         "a",
-        "Setelah diperbaiki, apa keputusan gerbang jika stok 2 dan pesanan 3?",
+        "Jika usulan == dipakai, apa keputusan gerbang saat stok 4 dan pesanan 3?",
         ["Terima", "Tunda"],
         "Tunda",
         10,
       ),
       field(
         "b",
-        "Setelah diperbaiki, apa keputusan gerbang jika stok 3 dan pesanan 3?",
+        "Jika usulan == dipakai, apa keputusan gerbang saat stok 3 dan pesanan 3?",
         ["Terima", "Tunda"],
         "Terima",
         10,
       ),
       field(
         "c",
-        "Setelah diperbaiki, apa keputusan gerbang jika stok 4 dan pesanan 3?",
+        "Jika usulan >= dipakai, apa keputusan gerbang saat stok 4 dan pesanan 3?",
         ["Terima", "Tunda"],
         "Terima",
         10,
@@ -328,19 +328,19 @@ export const MISSIONS = [
       field(
         "one",
         "Apa yang ditulis pada baris pertama?",
-        ["INPUT x", "OUTPUT y", "y ← x × 2"],
+        ["INPUT x", "OUTPUT y", "y ← x × 2", "y ← x + 2"],
         "INPUT x",
       ),
       field(
         "two",
         "Apa yang ditulis pada baris kedua?",
-        ["INPUT x", "OUTPUT y", "y ← x × 2"],
+        ["INPUT x", "OUTPUT y", "y ← x × 2", "y ← x + 2"],
         "y ← x × 2",
       ),
       field(
         "three",
         "Apa yang ditulis pada baris ketiga?",
-        ["INPUT x", "OUTPUT y", "y ← x × 2"],
+        ["INPUT x", "OUTPUT y", "y ← x × 2", "y ← x + 2"],
         "OUTPUT y",
       ),
       field(
@@ -368,25 +368,25 @@ export const MISSIONS = [
       field(
         "condition",
         "Kondisi apa yang perlu ditulis setelah IF agar biaya sesuai aturan?",
-        ["jarak < 5", "jarak ≤ 5", "jarak > 5"],
+        ["jarak < 5", "jarak ≤ 5", "jarak > 5", "jarak ≥ 5"],
         "jarak ≤ 5",
       ),
       field(
         "a",
         "Berapa biaya pengiriman untuk jarak 2 km, dalam rupiah?",
-        ["4000", "7000"],
+        ["4000", "7000", "5000"],
         "4000",
       ),
       field(
         "b",
         "Berapa biaya pengiriman untuk jarak 5 km, dalam rupiah?",
-        ["4000", "7000"],
+        ["4000", "7000", "5000"],
         "4000",
       ),
       field(
         "c",
         "Berapa biaya pengiriman untuk jarak 8 km, dalam rupiah?",
-        ["4000", "7000"],
+        ["4000", "7000", "5000"],
         "7000",
       ),
     ],
@@ -533,14 +533,14 @@ export const MISSIONS = [
       field(
         "fix",
         "Dua nilai apa yang seharusnya dijumlahkan oleh ALU?",
-        ["10 dan 11", "12 dan 8", "10 dan 8"],
+        ["10 dan 11", "12 dan 8", "10 dan 8", "12 dan 11"],
         "12 dan 8",
         40,
       ),
       field(
         "test",
         "Jika isi RAM[10] diubah menjadi 15 dan RAM[11] tetap 8, berapa hasil penjumlahannya?",
-        ["21", "23", "26"],
+        ["21", "23", "26", "20"],
         "23",
         30,
       ),
@@ -605,7 +605,7 @@ export const MISSIONS = [
     [],
     {
       snippet:
-        'A: rata = sum(nilai) / 5\n\nB: IF len(nilai) > 0 THEN\n     rata = sum(nilai) / len(nilai)\n   ELSE\n     OUTPUT "Belum ada nilai"',
+        'A: rata = sum(nilai) / 5\n   OUTPUT rata\n\nB: IF len(nilai) > 0 THEN\n     rata = sum(nilai) / len(nilai)\n     OUTPUT rata\n   ELSE\n     OUTPUT "Belum ada nilai"',
       written: [
         [
           "choice",

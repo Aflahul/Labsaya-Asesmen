@@ -31,9 +31,6 @@ test("world map labels do not overlap and details belong to the selected island"
             boxes[i].b <= boxes[j].t ||
             boxes[j].b <= boxes[i].t,
         ).toBe(true);
-    await page.locator('.island-art[data-island="1"]').click();
-    await expect(page.locator(".island-entry")).toHaveCount(1);
-    await expect(page.locator(".island-entry [data-mission]")).toHaveCount(3);
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
@@ -43,7 +40,5 @@ test("world map labels do not overlap and details belong to the selected island"
       path: `test-results/map-menu-${width}.png`,
       fullPage: true,
     });
-    await page.locator("[data-close-island]").click();
-    await expect(page.locator(".island-entry")).toHaveCount(0);
   }
 });

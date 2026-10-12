@@ -20,16 +20,16 @@ test("competency keeps the best evidence; replays only deduct gameplay points", 
   expect(r.gameMissionGrades[CORE_MISSIONS[0].id]).toMatchObject({
     bestScore: 100,
     replayCount: 2,
-    replayPenalty: 2,
-    score: 98,
+    replayPenalty: 1,
+    score: 99,
   });
   expect(r.missionGrades[CORE_MISSIONS[0].id].score).toBe(100);
   expect(buildReport({ sessions }).rows[0]).toMatchObject({
     Nilai: 100,
-    SkorGame: 98,
+    SkorGame: 99,
     NilaiSesiTerbaik: 100,
     Pengulangan: 2,
-    PotonganUlang: 2,
+    PotonganUlang: 1,
   });
   expect(sessions[1].score).toBe(100);
 });
@@ -51,7 +51,7 @@ test("new replay counts immediately, duplicate sync and old empty visits do not"
     sessions: [first, replay, replay, emptyVisit],
   });
   expect(r.missionGrades[first.missionId].score).toBe(100);
-  expect(r.gameMissionGrades[first.missionId].score).toBe(99);
+  expect(r.gameMissionGrades[first.missionId].score).toBe(100);
 });
 test("competency determines islands, final mean and boss; game score remains separate", () => {
   const sessions = CORE_MISSIONS.map((m) => session(m.id, 90, m.id));
@@ -60,8 +60,8 @@ test("competency determines islands, final mean and boss; game score remains sep
   const r = summarizeProgress({ sessions });
   expect(r.competencies[0].score).toBe(100);
   expect(r.score).toBe(100);
-  expect(r.gameCompetencies[0].score).toBe(89.67);
-  expect(r.gameScore).toBe(89.93);
+  expect(r.gameCompetencies[0].score).toBe(90);
+  expect(r.gameScore).toBe(90);
   expect(r.bossUnlocked).toBe(true);
 });
 test("replay penalty cannot produce a negative grade", () => {
@@ -83,5 +83,5 @@ test("best accuracy wins even when a faster attempt has a higher gameplay score"
   const r = summarizeProgress({ sessions });
   expect(r.missionGrades[CORE_MISSIONS[0].id].score).toBe(95);
   expect(r.bestByMission[CORE_MISSIONS[0].id].id).toBe("accurate");
-  expect(r.gameMissionGrades[CORE_MISSIONS[0].id].score).toBe(89);
+  expect(r.gameMissionGrades[CORE_MISSIONS[0].id].score).toBe(90);
 });

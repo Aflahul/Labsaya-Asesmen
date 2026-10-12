@@ -27,3 +27,21 @@ test("incomplete response identifies the missing field without giving its answer
     m.rules.fields[0].label,
   );
 });
+test("rak is revealed only after Coba or Kirim", () => {
+  const m = getMission("v2p01m02");
+  const answers = { set: 'rak[1] = "Air"', remove: "rak.pop(2)", append: 'rak.append("Obat")' };
+  const before = v2ActivityHtml(m, { answers, tested: false });
+  expect(before).not.toContain("Isi rak saat ini");
+  expect(before).not.toContain('<strong>Obat</strong>');
+  const after = v2ActivityHtml(m, { answers, tested: true });
+  expect(after).toContain("Isi rak saat ini");
+  expect(after).toContain('<strong>Obat</strong>');
+});
+test("flowchart repair contrasts equality-only with inclusive comparison", () => {
+  const m = getMission("v2p02m03");
+  expect(m.instructions).toContain("usulan");
+  expect(m.rules.fields.find((f) => f.key === "a").label).toContain("usulan ==");
+  expect(m.rules.fields.find((f) => f.key === "b").label).toContain("usulan ==");
+  expect(m.rules.fields.find((f) => f.key === "c").label).toContain("usulan >=");
+  expect(m.rules.answers.a).toBe("Tunda");
+});

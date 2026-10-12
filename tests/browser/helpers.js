@@ -32,7 +32,6 @@ export async function register(
   await page.locator("#auth-form button[type=submit]").click();
   await expect(page.locator(".island-card")).toHaveCount(5);
   await page.locator('.island-art[data-island="1"]').click();
-  await page.locator('[data-mission="v2p01m01"]').click();
 }
 export async function enterMission(page, m) {
   await page

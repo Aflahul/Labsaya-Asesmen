@@ -43,7 +43,6 @@ test("15 core missions, real teacher review, optional boss and unchanged main gr
       await page.reload();
       await page.getByRole("button", { name: "Lanjut", exact: true }).click();
       await page.locator(`.island-art[data-island="${m.island}"]`).click();
-      await page.locator(`[data-mission="${m.id}"]`).click();
       await enterMission(page, m);
       await expect(page.locator("[data-answer=evidence]")).toHaveValue(
         "x".repeat(3300),
@@ -128,7 +127,7 @@ test("15 core missions, real teacher review, optional boss and unchanged main gr
   await expect(question.locator(".report-answer")).not.toBeVisible();
   await question.locator("summary").click();
   await expect(question.locator(".report-answer")).toBeVisible();
-  await expect(question).toContainText("skor permainan misi 98");
+  await expect(question).toContainText("skor permainan misi 99");
   await expect(page.locator(".footer-credit a")).toHaveAttribute(
     "href",
     "https://aflahul.vercel.app/",

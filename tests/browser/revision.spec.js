@@ -23,7 +23,7 @@ for (const width of [390, 1440]) {
       /prop-cargo-crate/,
     );
     await page.getByRole("button", { name: "Peta", exact: true }).click();
-    await expect(nara).toContainText("Pilih pulau, lalu tekan Masuk.");
+    await expect(nara).toContainText("Pilih pulau yang terbuka untuk langsung masuk ke misi berikutnya.");
     await page.locator("#nara-close").click();
     await expect
       .poll(() => page.locator(".map-links path").getAttribute("d"))
@@ -56,29 +56,34 @@ for (const width of [390, 1440]) {
     });
   });
 }
-test("mission completion exposes all five score components", async ({
-  page,
-}) => {
+test("mission completion is compact and the full scoring explanation is in report Q&A", async ({ page }) => {
   await register(page);
   await enterMission(page, MISSIONS[0]);
-  await page.locator("#nara-close").click();
   await fillMission(page, MISSIONS[0]);
-  await page.locator("#hint").click();
-  await page.locator("#nara-close").click();
   await page.locator("#submit").click();
-  await expect(page.locator(".score-breakdown")).toContainText(
-    "Skor permainan sesi: 100",
-  );
-  for (const text of [
-    "Ketepatan",
-    "Petunjuk",
-    "Percobaan",
-    "Kesalahan",
-    "Waktu aktif",
-  ])
-    await expect(page.locator(".score-breakdown")).toContainText(text);
-  await page.screenshot({
-    path: "test-results/score-revision.png",
-    fullPage: true,
-  });
+  await expect(page.locator(".score-breakdown")).toContainText("Nilai kompetensi misi: 100");
+  await expect(page.locator(".score-breakdown")).toContainText("Skor permainan misi: 100");
+  await expect(page.locator(".score-breakdown")).not.toContainText("Ketepatan");
+  await page.getByRole("button", { name: "Peta", exact: true }).click();
+  await page.locator("main [data-nav=report]").click();
+  await page.locator(".report-help > summary").click();
+  const detail = page.locator(".report-question").filter({ hasText: "Bagaimana membaca rincian skor sesi?" });
+  await detail.locator("summary").click();
+  await expect(detail).toContainText("Ketepatan");
+  await expect(detail).toContainText("waktu aktif");
+});
+test("rak contents stay hidden while selecting answers and appear after Coba", async ({ page }) => {
+  await register(page);
+  await enterMission(page, MISSIONS[0]);
+  await fillMission(page, MISSIONS[0]);
+  await page.locator("#submit").click();
+  await page.locator("#next").click();
+  await enterMission(page, MISSIONS[1]);
+  await fillMission(page, MISSIONS[1]);
+  await expect(page.locator(".sim-caption")).toContainText("setelah kamu menekan Coba atau Kirim");
+  await expect(page.locator(".sim-caption")).not.toContainText("Isi rak saat ini");
+  await page.locator("#run").click();
+  await expect(page.locator(".sim-caption")).toContainText("Isi rak saat ini");
+  await page.locator('[data-answer="append"]').selectOption('rak.insert(0, "Obat")');
+  await expect(page.locator(".sim-caption")).not.toContainText("Isi rak saat ini");
 });

@@ -70,13 +70,13 @@ function pageGuide(page) {
               help: "Nilai kompetensi berasal dari ketepatan jawaban atau rubrik guru. Rata-rata 15 misi minimal 90 membuka bos pengayaan. Petunjuk, percobaan, kesalahan, dan waktu hanya memengaruhi skor permainan.",
             }
           : {
-              goal: "Pilih pulau, lalu tekan Masuk.",
+              goal: "Pilih pulau yang terbuka untuk langsung masuk ke misi berikutnya.",
               steps: [
                 "Pilih pulau yang terbuka.",
-                "Tekan Masuk di samping pulau.",
+                "Misi yang belum selesai akan terbuka lebih dulu.",
                 "Selesaikan tiga misi untuk membuka pulau berikutnya.",
               ],
-              help: "Nilai misi memakai bukti kompetensi terbaik. Nilai pulau adalah rata-rata tiga misi; nilai akhir rata-rata lima pulau. Setelah 15 misi dinilai dengan nilai akhir minimal 90, portal Ruang Arsitek terbuka. Ulang hanya memotong skor permainan.",
+              help: "Nilai misi memakai bukti kompetensi terbaik. Nilai pulau adalah rata-rata tiga misi; nilai akhir rata-rata lima pulau. Setelah 15 misi dinilai dengan nilai akhir minimal 90, portal Ruang Arsitek terbuka. Ulang pertama gratis; mulai Ulang kedua, skor permainan berkurang 1 poin.",
             },
     },
     pageNara[page],
@@ -307,7 +307,7 @@ function map() {
         const ms = CORE_MISSIONS.filter((m) => m.island === i.id),
           done = ms.filter((m) => summary.bestByMission[m.id]).length,
           open = unlocked(ms[0], summary);
-        return `<section class="island-card ${open ? "" : "locked"} ${selected.id === i.id ? "selected" : ""}"><button class="island-art" data-island="${i.id}" aria-pressed="${selected.id === i.id}" aria-label="Pilih ${esc(i.name)}${open ? "" : " · terkunci"}"><img src="/game-assets/island-${i.slug}.webp" alt=""></button><div class="island-label"><small>${done === 3 ? "✓ PULIH" : open ? "JALUR TERBUKA" : "TERKUNCI"} · ${done}/3</small><button class="island-name" data-island="${i.id}">${esc(i.name)}</button></div>${selectedIsland === i.id ? `<div class="island-entry" role="region" aria-label="Informasi ${esc(i.name)}"><div class="island-entry-heading"><strong>${esc(i.name)}</strong><button class="ghost small" data-close-island="${i.id}" aria-label="Tutup informasi pulau">×</button></div><p>${esc(i.topic)}</p>${open ? `<button class="primary" data-enter-island="${i.id}">Masuk</button><div class="mission-list">${ms.map((m, n) => `<article class="mission-choice"><div><strong>${n + 1}. ${esc(m.title)}</strong><small>${summary.bestByMission[m.id] ? "Nilai " + summary.missionGrades[m.id].score : progress.sessions.some((s) => s.missionId === m.id && s.status === "pending_review") ? "Menunggu guru" : "Belum selesai"}</small></div><button class="small" data-mission="${m.id}" aria-label="Buka ${esc(m.title)}">Buka</button></article>`).join("")}</div>` : `<p>Selesaikan tiga misi pulau sebelumnya untuk membuka pulau ini.</p>`}</div>` : ""}</section>`;
+        return `<section class="island-card ${open ? "" : "locked"} ${selected.id === i.id ? "selected" : ""}"><button class="island-art" data-island="${i.id}" aria-label="${open ? "Masuk ke" : "Lihat syarat membuka"} ${esc(i.name)}"><img src="/game-assets/island-${i.slug}.webp" alt=""></button><div class="island-label"><small>${done === 3 ? "✓ PULIH" : open ? "JALUR TERBUKA" : "TERKUNCI"} · ${done}/3</small><button class="island-name" data-island="${i.id}">${esc(i.name)}</button></div>${selectedIsland === i.id && !open ? `<div class="island-entry" role="status"><p>Selesaikan tiga misi pulau sebelumnya untuk membuka ${esc(i.name)}.</p></div>` : ""}</section>`;
       },
     ).join(
       "",
@@ -412,7 +412,7 @@ function renderMission() {
   world.setScene(m.scene || m.slug);
   world.setProp(m.prop);
   shell(
-    `<div class="topline"><button class="ghost small" data-nav="map">← Peta</button></div><div class="mission-layout"><section class="panel mission-panel"><div class="mission-title"><div><div class="eyebrow">${esc(m.islandName)} · ${m.enrichment ? "BOS OPSIONAL" : m.meeting + " · Misi " + Number(m.id.slice(-2)) + "/3"}</div><h2 id="mission-heading" tabindex="-1">${esc(m.title)}</h2></div><span class="badge">${done ? "✓ Dinilai" : pending ? "◷ Menunggu guru" : "Sedang dimainkan"}</span></div><div class="mission-progress"><span>Misi ${summary.completed}/15</span><span>Waktu <strong id="timer">${seconds(s.activeMs)}</strong></span><progress max="15" value="${summary.completed}" aria-label="Misi inti selesai"></progress></div><div class="instruction"><strong>Misi kita</strong><p>${esc(s.assessmentRevision < 2 && m.priorInstructions ? m.priorInstructions : m.instructions)}</p><details class="report-question"><summary>Acuan waktu skor permainan: ${s.scoringConfig?.timeBudgetSeconds || m.timeBudgetSeconds} detik</summary><div class="report-answer"><p>${esc(m.timeBudgetReason || "Acuan waktu sesuai beban misi.")}</p><p>Poin waktu permainan penuh sampai batas ini; nilai kompetensi tidak dipotong oleh waktu. Setelahnya, poin turun bertahap hingga 0 pada ${3 * (s.scoringConfig?.timeBudgetSeconds || m.timeBudgetSeconds)} detik. Misi tetap bisa diselesaikan. Sesi yang sudah dimulai memakai acuan saat sesi dibuat.</p></div></details></div><div class="activity" ${done || pending ? "inert" : ""}>${m.missionVersion === 2 ? v2ActivityHtml(m, draftState(s)) : activityHtml(m, s.state)}</div>${done ? `<p class="feedback" role="status">Skor permainan sesi ini: <strong>${s.score}</strong></p>${scoreBreakdown(s, summary.missionGrades[m.id], summary.gameMissionGrades[m.id])}` : pending ? `<p class="feedback" role="status">Jawabanmu sudah terkirim. Tunggu penilaian guru di Rapor.</p>` : `<p id="error" class="error" role="alert"></p>`}<div class="mission-controls">${done ? '<button class="primary" id="next">Next</button><button id="replay" title="Mengulang mengurangi skor permainan 1 poin; nilai kompetensi tidak berkurang">Ulang</button>' : pending ? '<button class="primary" data-nav="map">← Peta</button><button id="refresh-progress">Periksa</button><button data-nav="report">Rapor</button>' : `${!m.written ? '<button id="run">Coba</button>' : ""}<button class="primary" id="submit">Kirim</button><button id="hint">Petunjuk</button><button class="ghost" id="reset">Bersihkan</button>`}</div></section></div>${naraToast(m, naraState, naraState.mode === "hint" ? hint : done && s.score < 100 ? "Jawaban sudah dinilai. Kamu boleh mencoba lagi; nilai kompetensi memakai bukti terbaik. Setiap Ulang hanya mengurangi skor permainan 1 poin." : s.feedback)}`,
+    `<div class="topline"><button class="ghost small" data-nav="map">← Peta</button></div><div class="mission-layout"><section class="panel mission-panel"><div class="mission-title"><div><div class="eyebrow">${esc(m.islandName)} · ${m.enrichment ? "BOS OPSIONAL" : m.meeting + " · Misi " + Number(m.id.slice(-2)) + "/3"}</div><h2 id="mission-heading" tabindex="-1">${esc(m.title)}</h2></div><span class="badge">${done ? "✓ Dinilai" : pending ? "◷ Menunggu guru" : "Sedang dimainkan"}</span></div><div class="mission-progress"><span>Misi ${summary.completed}/15</span><span>Waktu <strong id="timer">${seconds(s.activeMs)}</strong></span><progress max="15" value="${summary.completed}" aria-label="Misi inti selesai"></progress></div><div class="instruction"><strong>Misi kita</strong><p>${esc(s.assessmentRevision < 2 && m.priorInstructions ? m.priorInstructions : m.instructions)}</p><details class="report-question"><summary>Acuan waktu skor permainan: ${s.scoringConfig?.timeBudgetSeconds || m.timeBudgetSeconds} detik</summary><div class="report-answer"><p>${esc(m.timeBudgetReason || "Acuan waktu sesuai beban misi.")}</p><p>Poin waktu permainan penuh sampai batas ini; nilai kompetensi tidak dipotong oleh waktu. Setelahnya, poin turun bertahap hingga 0 pada ${3 * (s.scoringConfig?.timeBudgetSeconds || m.timeBudgetSeconds)} detik. Misi tetap bisa diselesaikan. Sesi yang sudah dimulai memakai acuan saat sesi dibuat.</p></div></details></div><div class="activity" ${done || pending ? "inert" : ""}>${m.missionVersion === 2 ? v2ActivityHtml(m, draftState(s)) : activityHtml(m, s.state)}</div>${done ? `${scoreBreakdown(s, summary.missionGrades[m.id], summary.gameMissionGrades[m.id])}` : pending ? `<p class="feedback" role="status">Jawabanmu sudah terkirim. Tunggu penilaian guru di Rapor.</p>` : `<p id="error" class="error" role="alert"></p>`}<div class="mission-controls">${done ? '<button class="primary" id="next">Next</button><button id="replay" title="Ulang pertama gratis; berikutnya mengurangi skor permainan 1 poin">Ulang</button>' : pending ? '<button class="primary" data-nav="map">← Peta</button><button id="refresh-progress">Periksa</button><button data-nav="report">Rapor</button>' : `${!m.written ? '<button id="run">Coba</button>' : ""}<button class="primary" id="submit">Kirim</button><button id="hint">Petunjuk</button><button class="ghost" id="reset">Bersihkan</button>`}</div></section></div>${naraToast(m, naraState, naraState.mode === "hint" ? hint : done && s.score < 100 ? "Jawaban sudah dinilai. Kamu boleh mencoba lagi; nilai kompetensi memakai bukti terbaik. Ulang pertama gratis; berikutnya mengurangi skor permainan 1 poin." : s.feedback)}`,
   );
   if (focusedId)
     document.getElementById(focusedId)?.focus({ preventScroll: true });
@@ -670,33 +670,16 @@ app.addEventListener("click", async (e) => {
       travel(getMission(b.dataset.mission));
       return;
     }
-    if (b.dataset.enterIsland) {
-      const ms = CORE_MISSIONS.filter(
-        (m) => m.island === Number(b.dataset.enterIsland),
-      );
-      const summary = summarizeProgress(progress);
-      travel(ms.find((m) => !summary.bestByMission[m.id]) || ms[0]);
-      return;
-    }
-    if (b.dataset.closeIsland) {
-      const id = b.dataset.closeIsland;
-      selectedIsland = null;
-      const position = window.scrollY;
-      map();
-      document
-        .querySelector(`.island-art[data-island="${id}"]`)
-        ?.focus({ preventScroll: true });
-      window.scrollTo({ top: position, behavior: "instant" });
-      return;
-    }
     if (b.dataset.island) {
-      selectedIsland = Number(b.dataset.island);
-      const position = window.scrollY;
-      map();
-      document
-        .querySelector(`[data-enter-island="${selectedIsland}"]`)
-        ?.focus({ preventScroll: true });
-      window.scrollTo({ top: position, behavior: "instant" });
+      const islandId = Number(b.dataset.island);
+      const ms = CORE_MISSIONS.filter((m) => m.island === islandId);
+      const summary = summarizeProgress(progress);
+      if (unlocked(ms[0], summary)) {
+        travel(ms.find((m) => !summary.bestByMission[m.id]) || ms[0]);
+      } else {
+        selectedIsland = islandId;
+        map();
+      }
       return;
     }
     if (b.dataset.resetPassword) {

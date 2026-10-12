@@ -16,9 +16,9 @@ export const GUIDANCE = {
     [
       "Tentukan posisi Kayu pada rak awal.",
       "Pilih perintah untuk mengganti Kayu, menghapus Batu, lalu menambahkan Obat.",
-      "Perhatikan perubahan isi rak, lalu cocokkan dengan urutan barang yang diminta.",
+      "Tekan Coba untuk melihat hasil susunan rak, lalu cocokkan dengan urutan yang diminta.",
     ],
-    "Indeks menunjukkan posisi barang dalam list (daftar). Isi rak akan berubah sesuai perintah yang kamu pilih. Periksa hasilnya sebelum menekan Kirim.",
+    "Indeks menunjukkan posisi barang dalam list (daftar). Isi rak baru ditampilkan setelah kamu menekan Coba atau Kirim.",
     "Ikuti perintah satu per satu. Menghapus barang dapat menggeser posisi barang setelahnya.",
   ),
   v2p01m03: guide(
@@ -52,14 +52,14 @@ export const GUIDANCE = {
     "Coba baca kondisi sebagai kalimat untuk setiap pasangan angka, termasuk saat kedua angkanya sama.",
   ),
   v2p02m03: guide(
-    "Perbaiki gerbang yang menolak pesanan saat stok sebenarnya cukup.",
+    "Bandingkan dua usulan perbaikan untuk gerbang yang keliru.",
     [
       "Baca contoh kegagalan dan pilih penyebabnya.",
       "Pilih tanda pembanding untuk memperbaiki kondisi gerbang.",
-      "Tentukan hasil untuk ketiga contoh setelah diperbaiki, lalu tekan Coba.",
+      "Uji hasil masing-masing usulan pada stok sama dan stok berlebih, lalu tekan Coba.",
     ],
     "Diagram mula-mula menunjukkan kondisi yang salah. Setelah kamu memilih operator, diagram menampilkan kondisi yang kamu pilih.",
-    "Periksa tiga keadaan: stok kurang, stok tepat cukup, dan stok lebih banyak daripada pesanan.",
+    "Perbaikan harus menerima stok yang tepat cukup maupun berlebih, tanpa menerima stok yang kurang.",
   ),
   v2p03m01: guide(
     "Susun langkah pengendali untuk menghitung energi pengiriman.",

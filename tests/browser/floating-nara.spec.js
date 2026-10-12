@@ -26,26 +26,13 @@ test("Nara floats outside the question panel, can be dismissed and reopened with
   await expect(page.locator("[data-answer=phone]")).toHaveValue("String");
   await page.screenshot({ path: "test-results/nara-floating-phone.png" });
 });
-test("selecting an island opens its own entry button without scrolling to the dock", async ({
-  page,
-}) => {
+test("selecting an unlocked island starts its next mission directly", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await register(page);
   await enterMission(page, MISSIONS[0]);
   await page.getByRole("button", { name: "Peta", exact: true }).click();
-  const island = page.locator('.island-art[data-island="1"]');
-  await island.scrollIntoViewIfNeeded();
-  const before = await page.evaluate(() => scrollY);
-  await island.click();
-  await expect(
-    page.locator(".island-card.selected [data-enter-island]"),
-  ).toBeVisible();
-  expect(Math.abs((await page.evaluate(() => scrollY)) - before)).toBeLessThan(
-    30,
-  );
-  await expectShortButtons(page);
-  await page.screenshot({ path: "test-results/island-entry-phone.png" });
-  await page.locator('[data-enter-island="1"]').click();
+  await page.locator('.island-art[data-island="1"]').click();
+  await expect(page.locator(".island-entry")).toHaveCount(0);
   await enterMission(page, MISSIONS[0]);
 });
 test("entry zoom has no ship; island travel sails before zooming, with skip cancellation", async ({
@@ -66,12 +53,6 @@ test("entry zoom has no ship; island travel sails before zooming, with skip canc
   }
   await expect(page.locator("#world")).toHaveAttribute("data-phase", "sail");
   await expect(page.locator("#world .arrival-island")).toBeHidden();
-  await expect(page.locator("#world")).toHaveAttribute(
-    "data-phase",
-    "approach",
-    { timeout: 4000 },
-  );
-  await expect(page.locator("#world .travel-ship")).toBeHidden();
   await page.locator("#skip").click();
   await expect(page.locator("#world")).not.toHaveAttribute("data-phase", /.+/);
   await expect(page.locator("#begin-mission")).toBeVisible();

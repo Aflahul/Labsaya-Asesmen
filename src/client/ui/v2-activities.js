@@ -1,16 +1,22 @@
 import { esc } from "./activities.js";
 const chip = (label, value) =>
   `<div class="machine-cell"><small>${esc(label)}</small><strong>${esc(value ?? "…")}</strong></div>`;
-function simulation(m, a) {
+function simulation(m, a, state) {
   if (m.kind === "list") {
+    if (!state.tested) return '<p class="sim-caption">Isi rak akan terlihat setelah kamu menekan Coba atau Kirim.</p>';
     const list = [...m.initial];
-    if (a.set) {
+    if (a.set?.includes(" = ")) {
       list[Number(a.set.match(/\[(\d)\]/)?.[1])] = "Air";
     }
-    if (a.remove) list.splice(Number(a.remove.match(/\((\d)\)/)?.[1]), 1);
+    if (a.remove?.startsWith("rak.pop")) list.splice(Number(a.remove.match(/\((\d)\)/)?.[1]), 1);
+    if (a.remove === 'rak.remove("Air")') {
+      const index = list.indexOf("Air");
+      if (index >= 0) list.splice(index, 1);
+    }
     if (a.append === 'rak.append("Obat")') list.push("Obat");
     else if (a.append === 'rak[0] = "Obat"') list[0] = "Obat";
-    else if (a.append) list.splice(2, 1);
+    else if (a.append === 'rak.insert(0, "Obat")') list.unshift("Obat");
+    else if (a.append === "rak.pop(2)") list.splice(2, 1);
     return `<div class="sim-caption">Isi rak saat ini</div><div class="machine-row">${list.map((v) => `<div class="machine-cell"><strong>${esc(v)}</strong></div>`).join("")}</div>`;
   }
   if (["flow", "flow-trace", "boundary"].includes(m.kind))
@@ -25,7 +31,7 @@ function simulation(m, a) {
 }
 export function v2ActivityHtml(m, state) {
   const a = state.answers || {};
-  return `${simulation(m, a)}${m.snippet ? `<pre class="trace">${esc(m.snippet.replace("[pilih kondisi]", a.condition || "[pilih kondisi]"))}</pre>` : ""}${m.reference ? `<p class="notice">${esc(m.reference)}</p>` : ""}<div class="answer-grid">${m.rules.fields.map((f) => `<label for="answer-${f.key}">${esc(f.label)}<select id="answer-${f.key}" data-answer="${f.key}"><option value="" disabled ${a[f.key] === undefined ? "selected" : ""}>Pilih jawaban…</option>${f.options.map((o) => `<option value="${esc(o)}" ${a[f.key] === o ? "selected" : ""}>${esc(o === "Output terjadi sebelum assignment energi" ? "Hasil ditampilkan sebelum energi diberi nilai" : o)}</option>`).join("")}</select></label>`).join("")}</div>${m.code ? `<label for="code">Editor program <span class="notice">· Ubah kode di bawah, lalu tekan Coba.</span></label><textarea id="code" data-answer="code" class="code-editor" rows="7" spellcheck="false" maxlength="6000">${esc(a.code || "")}</textarea>` : ""}${m.written ? `<p class="notice">Tuliskan jawaban dan alasanmu pada kotak berikut.</p>${m.written.map(([key, label]) => `<label for="answer-${key}">${esc(label)}</label><textarea id="answer-${key}" data-answer="${key}" rows="5" maxlength="5000">${esc(a[key] || "")}</textarea>`).join("")}<details><summary>Yang dinilai</summary><ul>${m.rubric.map(([, label, max]) => `<li>${esc(label)}: maksimal ${max} poin</li>`).join("")}</ul></details>` : ""}${state.trace?.length ? `<section class="run-results" aria-label="Hasil pengujian"><h3>Hasil percobaan</h3>${state.trace.map((r, i) => `<details open><summary>Uji ${i + 1} · ${r.ok && (m.kind !== "python" || r.outputs.length === 1) && JSON.stringify(r.outputs.at(-1)) === JSON.stringify(r.expected) ? "Sesuai" : "Periksa kembali"}</summary><pre class="trace">Data: ${esc(JSON.stringify(r.input))}\nSeharusnya: ${esc(JSON.stringify(r.expected))}\nHasilmu: ${esc(r.outputs?.length ? r.outputs.map((v) => (typeof v === "string" ? v : JSON.stringify(v))).join("\n") : "Belum ada keluaran")}${r.error ? "\n" + esc(r.error) : ""}</pre></details>`).join("")}</section>` : ""}`;
+  return `${simulation(m, a, state)}${m.snippet ? `<pre class="trace">${esc(m.snippet.replace("[pilih kondisi]", a.condition || "[pilih kondisi]"))}</pre>` : ""}${m.reference ? `<p class="notice">${esc(m.reference)}</p>` : ""}<div class="answer-grid">${m.rules.fields.map((f) => `<label for="answer-${f.key}">${esc(f.label)}<select id="answer-${f.key}" data-answer="${f.key}"><option value="" disabled ${a[f.key] === undefined ? "selected" : ""}>Pilih jawaban…</option>${f.options.map((o) => `<option value="${esc(o)}" ${a[f.key] === o ? "selected" : ""}>${esc(o === "Output terjadi sebelum assignment energi" ? "Hasil ditampilkan sebelum energi diberi nilai" : o)}</option>`).join("")}</select></label>`).join("")}</div>${m.code ? `<label for="code">Editor program <span class="notice">· Ubah kode di bawah, lalu tekan Coba.</span></label><textarea id="code" data-answer="code" class="code-editor" rows="7" spellcheck="false" maxlength="6000">${esc(a.code || "")}</textarea>` : ""}${m.written ? `<p class="notice">Tuliskan jawaban dan alasanmu pada kotak berikut.</p>${m.written.map(([key, label]) => `<label for="answer-${key}">${esc(label)}</label><textarea id="answer-${key}" data-answer="${key}" rows="5" maxlength="5000">${esc(a[key] || "")}</textarea>`).join("")}<details><summary>Yang dinilai</summary><ul>${m.rubric.map(([, label, max]) => `<li>${esc(label)}: maksimal ${max} poin</li>`).join("")}</ul></details>` : ""}${state.trace?.length ? `<section class="run-results" aria-label="Hasil pengujian"><h3>Hasil percobaan</h3>${state.trace.map((r, i) => `<details open><summary>Uji ${i + 1} · ${r.ok && (m.kind !== "python" || r.outputs.length === 1) && JSON.stringify(r.outputs.at(-1)) === JSON.stringify(r.expected) ? "Sesuai" : "Periksa kembali"}</summary><pre class="trace">Data: ${esc(JSON.stringify(r.input))}\nSeharusnya: ${esc(JSON.stringify(r.expected))}\nHasilmu: ${esc(r.outputs?.length ? r.outputs.map((v) => (typeof v === "string" ? v : JSON.stringify(v))).join("\n") : "Belum ada keluaran")}${r.error ? "\n" + esc(r.error) : ""}</pre></details>`).join("")}</section>` : ""}`;
 }
 export function reviewHtml(p) {
   return p.sessions

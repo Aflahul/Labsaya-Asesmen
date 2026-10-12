@@ -12,7 +12,6 @@ test("incomplete answer stays active, keyboard choices and drafts survive naviga
   await page.locator("[data-answer=phone]").selectOption("String");
   await page.getByRole("button", { name: "Peta", exact: true }).click();
   await page.locator('.island-art[data-island="1"]').click();
-  await page.locator('[data-mission="v2p01m01"]').click();
   await enterMission(page, MISSIONS[0]);
   await expect(page.locator("[data-answer=phone]")).toHaveValue("String");
 });

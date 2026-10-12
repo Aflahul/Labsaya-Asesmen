@@ -11,7 +11,7 @@ export const MISSION_EVIDENCE = {
   v2p02m02:
     "Menelusuri cabang dan keluaran flowchart pada tiga nilai stok dan pesanan.",
   v2p02m03:
-    "Menjelaskan kesalahan operator batas, memilih perbaikan, lalu memeriksa tiga kasus.",
+    "Membandingkan usulan == dan >=, menjelaskan kelemahan ==, lalu memilih perbaikan yang menerima stok tepat cukup dan berlebih.",
   v2p03m01:
     "Menyusun urutan input–proses–output dalam pseudocode dan menghitung dua hasil.",
   v2p03m02:

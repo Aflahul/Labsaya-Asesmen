@@ -26,7 +26,6 @@ test("production assets and answer draft reload offline, then synchronize", asyn
     )
     .toBe(true);
   await page.locator('.island-art[data-island="1"]').click();
-  await page.locator('[data-mission="v2p01m01"]').click();
   await enterMission(page, MISSIONS[0]);
   await expect(page.locator("[data-answer=phone]")).toHaveValue("String");
   await page.locator("[data-answer=count]").selectOption("3");

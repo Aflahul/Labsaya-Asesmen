@@ -55,13 +55,14 @@ export function summarizeProgress({ sessions = [] }) {
   const gameMissionGrades = Object.fromEntries(
     Object.entries(gameBestByMission).map(([id, s]) => {
       const replayCount = Math.max(0, (starts[id]?.size || 1) - 1);
+      const replayPenalty = Math.max(0, replayCount - 1);
       return [
         id,
         {
           bestScore: s.score,
           replayCount,
-          replayPenalty: replayCount,
-          score: Math.max(0, Math.round((s.score - replayCount) * 100) / 100),
+          replayPenalty,
+          score: Math.max(0, Math.round((s.score - replayPenalty) * 100) / 100),
         },
       ];
     }),

@@ -34,7 +34,7 @@ export const MISSION_ALIGNMENT = {
     tp: "BK.5",
     indicators: "BK.5.5 (sebagian)",
     limit:
-      "Diagnosis operator dan uji batas; belum membuktikan revisi program mandiri.",
+      "Membandingkan dua usulan operator dan uji batas; belum membuktikan revisi program mandiri.",
   },
   v2p03m01: {
     tp: "BK.5",
