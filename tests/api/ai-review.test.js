@@ -90,6 +90,20 @@ test("boss grading sends the displayed case and a server-only, non-exclusive sol
   expect(JSON.stringify(BOSS)).not.toContain("OUTPUT kebutuhan");
 });
 
+test("Gemini defaults to the current Flash alias when no model override is configured", async () => {
+  vi.stubEnv("GOOGLE_AI_MODEL", "");
+  try {
+    await gradeWithGemini(mission, {}, { apiKey: "test-key", fetchImpl: async (url) => {
+      expect(url).toBe("https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent");
+      return { ok: true, json: async () => ({ candidates: [{ content: { parts: [{ text: JSON.stringify({
+        marks: { decision: 0, evidence: 0, reason: 0 },
+        reasons: { decision: "Belum ada pilihan", evidence: "Belum ada bukti", reason: "Belum ada alasan" },
+        feedback: "Lengkapi jawabanmu dengan bukti dan alasan.",
+      }) }] } }] }) };
+    } });
+  } finally { vi.unstubAllEnvs(); }
+});
+
 test("AI failure leaves written work pending for teacher review", async () => {
   const app = await setup({ aiGrader: async () => { throw Error("provider unavailable"); } });
   const { session, headers } = await pending(app);
