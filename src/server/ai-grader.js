@@ -83,7 +83,7 @@ export async function gradeWithGemini(mission, answers, {
         },
       },
     }),
-    signal: AbortSignal.timeout(45000),
+    signal: AbortSignal.timeout(120000),
   });
   if (!response.ok) {
     const error = Error(`Google AI gagal (${response.status})`);

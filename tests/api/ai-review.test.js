@@ -84,6 +84,28 @@ test("long AI feedback keeps a complete sentence within 250 characters without d
   expect(withoutSentence.feedback).toMatch(/…$/);
 });
 
+test("grading tolerates a minute of provider latency but still aborts a stalled request", async () => {
+  vi.useFakeTimers();
+  const timeout = vi.spyOn(AbortSignal, "timeout").mockImplementation(ms => {
+    const controller = new AbortController();
+    setTimeout(() => controller.abort(new DOMException("Deadline exceeded", "TimeoutError")), ms);
+    return controller.signal;
+  });
+  let aborted = false;
+  try {
+    const grading = gradeWithGemini(BOSS, {}, { apiKey: "test-key", fetchImpl: (_url, { signal }) => new Promise((_resolve, reject) => {
+      signal.addEventListener("abort", () => { aborted = true; reject(signal.reason); }, { once: true });
+    }) });
+    const rejection = expect(grading).rejects.toMatchObject({ name: "TimeoutError" });
+    await vi.advanceTimersByTimeAsync(60000);
+    const abortedAfterMinute = aborted;
+    await vi.advanceTimersByTimeAsync(60000);
+    await rejection;
+    expect(abortedAfterMinute).toBe(false);
+    expect(aborted).toBe(true);
+  } finally { timeout.mockRestore(); vi.useRealTimers(); }
+});
+
 test("boss grading sends the displayed case and a server-only, non-exclusive solution guide", async () => {
   let prompt;
   await gradeWithGemini(BOSS, { solution: "Periksa setiap syarat satu per satu." }, {
