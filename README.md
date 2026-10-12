@@ -1,6 +1,8 @@
-# Pulau Logika — Ekspedisi Menara Awan
+# Pulau Logika | Ekspedisi Menara Awan
 
 Game asesmen Informatika Fase E: lima pulau, 15 misi inti dan satu bos C6 opsional. Frontend DOM/CSS/Vite dengan aset ilustrasi; API Node.js/Fastify di Vercel Functions; PostgreSQL Neon.
+
+Pulau Program adalah pulau kelima. Menara Awan merupakan bangunan utama di pulau itu sekaligus pusat jaringan lima pulau. Ruang Arsitek di dalam Menara Awan menjadi tempat tantangan bos opsional.
 
 ## Pengembangan
 

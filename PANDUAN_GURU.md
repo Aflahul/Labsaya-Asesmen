@@ -8,8 +8,8 @@ Asesmen Informatika kelas X/Fase E yang dapat digunakan sebagai salah satu bukti
 | Gerbang Alur | Pertemuan 3: flowchart | Bangun Jalur C3; Jalankan Gerbang C3; Perbaiki Batas C4 |
 | Bengkel Logika | Pertemuan 3: pseudocode | Rakit Pengendali C3; Atur Pengiriman C3; Lacak Gangguan C4 |
 | Pusat Mesin | Pertemuan 8: arsitektur Von Neumann | Hubungkan Sistem C3; Jalankan Perhitungan C3; Alamat atau Isi? C4 |
-| Menara Program | Pertemuan 9: Python dan evaluasi solusi | Pulihkan Pengolah Nilai C3; Perbaiki Daftar C4; Pilih Solusi Terbaik C5 |
-| Ruang Arsitek, scene di Menara Program | Integrasi variabel, tipe data, perhitungan, percabangan, dan pengujian | Rancang Pemeriksa Keberangkatan C6, pengayaan |
+| Pulau Program, lokasi Menara Awan | Pertemuan 9: Python dan evaluasi solusi | Pulihkan Pengolah Nilai C3; Perbaiki Daftar C4; Pilih Solusi Terbaik C5 |
+| Ruang Arsitek di dalam Menara Awan | Integrasi variabel, tipe data, perhitungan, percabangan, dan pengujian | Rancang Pemeriksa Keberangkatan C6, pengayaan |
 
 ## Nilai inti dan pengayaan
 

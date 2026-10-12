@@ -152,7 +152,7 @@ export const GUIDANCE = {
     "Bandingkan semua kasus, bukan hanya contoh lima murid. Jelaskan juga apa arti hasil ketika daftar kosong.",
   ),
   v2p05m04: guide(
-    "Bantu aku memeriksa apakah pesawat boleh berangkat. Gunakan aturan dan data uji yang tersedia. Tantangan ini boleh kamu lewati.",
+    "Selamat datang di Ruang Arsitek, di dalam Menara Awan. Bantu aku memeriksa apakah pesawat boleh berangkat. Gunakan aturan dan data uji yang tersedia. Tantangan ini boleh kamu lewati.",
     [
       "Baca aturan satu per satu. Mulai dari kotak Data: tulis masukan, keluaran, dan tipe datanya.",
       "Di kotak Langkah program, susun solusi dengan bahasa sendiri, pseudocode, atau Python. Kamu cukup memilih satu bentuk.",

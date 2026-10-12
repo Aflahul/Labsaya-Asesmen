@@ -16,6 +16,7 @@ export default defineConfig({
           (n) => "/assets/" + n,
         );
         assets.push(
+          "/favicon.ico",
           ...(await fs.readdir("dist/game-assets")).map(
             (n) => "/game-assets/" + n,
           ),

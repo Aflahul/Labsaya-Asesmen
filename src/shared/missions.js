@@ -32,7 +32,7 @@ export const ISLANDS = [
   },
   {
     id: 5,
-    name: "Menara Program",
+    name: "Pulau Program",
     slug: "menara-program",
     topic: "Python · evaluasi solusi",
     meeting: "Pertemuan 10",

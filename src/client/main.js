@@ -62,7 +62,7 @@ function pageGuide(page) {
       guidance:
         page === "home"
           ? {
-              goal: "Aku Nara, teman perjalananmu. Siap menjelajahi pulau pertama? Daftar sendiri atau Masuk dengan akun yang sudah kamu punya.",
+              goal: "Aku Nara, teman perjalananmu. Menara Awan di Pulau Program sedang padam. Ayo pulihkan jalur lima pulau agar menara menyala kembali.",
               steps: [
                 "Buat akun dengan nama lengkap sesuai daftar kelas, atau gunakan akun dari guru.",
                 "Jelajahi lima pulau dan selesaikan misinya.",
@@ -71,13 +71,13 @@ function pageGuide(page) {
               help: "Nilai kompetensi berasal dari ketepatan jawaban atau rubrik guru. Rata-rata 15 misi minimal 90 membuka bos pengayaan. Petunjuk, percobaan, kesalahan, dan waktu hanya memengaruhi skor permainan.",
             }
           : {
-              goal: "Pilih pulau yang terbuka untuk langsung masuk ke misi berikutnya.",
+              goal: "Pilih pulau yang terbuka untuk masuk ke misi berikutnya. Tujuan terakhir kita adalah Pulau Program, tempat Menara Awan berada.",
               steps: [
                 "Pilih pulau yang terbuka.",
                 "Misi yang belum selesai akan terbuka lebih dulu.",
                 "Selesaikan tiga misi untuk membuka pulau berikutnya.",
               ],
-              help: "Nilai misi memakai bukti kompetensi terbaik. Nilai pulau adalah rata-rata tiga misi; nilai akhir rata-rata lima pulau. Setelah 15 misi dinilai dengan nilai akhir minimal 90, portal Ruang Arsitek terbuka. Ulang pertama gratis; mulai Ulang kedua, skor permainan berkurang 1 poin.",
+              help: "Nilai misi memakai bukti kompetensi terbaik. Nilai pulau adalah rata-rata tiga misi; nilai akhir rata-rata lima pulau. Setelah 15 misi dinilai dengan nilai akhir minimal 90, portal Ruang Arsitek di dalam Menara Awan terbuka. Ulang pertama gratis; mulai Ulang kedua, skor permainan berkurang 1 poin.",
             },
     },
     pageNara[page],
@@ -258,7 +258,7 @@ function shell(content) {
 function home() {
   world.reset();
   shell(
-    `<section class="home game-home"><div class="hero"><div class="eyebrow">EKSPEDISI MENARA AWAN · INFORMATIKA KELAS X</div><h1>Hidupkan kembali<br><em>Menara Awan.</em></h1><p>Jaringan penghubung lima pulau terputus. Bantu Nara menyambungkannya kembali dengan menyelesaikan tantangan data, algoritma, dan pemrograman.</p><div class="actions"><button class="primary" data-nav="${auth?.role === "participant" ? "map" : "login"}">${auth?.role === "participant" ? "Lanjut" : "Masuk"}</button>${auth?.role === "participant" ? "" : '<button class="ghost" data-nav="register">Daftar</button>'}</div><p class="notice">${auth?.role === "participant" ? "Lanjutkan perjalananmu dari peta." : "Belum punya akun? Daftar sendiri atau minta dibuatkan guru."}</p></div><img class="hero-island" src="/game-assets/island-menara-program.webp" alt="Menara Program melayang di atas awan"></section>${pageGuide("home")}`,
+    `<section class="home game-home"><div class="hero"><div class="eyebrow">EKSPEDISI MENARA AWAN · INFORMATIKA KELAS X</div><h1>Hidupkan kembali<br><em>Menara Awan.</em></h1><p>Menara Awan di Pulau Program adalah pusat jaringan lima pulau. Jaringannya terputus dan menara padam. Bantu Nara memulihkannya melalui tantangan data, algoritma, dan pemrograman.</p><div class="actions"><button class="primary" data-nav="${auth?.role === "participant" ? "map" : "login"}">${auth?.role === "participant" ? "Lanjut" : "Masuk"}</button>${auth?.role === "participant" ? "" : '<button class="ghost" data-nav="register">Daftar</button>'}</div><p class="notice">${auth?.role === "participant" ? "Lanjutkan perjalananmu dari peta." : "Belum punya akun? Daftar sendiri atau minta dibuatkan guru."}</p></div><img class="hero-island" src="/game-assets/island-menara-program.webp" alt="Menara Awan berdiri di tengah Pulau Program yang melayang di atas awan"></section>${pageGuide("home")}`,
   );
 }
 function passwordInput(id, label, autocomplete = "new-password") {
@@ -323,11 +323,11 @@ function map() {
         const ms = CORE_MISSIONS.filter((m) => m.island === i.id),
           done = ms.filter((m) => summary.bestByMission[m.id]).length,
           open = unlocked(ms[0], summary);
-        return `<section class="island-card ${open ? "" : "locked"} ${selected.id === i.id ? "selected" : ""}"><button class="island-art" data-island="${i.id}" aria-label="${open ? "Masuk ke" : "Lihat syarat membuka"} ${esc(i.name)}"><img src="/game-assets/island-${i.slug}.webp" alt=""></button><div class="island-label"><small>${done === 3 ? "✓ PULIH" : open ? "JALUR TERBUKA" : "TERKUNCI"} · ${done}/3</small><button class="island-name" data-island="${i.id}">${esc(i.name)}</button></div>${selectedIsland === i.id && !open ? `<div class="island-entry" role="status"><p>Selesaikan tiga misi pulau sebelumnya untuk membuka ${esc(i.name)}.</p></div>` : ""}</section>`;
+        return `<section class="island-card ${open ? "" : "locked"} ${selected.id === i.id ? "selected" : ""}"><button class="island-art" data-island="${i.id}" aria-label="${open ? "Masuk ke" : "Lihat syarat membuka"} ${esc(i.name)}"><img src="/game-assets/island-${i.slug}.webp" alt=""></button><div class="island-label"><small>${done === 3 ? "✓ PULIH" : open ? "JALUR TERBUKA" : "TERKUNCI"} · ${done}/3</small><button class="island-name" data-island="${i.id}">${esc(i.name)}</button>${i.id === 5 ? "<small>Lokasi Menara Awan</small>" : ""}</div>${selectedIsland === i.id && !open ? `<div class="island-entry" role="status"><p>Selesaikan tiga misi pulau sebelumnya untuk membuka ${esc(i.name)}.</p></div>` : ""}</section>`;
       },
     ).join(
       "",
-    )}</div></div>${summary.completed === 15 ? `<section class="panel ending-card"><img src="/game-assets/ending-network-restored.webp" alt="Jaringan antarpulau kembali bercahaya"><div><div class="eyebrow">EKSPEDISI INTI SELESAI</div><h2>Menara Awan kembali menyala.</h2><p>Nilai kompetensi akhir: <strong>${summary.score}</strong>. Lihat hasil seluruh misimu di Rapor.</p>${summary.bossUnlocked ? `<p>Sebuah portal terbuka. Ruang Arsitek menantangmu membuat solusi sendiri.</p><button class="primary" data-mission="${BOSS.id}">Tantang</button><p class="notice">Tantangan ini boleh dilewati. Hasilnya tidak mengurangi nilai kompetensimu.</p>` : '<p class="notice">Ingin mencoba lagi? Kamu bisa mengulang misi. Nilai terbaikmu tetap disimpan.</p>'}</div></section>` : ""}`,
+    )}</div></div>${summary.completed === 15 ? `<section class="panel ending-card"><img src="/game-assets/ending-network-restored.webp" alt="Jaringan antarpulau kembali bercahaya"><div><div class="eyebrow">EKSPEDISI INTI SELESAI</div><h2>Menara Awan kembali menyala.</h2><p>Nilai kompetensi akhir: <strong>${summary.score}</strong>. Lihat hasil seluruh misimu di Rapor.</p>${summary.bossUnlocked ? `<p>Portal Ruang Arsitek di dalam Menara Awan terbuka. Di sana, kamu dapat mencoba tantangan pengayaan dengan merancang solusi sendiri.</p><button class="primary" data-mission="${BOSS.id}">Tantang</button><p class="notice">Tantangan ini boleh dilewati. Hasilnya tidak mengurangi nilai kompetensimu.</p>` : '<p class="notice">Ingin mencoba lagi? Kamu bisa mengulang misi. Nilai terbaikmu tetap disimpan.</p>'}</div></section>` : ""}`,
   );
   app.querySelector("main").insertAdjacentHTML("beforeend", pageGuide("map"));
   disconnectMap = connectIslands($(".constellation"));
