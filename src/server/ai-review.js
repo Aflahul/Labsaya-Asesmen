@@ -1,7 +1,7 @@
 import { getMission } from "../shared/missions.js";
 import { upgradeScoring } from "../shared/assessment.js";
 import { gradeReview } from "../shared/v2-evaluator.js";
-import { gradeWithGemini, validateAiGrade } from "./ai-grader.js";
+import { gradeWithGemini, validateAiGrade, aiFailureDetails } from "./ai-grader.js";
 
 export async function gradePendingSession(db, sessionId, grader = gradeWithGemini) {
   const current = (await db.query("SELECT document FROM mission_sessions WHERE id=$1", [sessionId])).rows[0]?.document;
@@ -13,7 +13,8 @@ export async function gradePendingSession(db, sessionId, grader = gradeWithGemin
   try {
     const proposal = await grader(mission, current.state.answers);
     result = { ...validateAiGrade(mission, proposal), model: proposal.model };
-  } catch {
+  } catch (error) {
+    console.error("[AI_GRADING_FAILURE]", { missionId: mission.id, ...aiFailureDetails(error) });
     const client = await db.connect();
     try {
       await client.query("BEGIN");

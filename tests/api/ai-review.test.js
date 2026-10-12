@@ -1,9 +1,9 @@
-import { test, expect } from "vitest";
+import { test, expect, vi } from "vitest";
 import { setup, loginSeededParticipant } from "./helpers.js";
 import { MISSIONS, BOSS } from "../../src/shared/missions.js";
 import { newSession } from "../../src/shared/assessment.js";
 import { passwordHash } from "../../src/server/auth.js";
-import { gradeWithGemini, validateAiGrade } from "../../src/server/ai-grader.js";
+import { gradeWithGemini, validateAiGrade, aiFailureDetails } from "../../src/server/ai-grader.js";
 
 const mission = MISSIONS.find((m) => m.bloom === "C5");
 const profile = { realName: "Dewi", alias: "DewiAI", className: "X", attendance: 1 };
@@ -98,6 +98,58 @@ test("AI failure leaves written work pending for teacher review", async () => {
   expect(response.json().data).toMatchObject({ status: "pending_review", aiGrade: { status: "unavailable" } });
   expect(JSON.stringify(response.json())).not.toContain("provider unavailable");
   await app.close();
+});
+
+test("Google failure diagnostics preserve only an allowlisted reason and HTTP status", async () => {
+  let error;
+  try {
+    await gradeWithGemini(mission, {}, {
+      apiKey: "private-test-key",
+      fetchImpl: async () => ({ ok: false, status: 400, json: async () => ({ error: {
+        message: "private-test-key and student answer must not be logged",
+        details: [{ reason: "API_KEY_INVALID" }],
+      } }) }),
+    });
+  } catch (caught) { error = caught; }
+  expect(aiFailureDetails(error)).toEqual({ code: "GOOGLE_HTTP_400", reason: "API_KEY_INVALID" });
+  expect(JSON.stringify(error)).not.toContain("private-test-key");
+  expect(aiFailureDetails(Object.assign(Error("private-test-key"), { providerReason: "private-test-key" }))).toEqual({ code: "AI_ERROR" });
+  expect(aiFailureDetails(Error("Kunci Google AI belum dikonfigurasi"))).toEqual({ code: "KEY_MISSING" });
+  expect(aiFailureDetails(new DOMException("secret details", "TimeoutError"))).toEqual({ code: "TIMEOUT" });
+});
+
+test.each([
+  ["standard-test-key", "", "standard-test-key"],
+  ["standard-test-key", "legacy-test-key", "standard-test-key"],
+  ["", "legacy-test-key", "legacy-test-key"],
+])("Gemini reads GOOGLE_API_KEY first and supports the legacy binding (%s)", async (standard, legacy, expected) => {
+  vi.stubEnv("GOOGLE_API_KEY", standard);
+  vi.stubEnv("GOOGLE_AI_API_KEY", legacy);
+  let sentKey;
+  try {
+    await gradeWithGemini(mission, {}, { fetchImpl: async (_url, options) => {
+      sentKey = options.headers["x-goog-api-key"];
+      return { ok: true, json: async () => ({ candidates: [{ content: { parts: [{ text: JSON.stringify({
+        marks: { decision: 0, evidence: 0, reason: 0 },
+        reasons: { decision: "Belum ada pilihan", evidence: "Belum ada bukti", reason: "Belum ada alasan" },
+        feedback: "Lengkapi jawabanmu dengan bukti dan alasan.",
+      }) }] } }] }) };
+    } });
+    expect(sentKey).toBe(expected);
+  } finally { vi.unstubAllEnvs(); }
+});
+
+test("grading failures log safe diagnostics without returning provider details to students", async () => {
+  const log = vi.spyOn(console, "error").mockImplementation(() => {});
+  const app = await setup({ aiGrader: async () => { throw Error("Google AI gagal (429)"); } });
+  try {
+    const { session, headers } = await pending(app);
+    const response = await app.inject({ method: "POST", url: `/api/sessions/${session.id}/grade`, headers });
+    expect(log).toHaveBeenCalledWith("[AI_GRADING_FAILURE]", { missionId: mission.id, code: "GOOGLE_HTTP_429" });
+    expect(response.json().data.aiGrade.status).toBe("unavailable");
+    expect(response.body).not.toContain("GOOGLE_HTTP_429");
+    expect(response.json().data.state.answers).toEqual(session.state.answers);
+  } finally { await app.close(); log.mockRestore(); }
 });
 
 test("teacher can correct an AI grade and the previous decision remains auditable", async () => {

@@ -24,7 +24,7 @@ Asesmen Informatika kelas X/Fase E yang dapat digunakan sebagai salah satu bukti
 
 ## Menilai C5 dan C6
 
-Jika `GOOGLE_AI_API_KEY` terpasang, Nara (Google Gemini) menilai karya yang dikirim berdasarkan rubrik, bukti dalam jawaban, dan panduan penilai. Model memberikan alasan untuk setiap kriteria serta feedback hangat kepada murid. Nilai divalidasi oleh server dan tersimpan tanpa menunggu guru. Lihat [cara memasang kunci](GOOGLE_AI.md).
+Jika `GOOGLE_API_KEY` terpasang, Nara (Google Gemini) menilai karya yang dikirim berdasarkan rubrik, bukti dalam jawaban, dan panduan penilai. Model memberikan alasan untuk setiap kriteria serta feedback hangat kepada murid. Nilai divalidasi oleh server dan tersimpan tanpa menunggu guru. Lihat [cara memasang kunci](GOOGLE_AI.md).
 
 Masuk lewat **Guru**, cari peserta, lalu **Buka rapor**. Penilaian Nara (AI) menampilkan skor dan alasan per kriteria; gunakan **Koreksi** bila keputusan perlu diubah. Keputusan AI sebelumnya tetap tersimpan dalam riwayat. Jika layanan AI gagal, karya tetap berstatus **Menunggu penilaian** dan guru dapat mengisi rubrik secara manual. Penilaian tidak ditentukan berdasarkan kata kunci atau panjang teks saja.
 

@@ -1,6 +1,23 @@
 import { BOSS_GRADING_GUIDE } from "./boss-grading-guide.js";
 
 const DEFAULT_MODEL = "gemini-2.5-flash";
+const PROVIDER_REASONS = new Set([
+  "API_KEY_INVALID", "API_KEY_EXPIRED", "API_KEY_SERVICE_BLOCKED",
+  "API_KEY_HTTP_REFERRER_BLOCKED", "API_KEY_IP_ADDRESS_BLOCKED",
+  "SERVICE_DISABLED", "BILLING_DISABLED", "RATE_LIMIT_EXCEEDED", "QUOTA_EXCEEDED",
+]);
+
+export function aiFailureDetails(error) {
+  const status = /^Google AI gagal \(([1-5]\d{2})\)$/.exec(error?.message || "")?.[1];
+  const code = status ? `GOOGLE_HTTP_${status}`
+    : error?.message === "Kunci Google AI belum dikonfigurasi" ? "KEY_MISSING"
+    : error?.message === "Model Google AI tidak valid" ? "MODEL_INVALID"
+    : ["TimeoutError", "AbortError"].includes(error?.name) ? "TIMEOUT"
+    : error?.message === "fetch failed" ? "NETWORK_ERROR"
+    : error instanceof SyntaxError || /^(Respons penilaian AI|Jumlah kriteria penilaian AI|Skor kriteria AI|Alasan kriteria AI|Umpan balik AI|Google AI tidak mengembalikan penilaian)/.test(error?.message || "") ? "RESPONSE_INVALID"
+    : "AI_ERROR";
+  return { code, ...(status && PROVIDER_REASONS.has(error?.providerReason) ? { reason: error.providerReason } : {}) };
+}
 
 export function validateAiGrade(mission, value) {
   if (!value || typeof value !== "object" || !value.marks || typeof value.marks !== "object")
@@ -26,7 +43,7 @@ export function validateAiGrade(mission, value) {
 }
 
 export async function gradeWithGemini(mission, answers, {
-  apiKey = process.env.GOOGLE_AI_API_KEY,
+  apiKey = process.env.GOOGLE_API_KEY || process.env.GOOGLE_AI_API_KEY,
   model = process.env.GOOGLE_AI_MODEL || DEFAULT_MODEL,
   fetchImpl = fetch,
 } = {}) {
@@ -62,7 +79,15 @@ export async function gradeWithGemini(mission, answers, {
     }),
     signal: AbortSignal.timeout(20000),
   });
-  if (!response.ok) throw Error(`Google AI gagal (${response.status})`);
+  if (!response.ok) {
+    const error = Error(`Google AI gagal (${response.status})`);
+    try {
+      const body = await response.json();
+      const reason = body?.error?.details?.find((detail) => PROVIDER_REASONS.has(detail?.reason))?.reason;
+      if (reason) error.providerReason = reason;
+    } catch {}
+    throw error;
+  }
   const json = await response.json();
   const raw = json.candidates?.[0]?.content?.parts?.map((part) => part.text || "").join("");
   if (!raw) throw Error("Google AI tidak mengembalikan penilaian");

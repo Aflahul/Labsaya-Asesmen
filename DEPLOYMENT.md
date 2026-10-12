@@ -12,7 +12,7 @@ Repositori GitHub berisi kode aplikasi, proyek Vercel, proyek Neon development/p
 5. Import repositori ke Vercel, pilih framework Vite, build `npm run build`, output `dist`, runtime Node.js 24. `vercel.json` dan `api/index.js` menyediakan routing frontend dan API serverless same-origin.
 6. Deploy preview dan jalankan smoke test di bawah. Publish production dilakukan pengelola setelah memeriksa hasil.
 
-Untuk menyalakan penilaian otomatis misi 15 dan bos, tambahkan `GOOGLE_AI_API_KEY` sebagai variabel **Sensitive** di Vercel lalu redeploy. Lihat [panduan Google AI](GOOGLE_AI.md). Tanpa kunci, jawaban tertulis tetap tersimpan dan dapat dinilai guru.
+Untuk menyalakan penilaian otomatis misi 15 dan bos, tambahkan `GOOGLE_API_KEY` sebagai variabel **Secret** di Vercel lalu redeploy. Lihat [panduan Google AI](GOOGLE_AI.md). Tanpa kunci, jawaban tertulis tetap tersimpan dan dapat dinilai guru.
 
 ## Smoke test wajib pada preview HTTPS
 
