@@ -2,7 +2,7 @@
 
 ## Prasyarat
 
-Repositori GitHub berisi kode aplikasi, proyek Vercel, proyek Neon development/production, Node.js 24 untuk operator, serta akses pengelola. ZIP tidak diperlukan. Deployment belum dilakukan oleh sesi pengembangan ini.
+Repositori GitHub berisi kode aplikasi, proyek Vercel, proyek Neon development/production, Node.js 24 untuk operator, serta akses pengelola. ZIP tidak diperlukan. Deployment produksi berada pada proyek Vercel **asesmen-labs**.
 
 0. Pastikan commit aplikasi sudah berada di repositori GitHub yang akan di-import. Pada lingkungan pengembangan ini kode disimpan di branch lokal `work`; push ke branch deployment yang Anda pilih melalui Git. Jika repositori masih kosong dan Anda memilih `main`, perintah tanpa force adalah `git push origin HEAD:main`. Jika ditolak karena remote berubah, integrasikan perubahan remote terlebih dahulu; jangan force-push.
 1. Buat database Neon untuk environment yang dituju. Salin **pooled connection string** lewat Neon dashboard dan simpan langsung di environment server Vercel sebagai `DATABASE_URL`. Jangan menggunakan awalan `VITE_` karena variabel tersebut dapat masuk frontend. Pertahankan pengaturan TLS yang diberikan Neon, termasuk verifikasi; jangan menambahkan `rejectUnauthorized=false`.
@@ -11,6 +11,8 @@ Repositori GitHub berisi kode aplikasi, proyek Vercel, proyek Neon development/p
 4. Jalankan `npm run teacher:create` di terminal interaktif. Masukkan username dan password minimal 10 karakter; password tidak ditampilkan. Tidak ada akun guru default. Gunakan target database yang sama dengan deployment.
 5. Import repositori ke Vercel, pilih framework Vite, build `npm run build`, output `dist`, runtime Node.js 24. `vercel.json` dan `api/index.js` menyediakan routing frontend dan API serverless same-origin.
 6. Deploy preview dan jalankan smoke test di bawah. Publish production dilakukan pengelola setelah memeriksa hasil.
+
+Untuk menyalakan penilaian otomatis misi 15 dan bos, tambahkan `GOOGLE_AI_API_KEY` sebagai variabel **Sensitive** di Vercel lalu redeploy. Lihat [panduan Google AI](GOOGLE_AI.md). Tanpa kunci, jawaban tertulis tetap tersimpan dan dapat dinilai guru.
 
 ## Smoke test wajib pada preview HTTPS
 

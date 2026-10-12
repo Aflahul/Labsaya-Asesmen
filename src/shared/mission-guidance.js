@@ -148,7 +148,7 @@ export const GUIDANCE = {
       "Tulis hasil masing-masing rancangan, lalu tentukan pilihanmu.",
       "Jelaskan bagaimana pilihanmu memenuhi ketiga syarat. Buka Yang dinilai untuk memeriksa kelengkapan jawabanmu.",
     ],
-    "A dan B ditulis dalam pseudocode. Baca langkahnya, lalu tulis hasil hitungan atau pesan yang muncul pada kotak jawaban. Guru akan membaca hasil dan alasanmu.",
+    "A dan B ditulis dalam pseudocode. Baca langkahnya, lalu tulis hasil hitungan atau pesan yang muncul pada kotak jawaban. Nara akan menilai bukti dan alasanmu dengan rubrik.",
     "Bandingkan semua kasus, bukan hanya contoh lima murid. Jelaskan juga apa arti hasil ketika daftar kosong.",
   ),
   v2p05m04: guide(
@@ -158,7 +158,7 @@ export const GUIDANCE = {
       "Tulis algoritma, pseudocode, atau Python buatanmu sendiri.",
       "Buat kasus uji beserta hasil yang diharapkan, lalu jelaskan alasan rancanganmu.",
     ],
-    "Isi keempat kotak dengan idemu sendiri. Kode yang kamu tulis di sini akan dibaca guru. Tantangan ini pilihan saja; hasilnya tidak mengurangi nilai inti.",
+    "Isi keempat kotak dengan idemu sendiri. Nara akan menilai rancanganmu dengan rubrik. Tantangan ini pilihan saja; hasilnya tidak mengurangi nilai inti.",
     "Pastikan rancanganmu menjelaskan keputusan ketika stok cukup, stok kurang, atau data berupa angka negatif. Ujilah juga saat stok tepat sama dengan permintaan.",
   ),
 };

@@ -35,11 +35,11 @@ export function v2ActivityHtml(m, state) {
 }
 export function reviewHtml(p) {
   return p.sessions
-    .filter((s) => s.status === "pending_review")
+    .filter((s) => s.status === "pending_review" || s.review?.source === "ai")
     .map((s) => {
       // Imported lazily by caller through mission metadata attached below.
       const m = s.mission;
-      return `<form class="review-form" data-review="${esc(s.id)}"><h3>${esc(m.title)} ${m.enrichment ? "· Pengayaan" : ""}</h3>${m.written.map(([key, label]) => `<h4>${esc(label)}</h4><pre class="written-answer">${esc(s.state.answers[key])}</pre>`).join("")}<details><summary>Panduan penilai</summary><p>${esc(m.teacherGuide)}</p></details><div class="answer-grid">${m.rubric.map(([key, label, max]) => `<label>${esc(label)} (0–${max})<input name="${key}" type="number" min="0" max="${max}" step="0.5" required></label>`).join("")}</div><label>Umpan balik untuk murid<textarea name="comment" required maxlength="3000" rows="3"></textarea></label><button class="primary" type="submit">Simpan</button><p role="status"></p></form>`;
+      return `<form class="review-form" data-review="${esc(s.id)}"><h3>${esc(m.title)} ${m.enrichment ? "· Pengayaan" : ""}</h3>${s.review?.source === "ai" ? `<p class="notice">Nara (AI) memberi nilai ${s.firstAccuracy}. Periksa bukti dan koreksi bila perlu.</p>` : ""}${m.written.map(([key, label]) => `<h4>${esc(label)}</h4><pre class="written-answer">${esc(s.state.answers[key])}</pre>`).join("")}<details><summary>Panduan penilai</summary><p>${esc(m.teacherGuide)}</p></details><div class="answer-grid">${m.rubric.map(([key, label, max]) => `<label>${esc(label)} (0–${max})<input name="${key}" type="number" min="0" max="${max}" step="0.5" value="${s.review?.marks?.[key] ?? ""}" required>${s.review?.reasons?.[key] ? `<small>${esc(s.review.reasons[key])}</small>` : ""}</label>`).join("")}</div><label>Umpan balik untuk murid<textarea name="comment" required maxlength="3000" rows="3">${esc(s.review?.comment || "")}</textarea></label><button class="primary" type="submit">${s.review?.source === "ai" ? "Koreksi" : "Simpan"}</button><p role="status"></p></form>`;
     })
     .join("");
 }

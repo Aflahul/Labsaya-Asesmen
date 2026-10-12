@@ -52,7 +52,7 @@ test("15 core missions, real teacher review, optional boss and unchanged main gr
     await fillMission(page, m);
     if (m.written) {
       await page.locator("#submit").click();
-      await expect(page.locator(".badge")).toContainText("Menunggu guru");
+      await expect(page.locator(".badge")).toContainText("Menunggu nilai");
       break;
     }
     await page.locator("#run").click();
@@ -95,7 +95,7 @@ test("15 core missions, real teacher review, optional boss and unchanged main gr
   await enterMission(page, BOSS);
   await fillMission(page, BOSS);
   await page.locator("#submit").click();
-  await expect(page.locator(".badge")).toContainText("Menunggu guru");
+  await expect(page.locator(".badge")).toContainText("Menunggu nilai");
   await waitForSaved(page);
   await teacher.getByRole("button", { name: "← Kembali", exact: true }).click();
   await teacher.getByPlaceholder("Nama lengkap / samaran").fill(alias);

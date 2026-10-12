@@ -15,5 +15,13 @@ await db.query(
   "INSERT INTO teachers(id,username,password_hash) VALUES($1,$2,$3)",
   ["teacher-test", "guru", passwordHash("test-password-only")],
 );
-const app = await buildApp({ db });
+const aiGrader = process.env.TEST_AI_GRADER === "1"
+  ? async (mission) => ({
+      marks: Object.fromEntries(mission.rubric.map(([key, , max]) => [key, max])),
+      reasons: Object.fromEntries(mission.rubric.map(([key]) => [key, "Bukti sesuai rubrik."])),
+      feedback: "Kamu sudah menunjukkan bukti yang jelas. Pertahankan cara menjelaskan alasan dan pengujianmu.",
+      model: "gemini-mock",
+    })
+  : undefined;
+const app = await buildApp({ db, aiGrader });
 await app.listen({ host: "127.0.0.1", port: 3000 });

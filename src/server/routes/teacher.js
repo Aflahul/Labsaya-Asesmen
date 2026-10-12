@@ -123,7 +123,7 @@ export async function teacherRoutes(app) {
       );
       if (!rows[0]) fail(404, "Sesi tidak ditemukan");
       const old = rows[0].document;
-      if (old.status !== "pending_review")
+      if (old.status !== "pending_review" && !(old.status === "complete" && old.review?.source === "ai"))
         fail(409, "Karya sudah dinilai atau belum dikirim");
       let graded;
       try {

@@ -1,6 +1,6 @@
 # Panduan Guru — Ekspedisi Lima Pulau
 
-Asesmen formatif Informatika kelas X/Fase E. Ada 15 misi inti: 10 C3/AKM L2, 4 C4/L3, dan 1 C5/L3. Satu C6/L3 menjadi pengayaan opsional dalam scene tambahan. Label kognitif adalah rancangan instrumen, bukan hasil validasi psikometrik.
+Asesmen Informatika kelas X/Fase E yang dapat digunakan sebagai salah satu bukti sumatif setelah identitas dan hasil ditinjau guru. Ada 15 misi inti: 10 C3/AKM L2, 4 C4/L3, dan 1 C5/L3. Satu C6/L3 menjadi pengayaan opsional. Label kognitif adalah rancangan instrumen, bukan hasil validasi psikometrik.
 
 | Pulau | Materi yang dihubungkan | Misi dan level |
 |---|---|---|
@@ -15,8 +15,8 @@ Asesmen formatif Informatika kelas X/Fase E. Ada 15 misi inti: 10 C3/AKM L2, 4 C
 
 - Setiap misi inti berbobot sama. Rapor/leaderboard memakai rata-rata **nilai terbaik** dari 15 misi yang sudah dinilai. Belum lengkap berarti belum ada nilai inti, bukan nol.
 - Misi objektif menggunakan proporsi bukti benar. Analisis C4 berbobot sebab 30, perbaikan 40, dan pengujian 30. Pada Perbaiki Daftar, kode bernilai 40, sebab 30, dan prediksi uji 30.
-- Nilai akhir setiap misi = **60% ketepatan + 10% petunjuk + 10% percobaan + 10% kesalahan + 10% waktu aktif**. Rubrik guru menjadi komponen ketepatan untuk C5/C6.
-- Komponen petunjuk dimulai dari 100 dan turun 25 per petunjuk. Percobaan turun 20 untuk setiap percobaan setelah yang pertama, serta 10 per Bersihkan. Kesalahan turun 20 per tindakan tidak valid atau pengujian gagal/tidak lengkap. Semua komponen dibatasi 0–100.
+- **Nilai kompetensi misi** berasal dari ketepatan jawaban terbaik atau rubrik karya tertulis terbaik. Nilai akhir adalah rata-rata nilai 15 misi, setara dengan rata-rata lima nilai pulau. Petunjuk, percobaan, kesalahan, waktu, dan Ulang tidak mengurangi nilai kompetensi.
+- **Skor permainan** adalah informasi proses: 60% ketepatan + 10% petunjuk + 10% percobaan + 10% kesalahan + 10% waktu aktif. Petunjuk pertama, Coba pertama, Bersihkan pertama, dan Ulang pertama gratis. Petunjuk berikutnya mengurangi 1 poin skor permainan per penggunaan; Ulang berikutnya mengurangi 1 poin skor permainan misi per pengulangan. Komponen dibatasi 0–100.
 - Coba menghitung satu percobaan. Kirim tanpa perubahan setelah Coba tidak dihitung ulang. Panduan umum Nara tidak dihitung sebagai Petunjuk.
 - Acuan waktu: C3 180 detik, C4 300, C5 600, C6 900; ditambah 30 detik per isian terstruktur. Komponen waktu tetap 100 sampai acuan terlewati, lalu turun linier menjadi 0 pada tiga kali acuan. Waktu hanya saat misi aktif; tab tersembunyi dan menunggu guru tidak dihitung.
 - Bos terbuka hanya setelah 15 misi dinilai dan rata-rata mentah **≥90**. Angka tepat 90 membuka bos. Nilai tampilan dibulatkan dua desimal, tetapi penguncian memakai nilai sebelum pembulatan.
@@ -24,17 +24,19 @@ Asesmen formatif Informatika kelas X/Fase E. Ada 15 misi inti: 10 C3/AKM L2, 4 C
 
 ## Menilai C5 dan C6
 
-Masuk lewat **Guru**, cari peserta, lalu **Buka rapor**. Karya berstatus **Menunggu penilaian** menampilkan jawaban, panduan penilai, dan rubrik. Isi setiap skor serta umpan balik, lalu simpan. Penilaian tidak dilakukan otomatis berdasarkan kata kunci atau panjang teks. Setelah disimpan, peserta dapat memuat hasil melalui tombol pemeriksaan atau membuka ulang aplikasi.
+Jika `GOOGLE_AI_API_KEY` terpasang, Nara (Google Gemini) menilai karya yang dikirim berdasarkan rubrik, bukti dalam jawaban, dan panduan penilai. Model memberikan alasan untuk setiap kriteria serta feedback hangat kepada murid. Nilai divalidasi oleh server dan tersimpan tanpa menunggu guru. Lihat [cara memasang kunci](GOOGLE_AI.md).
+
+Masuk lewat **Guru**, cari peserta, lalu **Buka rapor**. Penilaian Nara (AI) menampilkan skor dan alasan per kriteria; gunakan **Koreksi** bila keputusan perlu diubah. Keputusan AI sebelumnya tetap tersimpan dalam riwayat. Jika layanan AI gagal, karya tetap berstatus **Menunggu penilaian** dan guru dapat mengisi rubrik secara manual. Penilaian tidak ditentukan berdasarkan kata kunci atau panjang teks saja.
 
 **C5:** keputusan sesuai kriteria 30; bukti perbandingan tiga pengujian 40; alasan dan pertimbangan 30. Periksa hasil untuk lima nilai, tiga nilai, dan list kosong. Terima pertimbangan alternatif yang akurat dan didukung bukti.
 
 **C6:** rancangan data 30; solusi 35; pengujian 25; penjelasan 10. Periksa kasus normal, stok sama dengan permintaan, stok kurang, dan input negatif. Pseudocode yang tepat setara dengan Python yang tepat. Nilai karya, bukan panjang tulisan.
 
-Penilaian yang tersimpan tidak dapat diedit melalui UI saat ini. Peserta dapat membuat percobaan baru setelah karya dinilai. Semua percobaan dan umpan balik tetap menjadi bukti; nilai terbaik dipakai dalam rekap.
+Nilai AI dapat dikoreksi sekali menjadi keputusan guru. Peserta dapat membuat percobaan baru setelah karya dinilai. Semua percobaan dan umpan balik tetap menjadi bukti; nilai kompetensi terbaik dipakai dalam rekap.
 
 ## Interpretasi dan batas
 
-Misi menggunakan konfigurasi terstruktur, pratinjau rak/diagram/RAM, dan interpreter Python terbatas untuk list satu dimensi, assignment, sum, len, append, pop, print, serta aritmetika. Interpreter bukan Python lengkap; tidak mendukung import, perulangan, atau akses sistem. Karya C6 dinilai guru dan tidak dieksekusi oleh interpreter.
+Misi menggunakan konfigurasi terstruktur, pratinjau rak/diagram/RAM, dan interpreter Python terbatas untuk list satu dimensi, assignment, sum, len, append, pop, print, serta aritmetika. Interpreter bukan Python lengkap; tidak mendukung import, perulangan, atau akses sistem. Karya C6 dinilai melalui rubrik oleh AI atau guru dan tidak dieksekusi oleh interpreter.
 
 Gunakan bersama observasi guru. Pengulangan dan bantuan merupakan bagian pembelajaran; nilai terbaik menggambarkan hasil terbaik beserta proses pengerjaannya. Pemilihan jenis data dan unit mesin memakai pilihan terstruktur, sehingga bukti kinerja perlu dilengkapi praktik langsung bila diperlukan.
 

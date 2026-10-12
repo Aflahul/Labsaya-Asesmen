@@ -1,17 +1,11 @@
 # Petunjuk Penjelajah — Lima Pulau
 
-1. Pilih **Mulai ekspedisi**, lalu isi nama asli, nama samaran, kelas, dan nomor absen. Gunakan nama yang sama saat masuk kembali.
-2. Pilih pulau di peta. Panel perjalanan menampilkan tiga misinya. Selesaikan tiga misi untuk membuka pulau berikutnya.
-3. Baca **Tujuan misimu**, lalu gunakan pilihan, editor program, atau ruang karya. Semua kontrol dapat digunakan dengan keyboard tanpa menyeret objek.
-4. **Uji solusi** menampilkan hasil tanpa mengakhiri percobaan. Perbaiki solusi, lalu tekan **Kirim jawaban** saat siap. Pengiriman mengakhiri percobaan; **Coba lagi** membuat percobaan baru. Nilai terbaik setiap misi tetap tersimpan.
-5. Nilai akhir terdiri dari ketepatan **60%**, serta petunjuk, percobaan, kesalahan, dan waktu aktif masing-masing **10%**. Lihat rincian setelah mengirim jawaban. Membaca panduan umum Nara tidak memakai petunjuk.
-6. Misi **Pilih Solusi Terbaik** meminta alasan dan bukti. **Kirim karya ke guru** mengunci karya untuk ditinjau. Gunakan **Periksa penilaian guru** untuk memuat hasil. Umpan balik tersedia di rapor.
-7. Setelah seluruh 15 misi dinilai, nilai inti muncul. Jika rata-rata nilai terbaik **minimal 90**, portal **Ruang Arsitek** terbuka. Bos ini opsional; hasilnya tidak mengurangi nilai inti atau peringkat.
-8. Buka **Rapor saya** untuk hasil, riwayat, ekspor CSV, atau cadangan JSON. Sesi permainan versi lama tetap ada di riwayat, terpisah dari ekspedisi baru.
-9. Tunggu status **Tersinkron ke Neon** sebelum berpindah perangkat. Saat offline, jawaban tersimpan di perangkat ini. Ekspor cadangan sebelum keluar atau menghapus cache jika masih ada perubahan yang belum tersinkron.
+1. Buat akun murid dengan nama lengkap untuk rapor, nama samaran untuk masuk dan papan peringkat, kelas, nomor absen, serta kata sandi. Simpan kata sandimu.
+2. Pilih pulau yang terbuka pada peta. Kamu langsung masuk ke misi berikutnya yang belum selesai. Selesaikan tiga misi untuk membuka pulau berikutnya.
+3. Baca instruksi Nara, isi jawaban, lalu tekan **Coba** untuk melihat hasil sementara atau **Kirim** untuk menyelesaikan misi. Pada misi rak, susunan baru terlihat setelah Coba atau Kirim.
+4. **Nilai kompetensi** berasal dari ketepatan jawaban atau rubrik karya terbaik. Nilai pulau adalah rata-rata tiga misi; nilai akhir adalah rata-rata lima pulau. Petunjuk, Coba, Bersihkan, waktu, dan Ulang hanya memengaruhi skor permainan. Penggunaan pertama Petunjuk, Coba, Bersihkan, dan Ulang gratis.
+5. Pada misi **Pilih Solusi Terbaik** dan bos **Ruang Arsitek**, Nara (AI) menilai jawaban tertulis dengan rubrik saat layanan tersedia. Feedback muncul pada balon Nara dan Rapor. Jika penilaian belum tersedia, tekan **Periksa** untuk mencoba lagi; guru juga dapat menilai. Guru dapat mengoreksi nilai AI.
+6. Setelah semua 15 misi dinilai, bos pengayaan terbuka jika nilai akhir kompetensi **minimal 90**. Bos bersifat opsional dan nilainya tidak mengurangi nilai akhir atau peringkat.
+7. Buka **Rapor** untuk nilai, feedback, CSV, dan cadangan JSON. Tunggu status **Tersinkron ke Neon** sebelum berpindah perangkat. Saat offline, jawaban disimpan pada perangkat dan akan dikirim setelah tersambung lagi.
 
-Suara, kualitas efek, dan gerakan dapat diatur di menu pengaturan. Mode offline baru tersedia setelah aplikasi dan akun pernah dimuat online; pendaftaran, login baru, penilaian guru, dan leaderboard memerlukan internet.
-
-Nama asli + nama samaran dipakai untuk masuk; keduanya bukan kata sandi. Nama samaran tampil di leaderboard. Jangan memakai nama samaran akun sensitif.
-
-Jika data lokal rusak, aplikasi mempertahankan cache asli. Buka Pengaturan → **Unduh cache asli** sebelum mencoba pemulihan. Hindari memainkan sesi yang sama pada dua perangkat bersamaan: versi server menjadi progres aktif, sedangkan bukti lokal yang bertentangan tetap dicadangkan dalam JSON.
+Nama lengkap hanya digunakan untuk asesmen dan tidak tampil pada papan peringkat publik. Jangan membagikan kata sandi. Guru perlu memastikan identitas murid sebelum memakai hasil sebagai nilai sumatif.

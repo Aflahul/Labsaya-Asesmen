@@ -11,6 +11,7 @@ import {
 import { summarizeProgress, unlocked } from "../../shared/progress.js";
 import { validateEvent, canonicalJson } from "../../shared/contracts.js";
 import { fail } from "../auth.js";
+import { gradePendingSession } from "../ai-review.js";
 export async function loadProgress(db, id) {
   const { rows } = await db.query(
     "SELECT document FROM mission_sessions WHERE participant_id=$1 ORDER BY updated_at",
@@ -21,7 +22,7 @@ export async function loadProgress(db, id) {
     sessions: rows.map((r) => upgradeScoring(r.document)),
   };
 }
-export async function progressRoutes(app) {
+export async function progressRoutes(app, aiGrader) {
   app.get("/api/progress", async (req) => {
     const a = app.requireRole(req, "participant");
     return { data: await loadProgress(app.db, a.user_id) };
@@ -72,6 +73,8 @@ export async function progressRoutes(app) {
     if (!Array.isArray(events) || events.length > 200)
       fail(400, "Batch event tidak valid");
     const client = await app.db.connect();
+    let s;
+    let gradeAfterCommit = false;
     try {
       await client.query("BEGIN");
       const { rows } = await client.query(
@@ -81,7 +84,7 @@ export async function progressRoutes(app) {
       if (!rows[0]) fail(404, "Sesi tidak ditemukan");
       if (rows[0].participant_id !== a.user_id)
         fail(403, "Sesi bukan milik Anda");
-      let s = upgradeScoring(rows[0].document);
+      s = upgradeScoring(rows[0].document);
       const m = getMission(s.missionId);
       let changed = false;
       for (const e of events) {
@@ -113,12 +116,25 @@ export async function progressRoutes(app) {
           [JSON.stringify(s), new Date(), s.id],
         );
       await client.query("COMMIT");
-      return { data: { session: s, accepted: events.map((e) => e.id) } };
+      gradeAfterCommit = changed && s.status === "pending_review" && m.written && events.some((e) => e.type === "submit");
     } catch (e) {
       await client.query("ROLLBACK");
       throw e;
     } finally {
       client.release();
     }
+    if (gradeAfterCommit) s = await gradePendingSession(app.db, s.id, aiGrader);
+    return { data: { session: s, accepted: events.map((e) => e.id) } };
+  });
+  app.post("/api/sessions/:id/grade", {
+    config: { rateLimit: { max: 5, timeWindow: "1 minute" } },
+  }, async (req) => {
+    const a = app.requireRole(req, "participant");
+    const { rows } = await app.db.query("SELECT document,participant_id FROM mission_sessions WHERE id=$1", [req.params.id]);
+    if (!rows[0]) fail(404, "Sesi tidak ditemukan");
+    if (rows[0].participant_id !== a.user_id) fail(403, "Sesi bukan milik Anda");
+    if (rows[0].document.status === "active") fail(409, "Karya belum dikirim");
+    const session = await gradePendingSession(app.db, req.params.id, aiGrader);
+    return { data: session };
   });
 }

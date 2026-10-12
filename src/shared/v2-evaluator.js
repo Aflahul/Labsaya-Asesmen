@@ -44,7 +44,7 @@ export function evaluateV2(m, state, assessmentRevision = 1) {
       pending: true,
       accuracy: null,
       feedback: ready
-        ? "Karya tersimpan. Menunggu penilaian guru dengan rubrik."
+        ? "Jawabanmu tersimpan. Saat tersinkron, Nara akan menilainya dengan rubrik; guru dapat membantu jika layanan belum tersedia."
         : "Lengkapi bagian: " +
           m.written
             .filter(([k]) => !a[k]?.trim())
@@ -177,8 +177,9 @@ export function reduceV2(old, e, m) {
   }
   return s;
 }
-export function gradeReview(session, m, marks, comment, teacherId) {
-  if (!m.written || session.status !== "pending_review")
+export function gradeReview(session, m, marks, comment, teacherId, metadata = {}) {
+  const correction = session.status === "complete" && session.review?.source === "ai" && metadata.source !== "ai";
+  if (!m.written || (session.status !== "pending_review" && !correction))
     throw Error("Karya tidak menunggu penilaian");
   if (typeof comment !== "string" || !comment.trim() || comment.length > 3000)
     throw Error("Tuliskan umpan balik guru");
@@ -196,12 +197,16 @@ export function gradeReview(session, m, marks, comment, teacherId) {
     firstAccuracy: accuracy,
     components,
     completedAt: new Date().toISOString(),
+    ...(correction ? { reviewHistory: [...(session.reviewHistory || []), session.review] } : {}),
     review: {
       teacherId,
       marks,
       comment: comment.trim(),
       at: new Date().toISOString(),
+      source: metadata.source || "teacher",
+      ...(metadata.model ? { model: metadata.model } : {}),
+      ...(metadata.reasons ? { reasons: metadata.reasons } : {}),
     },
-    feedback: "Karya sudah dinilai guru. " + comment.trim(),
+    feedback: metadata.source === "ai" ? comment.trim() : "Karya sudah dinilai guru. " + comment.trim(),
   };
 }
