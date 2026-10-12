@@ -61,9 +61,27 @@ test("Gemini request sends only task evidence and rejects invalid rubric output"
     },
   });
   expect(result.marks.decision).toBe(30);
+  const prompt = JSON.parse(request.options.body).contents[0].parts[0].text;
+  expect(prompt).toContain("guru bijak");
+  expect(prompt).toContain("growth mindset");
+  expect(prompt).toContain("maksimal 250 karakter");
   expect(request.options.headers["x-goog-api-key"]).toBe("test-key");
   expect(request.options.body).not.toContain("DewiAI");
   expect(() => validateAiGrade(mission, { ...result, marks: { ...result.marks, decision: 300 } })).toThrow();
+});
+
+test("long AI feedback keeps a complete sentence within 250 characters without discarding marks", () => {
+  const firstSentence = "Kamu sudah menuliskan empat pengujian.";
+  const result = validateAiGrade(mission, {
+    marks: { decision: 0, evidence: 10, reason: 0 },
+    reasons: { decision: "Pilihan salah", evidence: "Pengujian ditulis", reason: "Aturan terbalik" },
+    feedback: firstSentence + " " + "Coba periksa kembali aturan keberangkatan ".repeat(10) + ".",
+  });
+  expect(result.feedback).toBe(firstSentence);
+  expect(result.marks.evidence).toBe(10);
+  const withoutSentence = validateAiGrade(mission, { ...result, feedback: "Periksa kembali ".repeat(30) });
+  expect(Array.from(withoutSentence.feedback).length).toBeLessThanOrEqual(250);
+  expect(withoutSentence.feedback).toMatch(/…$/);
 });
 
 test("boss grading sends the displayed case and a server-only, non-exclusive solution guide", async () => {

@@ -11,6 +11,8 @@ Misi 15 (*Pilih Solusi Terbaik*) dan bos (*Ruang Arsitek*) menggunakan rubrik ya
 
 Model bawaan adalah `gemini-flash-latest`, mengikuti contoh terbaru SDK resmi Google. Jika perlu mengganti model yang tersedia untuk proyek Google Anda, tambahkan variabel server `GOOGLE_AI_MODEL` lalu redeploy. Hanya soal, rubrik, dan jawaban misi yang dikirim ke Google; nama asli, nama samaran, kelas, dan kredensial tidak dikirim dalam permintaan penilaian.
 
+Feedback Nara memakai nada guru bijak dengan growth mindset: menyebut bukti jawaban, mengoreksi tanpa melabeli kemampuan murid, dan mengajak mencoba satu langkah perbaikan atau pertanyaan refleksi. AI diminta menulis 1–2 kalimat dengan maksimal 250 karakter; server membatasi feedback yang terlalu panjang tanpa membuang nilai rubrik. Permintaan Google diberi batas 45 detik, dengan durasi fungsi Vercel 60 detik. `GOOGLE_HTTP_503` berarti layanan Google sedang tidak tersedia; jawaban tetap tersimpan dan dapat diperiksa lagi.
+
 Jika kunci belum dipasang, kuota habis, atau layanan gagal, jawaban tetap tersimpan sebagai **Menunggu penilaian**. Murid dapat menekan **Periksa** untuk mencoba lagi dan guru tetap dapat menilai lewat rapor. Jangan menganggap skor AI sebagai bukti tunggal ketercapaian TP; guru dapat meninjau dan mengoreksinya.
 
 ## Memeriksa kuota dan kegagalan
