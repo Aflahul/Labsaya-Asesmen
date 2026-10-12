@@ -1,6 +1,6 @@
 import { test, expect } from "vitest";
 import { setup, loginSeededParticipant } from "./helpers.js";
-import { MISSIONS } from "../../src/shared/missions.js";
+import { MISSIONS, BOSS } from "../../src/shared/missions.js";
 import { newSession } from "../../src/shared/assessment.js";
 import { passwordHash } from "../../src/server/auth.js";
 import { gradeWithGemini, validateAiGrade } from "../../src/server/ai-grader.js";
@@ -64,6 +64,30 @@ test("Gemini request sends only task evidence and rejects invalid rubric output"
   expect(request.options.headers["x-goog-api-key"]).toBe("test-key");
   expect(request.options.body).not.toContain("DewiAI");
   expect(() => validateAiGrade(mission, { ...result, marks: { ...result.marks, decision: 300 } })).toThrow();
+});
+
+test("boss grading sends the displayed case and a server-only, non-exclusive solution guide", async () => {
+  let prompt;
+  await gradeWithGemini(BOSS, { solution: "Periksa setiap syarat satu per satu." }, {
+    apiKey: "test-key",
+    fetchImpl: async (_url, options) => {
+      prompt = JSON.parse(options.body).contents[0].parts[0].text;
+      return { ok: true, json: async () => ({ candidates: [{ content: { parts: [{ text: JSON.stringify({
+        marks: { design: 0, solution: 0, tests: 0, reason: 0 },
+        reasons: { design: "Belum ada data", solution: "Belum lengkap", tests: "Belum ada bukti", reason: "Belum dijelaskan" },
+        feedback: "Kamu mulai menyusun langkah. Lengkapi aturan dan pengujianmu.",
+      }) }] } }] }) };
+    },
+  });
+  const task = JSON.parse(prompt.split("\n\n").at(-1));
+  expect(task.mission.caseRules).toEqual(BOSS.caseRules);
+  expect(task.mission.testCases).toEqual(BOSS.testCases);
+  expect(task.mission.teacherGuide).toContain("OUTPUT kebutuhan");
+  expect(task.mission.teacherGuide).toContain("A: kebutuhan 12");
+  expect(task.mission.teacherGuide).toContain("bukan satu-satunya jawaban benar");
+  expect(task.mission.teacherGuide).toContain("semua alasan atau satu alasan utama");
+  expect(task.mission.teacherGuide).toContain("15 + 10 + 10");
+  expect(JSON.stringify(BOSS)).not.toContain("OUTPUT kebutuhan");
 });
 
 test("AI failure leaves written work pending for teacher review", async () => {

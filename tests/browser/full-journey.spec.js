@@ -93,6 +93,14 @@ test("15 core missions, real teacher review, optional boss and unchanged main gr
   ).toBeVisible();
   await page.locator(`[data-mission="${BOSS.id}"]`).click();
   await enterMission(page, BOSS);
+  const originalViewport = page.viewportSize();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.getByRole("region", { name: "Aturan keberangkatan" })).toBeVisible();
+  await expect(page.getByRole("table")).toHaveCount(1);
+  expect(await page.locator(".case-tests").evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await page.screenshot({ path: "test-results/boss-case-mobile.png", fullPage: true });
+  await page.setViewportSize(originalViewport);
   await fillMission(page, BOSS);
   await page.locator("#submit").click();
   await expect(page.locator(".badge")).toContainText("Menunggu nilai");

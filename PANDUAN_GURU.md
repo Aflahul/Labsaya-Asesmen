@@ -9,7 +9,7 @@ Asesmen Informatika kelas X/Fase E yang dapat digunakan sebagai salah satu bukti
 | Bengkel Logika | Pertemuan 3: pseudocode | Rakit Pengendali C3; Atur Pengiriman C3; Lacak Gangguan C4 |
 | Pusat Mesin | Pertemuan 8: arsitektur Von Neumann | Hubungkan Sistem C3; Jalankan Perhitungan C3; Alamat atau Isi? C4 |
 | Menara Program | Pertemuan 9: Python dan evaluasi solusi | Pulihkan Pengolah Nilai C3; Perbaiki Daftar C4; Pilih Solusi Terbaik C5 |
-| Ruang Arsitek, scene di Menara Program | Integrasi rancangan data, algoritma, dan pengujian | Sistem distribusi bantuan C6, pengayaan |
+| Ruang Arsitek, scene di Menara Program | Integrasi variabel, tipe data, perhitungan, percabangan, dan pengujian | Rancang Pemeriksa Keberangkatan C6, pengayaan |
 
 ## Nilai inti dan pengayaan
 
@@ -30,7 +30,14 @@ Masuk lewat **Guru**, cari peserta, lalu **Buka rapor**. Penilaian Nara (AI) men
 
 **C5:** keputusan sesuai kriteria 30; bukti perbandingan tiga pengujian 40; alasan dan pertimbangan 30. Periksa hasil untuk lima nilai, tiga nilai, dan list kosong. Terima pertimbangan alternatif yang akurat dan didukung bukti.
 
-**C6:** rancangan data 30; solusi 35; pengujian 25; penjelasan 10. Periksa kasus normal, stok sama dengan permintaan, stok kurang, dan input negatif. Pseudocode yang tepat setara dengan Python yang tepat. Nilai karya, bukan panjang tulisan.
+**C6 — Rancang Pemeriksa Keberangkatan:** murid merancang pemeriksa pengiriman dari materi yang sudah dipelajari. Aturan disajikan terpisah, empat data uji tersedia dalam tabel, dan jawaban dipandu dalam empat bagian. Tidak perlu membuat aplikasi atau tampilan. Pengayaan berupa memilih cara menyampaikan alasan ketika beberapa syarat gagal, lalu menjelaskan manfaatnya.
+
+- Rancangan data 30: empat masukan beserta tipe yang sesuai (20), keluaran kebutuhan energi, keputusan, alasan penundaan, dan pesan data tidak valid (10).
+- Solusi 35: memeriksa ketiga angka negatif sebelum menghitung/menentukan keputusan (15), menghitung dan menampilkan kebutuhan energi (10), keputusan serta alasan memenuhi semua aturan dan batas inklusif (10).
+- Pengujian 25: A (7), B (6), C (6), D (6). A membutuhkan 12 unit dan boleh berangkat tepat di batas; B membutuhkan 12 tetapi energi hanya 10; C membutuhkan 8 tetapi berat 11 dan belum disetujui; D tidak valid dan tidak diproses lebih lanjut.
+- Penjelasan 10: alasan urutan langkah (3), penerimaan berat tepat 10 dan energi tepat cukup (4), pilihan pesan penundaan beserta manfaatnya (3).
+
+Terima bahasa sendiri, pseudocode, atau Python yang logis dengan nilai setara. Beri nilai sebagian berdasarkan bukti yang benar. Murid boleh menampilkan semua alasan penundaan atau satu alasan utama yang benar; keduanya dapat memperoleh nilai penuh jika alasannya masuk akal. Nama variabel, urutan percabangan, dan alasan tidak harus sama dengan contoh solusi. Contoh solusi untuk AI disimpan di sisi server, bukan di metadata misi yang dikirim ke frontend. Nilai karya, bukan panjang tulisan. AI memberi feedback singkat dan sederhana; guru tetap dapat mengoreksi hasilnya.
 
 Nilai AI dapat dikoreksi sekali menjadi keputusan guru. Peserta dapat membuat percobaan baru setelah karya dinilai. Semua percobaan dan umpan balik tetap menjadi bukti; nilai kompetensi terbaik dipakai dalam rekap.
 

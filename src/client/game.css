@@ -295,6 +295,29 @@ body[data-route="mission"] #world:after {
   display: block;
   color: #e2eeea;
 }
+.case-rules li {
+  margin-bottom: 10px;
+  line-height: 1.6;
+}
+.case-tests {
+  margin: 20px 0;
+}
+.case-tests caption {
+  margin-bottom: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: left;
+}
+.case-tests td,
+.case-tests th {
+  padding: 10px 6px;
+  font-size: 14px;
+}
+.case-tests th {
+  white-space: normal;
+  text-transform: none;
+  letter-spacing: 0;
+}
 .activity select {
   font-size: 14px;
   min-height: 46px;

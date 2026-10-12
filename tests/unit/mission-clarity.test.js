@@ -45,3 +45,17 @@ test("flowchart repair contrasts equality-only with inclusive comparison", () =>
   expect(m.rules.fields.find((f) => f.key === "c").label).toContain("usulan >=");
   expect(m.rules.answers.a).toBe("Tunda");
 });
+
+test("boss displays separate rules and test inputs before the four answer sections", () => {
+  const html = v2ActivityHtml(getMission("v2p05m04"), { answers: {} });
+  expect(html).toContain("Aturan keberangkatan");
+  expect(html).toContain('<caption>Data untuk pengujian</caption>');
+  expect(html.match(/scope="row"/g)).toHaveLength(4);
+  expect(html).toContain('<th scope="col">Berat (kg)</th>');
+  expect(html).toContain('<td>6</td><td>10</td><td>12</td><td>Ya</td>');
+  expect(html).toContain('<td>-2</td><td>5</td><td>10</td><td>Ya</td>');
+  expect(html.indexOf("Data untuk pengujian")).toBeLessThan(html.indexOf('id="answer-design"'));
+  for (const key of ["design", "solution", "tests", "reason"])
+    expect(html).toContain(`id="answer-${key}"`);
+  expect(html).not.toContain("OUTPUT kebutuhan");
+});

@@ -152,13 +152,13 @@ export const GUIDANCE = {
     "Bandingkan semua kasus, bukan hanya contoh lima murid. Jelaskan juga apa arti hasil ketika daftar kosong.",
   ),
   v2p05m04: guide(
-    "Rancang sistem bantuan versimu sendiri. Tantangan ini boleh kamu lewati.",
+    "Bantu aku memeriksa apakah pesawat boleh berangkat. Gunakan aturan dan data uji yang tersedia. Tantangan ini boleh kamu lewati.",
     [
-      "Tentukan data yang dibaca dan hasil yang ditampilkan.",
-      "Tulis algoritma, pseudocode, atau Python buatanmu sendiri.",
-      "Buat kasus uji beserta hasil yang diharapkan, lalu jelaskan alasan rancanganmu.",
+      "Baca aturan satu per satu. Mulai dari kotak Data: tulis masukan, keluaran, dan tipe datanya.",
+      "Di kotak Langkah program, susun solusi dengan bahasa sendiri, pseudocode, atau Python. Kamu cukup memilih satu bentuk.",
+      "Di kotak Pengujian, tulis hasil untuk data A sampai D. Terakhir, jelaskan alasan langkah dan pilihan pesanmu.",
     ],
-    "Isi keempat kotak dengan idemu sendiri. Nara akan menilai rancanganmu dengan rubrik. Tantangan ini pilihan saja; hasilnya tidak mengurangi nilai inti.",
-    "Pastikan rancanganmu menjelaskan keputusan ketika stok cukup, stok kurang, atau data berupa angka negatif. Ujilah juga saat stok tepat sama dengan permintaan.",
+    "Tidak perlu membuat aplikasi atau tampilan. Tulis solusi pada empat kotak yang tersedia. Yang dinilai adalah ketepatan logika dan bukti pengujian, bukan panjang tulisan. Kamu boleh memperbaiki jawaban sebelum menekan Kirim.",
+    "Periksa angka negatif sebelum menghitung energi. Saat data valid, periksa ketiga syarat keberangkatan. Ingat untuk menguji nilai yang tepat di batas dan menjelaskan alasan jika pengiriman ditunda.",
   ),
 };

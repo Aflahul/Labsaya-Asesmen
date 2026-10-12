@@ -632,40 +632,54 @@ export const MISSIONS = [
   make(
     5,
     4,
-    "Ruang Arsitek",
+    "Rancang Pemeriksa Keberangkatan",
     "C6",
     "boss",
-    "Buat program untuk membantu Nara membagikan bantuan. Program membaca stok dan jumlah permintaan. Jika keduanya tidak negatif dan stok cukup, kirim bantuan lalu tampilkan sisa stok. Jika stok kurang, tunda pengiriman; stok tidak berubah. Jika ada angka negatif, tampilkan pesan kesalahan tanpa menghitung sisa stok.",
+    "Nara ingin memeriksa pengiriman sebelum pesawat berangkat. Bantu Nara membuat program yang membaca data pengiriman, menghitung kebutuhan energi, lalu menentukan apakah pesawat boleh berangkat.",
     [],
     {
       enrichment: true,
       scene: "ruang-arsitek",
+      caseRules: [
+        "Setiap paket membutuhkan 2 unit energi. Kebutuhan energi = jumlah paket × 2.",
+        "Pesawat boleh berangkat jika berat kargo paling banyak 10 kg, energi tersedia cukup, dan pengiriman sudah disetujui. Ketiga syarat harus terpenuhi.",
+        "Tampilkan kebutuhan energi dan keputusan Berangkat atau Tunda. Jika ditunda, tuliskan alasannya.",
+        "Jika jumlah paket, berat kargo, atau energi tersedia bernilai negatif, tampilkan Data tidak valid. Jangan lanjutkan perhitungan atau keputusan keberangkatan.",
+      ],
+      testCases: [
+        ["A", 6, 10, 12, "Ya"],
+        ["B", 6, 8, 10, "Ya"],
+        ["C", 4, 11, 12, "Tidak"],
+        ["D", -2, 5, 10, "Ya"],
+      ],
+      reference:
+        "Gunakan materi yang sudah kamu pelajari: variabel, tipe data, perhitungan, dan percabangan. Kamu boleh menulis langkah dengan bahasa sendiri, pseudocode, atau Python. Tidak perlu membuat aplikasi atau tampilan. Tantangan ini opsional; nilainya terpisah dari nilai inti.",
       written: [
         [
           "design",
-          "Data apa yang perlu dimasukkan dan hasil apa yang perlu ditampilkan? Tuliskan nama variabel dan tipe datanya.",
+          "1. Data — Apa saja masukan dan keluaran programmu? Tuliskan nama variabel dan tipe data untuk jumlah paket, berat kargo, energi tersedia, dan status persetujuan. Status persetujuan dapat ditulis sebagai Boolean: True berarti sudah disetujui, False berarti belum.",
         ],
         [
           "solution",
-          "Bagaimana urutan langkah programmu? Tulis dalam bentuk algoritma, pseudocode, atau kode Python.",
+          "2. Langkah program — Bagaimana programmu membaca data, memeriksa angka negatif, menghitung kebutuhan energi, dan menentukan keputusan? Tulis langkahnya secara berurutan. Pilih satu bentuk: bahasa sendiri, pseudocode, atau Python.",
         ],
         [
           "tests",
-          "Bagaimana kamu memastikan programmu bekerja? Buat sedikitnya tiga contoh: stok cukup, stok sama dengan permintaan, dan data negatif. Untuk setiap contoh, tulis masukan dan hasil yang seharusnya muncul.",
+          "3. Pengujian — Gunakan data A, B, C, dan D pada tabel. Untuk setiap data, tuliskan kebutuhan energi dan keputusan atau pesan yang seharusnya muncul. Jika hasilnya Tunda, sertakan alasannya. Untuk data tidak valid, cukup tuliskan pesan kesalahan.",
         ],
         [
           "reason",
-          "Mengapa kamu menyusun langkahnya seperti itu? Jelaskan juga apa yang terjadi saat stok kurang atau ada angka negatif pada data yang dimasukkan.",
+          "4. Alasan dan pengayaan — Mengapa langkahmu sesuai dengan aturan? Jelaskan saat berat tepat 10 kg dan energi tepat cukup. Jika beberapa syarat gagal sekaligus, kamu boleh menampilkan semua alasan atau satu alasan utama. Pilih salah satu cara dan jelaskan mengapa cara itu membantu Nara.",
         ],
       ],
       rubric: [
-        ["design", "Kejelasan rancangan data", 30],
-        ["solution", "Ketepatan solusi", 35],
-        ["tests", "Kualitas pengujian", 25],
-        ["reason", "Penjelasan", 10],
+        ["design", "Masukan, keluaran, dan tipe data sesuai kebutuhan", 30],
+        ["solution", "Langkah memenuhi aturan, termasuk batas dan data negatif", 35],
+        ["tests", "Hasil dan alasan untuk keempat data uji benar", 25],
+        ["reason", "Alasan langkah dan pilihan pesan penundaan masuk akal", 10],
       ],
       teacherGuide:
-        "Nilai hasil karya, bukan panjang tulisan. Periksa input negatif, stok sama, stok kurang, dan sisa stok. Pseudocode yang benar setara dengan Python. Nilai ini tidak memengaruhi inti.",
+        "Nilai bukti yang ditulis, bukan panjang tulisan atau kesamaan dengan contoh solusi. Periksa rancangan data, aturan keberangkatan, hasil keempat pengujian, dan alasan pilihan pesan. Bahasa sendiri, pseudocode, dan Python yang logis bernilai setara. Beri nilai sebagian untuk bagian yang benar. Solusi alternatif dapat memperoleh nilai penuh jika memenuhi semua aturan. Nilai pengayaan terpisah dari nilai inti.",
     },
   ),
 ];
