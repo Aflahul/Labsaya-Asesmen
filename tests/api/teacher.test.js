@@ -101,6 +101,7 @@ test("filtered teacher export and leaderboard expose correct fields", async () =
   expect(r.statusCode).toBe(200);
   expect(r.body).toContain("Private 1");
   expect(r.body).not.toContain("Private 2");
+  expect(r.body).toContain('"Nama lengkap"');
   expect(r.body).toContain('"Nilai misi: Daftarkan Kargo"');
   expect(r.body).toContain('"Ketepatan: Daftarkan Kargo"');
   expect(r.body).toContain('"82","70"');

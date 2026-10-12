@@ -75,7 +75,7 @@ test("15 core missions, real teacher review, optional boss and unchanged main gr
     .getByLabel("Kata sandi", { exact: true })
     .fill("test-password-only");
   await teacher.getByRole("button", { name: "Masuk", exact: true }).click();
-  await teacher.getByPlaceholder("Nama asli / samaran").fill(alias);
+  await teacher.getByPlaceholder("Nama lengkap / samaran").fill(alias);
   await teacher.getByRole("button", { name: "Buka" }).click();
   const review = teacher.locator(".review-form");
   await expect(review).toBeVisible();
@@ -99,7 +99,7 @@ test("15 core missions, real teacher review, optional boss and unchanged main gr
   await expect(page.locator(".badge")).toContainText("Menunggu guru");
   await waitForSaved(page);
   await teacher.getByRole("button", { name: "← Kembali", exact: true }).click();
-  await teacher.getByPlaceholder("Nama asli / samaran").fill(alias);
+  await teacher.getByPlaceholder("Nama lengkap / samaran").fill(alias);
   await teacher.getByRole("button", { name: "Buka" }).click();
   for (const [key] of BOSS.rubric)
     await teacher.locator(`.review-form [name="${key}"]`).fill("0");

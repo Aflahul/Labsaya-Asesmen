@@ -171,7 +171,7 @@ export async function teacherRoutes(app) {
       .header("Content-Disposition", 'attachment; filename="rekap-kelas.csv"');
     return toCsv(
       rows.map((p) => ({
-        "Nama asli": p.real_name,
+        "Nama lengkap": p.real_name,
         "Nama samaran": p.alias,
         Kelas: p.class_name,
         Absen: p.attendance,

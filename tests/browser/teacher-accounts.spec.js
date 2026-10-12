@@ -15,6 +15,8 @@ test("teacher creates a student and resets access without exposing stored hashes
   await expect(page.locator("#student-create-form")).not.toBeVisible();
   await page.getByText("Buat akun murid").click();
   const form = page.locator("#student-create-form");
+  await expect(form.getByText("Nama lengkap murid")).toBeVisible();
+  await expect(form.getByText("Nama samaran untuk peringkat")).toBeVisible();
   await form.locator('[name="realName"]').fill("Siswa Aman");
   await form.locator('[name="alias"]').fill("AmanUji");
   await form.locator('[name="className"]').fill("X RPL 1");
