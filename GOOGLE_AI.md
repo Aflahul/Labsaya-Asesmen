@@ -15,6 +15,8 @@ Feedback Nara memakai nada guru bijak dengan growth mindset: menyebut bukti jawa
 
 Jika kunci belum dipasang, kuota habis, atau layanan gagal, jawaban tetap tersimpan sebagai **Menunggu penilaian**. Murid dapat menekan **Periksa** untuk mencoba lagi dan guru tetap dapat menilai lewat rapor. Jangan menganggap skor AI sebagai bukti tunggal ketercapaian TP; guru dapat meninjau dan mengoreksinya.
 
+Jika Google mengembalikan HTTP 503, server menunggu satu detik lalu mencoba ulang satu kali dalam batas waktu total 120 detik yang sama. Kesalahan kuota atau izin tidak dicoba ulang otomatis. Jika percobaan ulang tetap gagal, jawaban tetap menunggu penilaian.
+
 ## Memeriksa kuota dan kegagalan
 
 Di Google AI Studio, buka **Rate Limit** dan pilih proyek yang digunakan oleh API key. Cari model Flash yang digunakan oleh alias `gemini-flash-latest` (atau model yang disetel di `GOOGLE_AI_MODEL`), lalu periksa batas dan pemakaian permintaan/token. Batas nol atau jatah yang habis dapat menolak permintaan; pembuatan API key tidak menjamin kuota tersedia. Billing dipertimbangkan hanya jika model atau kuota yang diperlukan tidak tersedia pada paket saat ini.

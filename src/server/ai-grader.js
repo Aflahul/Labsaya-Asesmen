@@ -64,7 +64,8 @@ export async function gradeWithGemini(mission, answers, {
   ].join("\n\n");
   const properties = Object.fromEntries(mission.rubric.map(([key]) => [key, { type: "NUMBER" }]));
   const reasonProperties = Object.fromEntries(mission.rubric.map(([key]) => [key, { type: "STRING" }]));
-  const response = await fetchImpl(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+  const options = {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
     body: JSON.stringify({
@@ -84,7 +85,13 @@ export async function gradeWithGemini(mission, answers, {
       },
     }),
     signal: AbortSignal.timeout(120000),
-  });
+  };
+  let response = await fetchImpl(url, options);
+  if (response.status === 503 && !options.signal.aborted) {
+    await response.body?.cancel();
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    response = await fetchImpl(url, options);
+  }
   if (!response.ok) {
     const error = Error(`Google AI gagal (${response.status})`);
     try {

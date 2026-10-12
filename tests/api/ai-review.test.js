@@ -106,6 +106,44 @@ test("grading tolerates a minute of provider latency but still aborts a stalled 
   } finally { timeout.mockRestore(); vi.useRealTimers(); }
 });
 
+test("a temporary Google 503 is retried once and the successful rubric is validated", async () => {
+  vi.useFakeTimers();
+  let calls = 0;
+  const signals = [];
+  try {
+    const grading = gradeWithGemini(BOSS, {}, { apiKey: "test-key", fetchImpl: async (_url, options) => {
+      signals.push(options.signal);
+      calls++;
+      if (calls === 1) return { ok: false, status: 503, json: async () => ({ error: {} }) };
+      return { ok: true, json: async () => ({ candidates: [{ content: { parts: [{ text: JSON.stringify({
+        marks: { design: 0, solution: 0, tests: 0, reason: 0 },
+        reasons: { design: "Data salah", solution: "Aturan salah", tests: "Hasil salah", reason: "Alasan salah" },
+        feedback: "Kamu sudah menulis pengujian. Coba periksa kembali syarat keberangkatan.",
+      }) }] } }] }) };
+    } }).then(value => ({ value }), error => ({ error }));
+    await vi.advanceTimersByTimeAsync(1000);
+    const { value: result, error } = await grading;
+    expect(error).toBeUndefined();
+    expect(result.marks).toEqual({ design: 0, solution: 0, tests: 0, reason: 0 });
+    expect(calls).toBe(2);
+    expect(signals[1]).toBe(signals[0]);
+  } finally { vi.useRealTimers(); }
+});
+
+test.each([[503, 2], [429, 1], [403, 1]])("Google %s never causes unbounded or inappropriate retries", async (status, expectedCalls) => {
+  vi.useFakeTimers();
+  let calls = 0;
+  try {
+    const grading = gradeWithGemini(BOSS, {}, { apiKey: "test-key", fetchImpl: async () => {
+      calls++;
+      return { ok: false, status, json: async () => ({ error: {} }) };
+    } }).catch(error => error);
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(aiFailureDetails(await grading)).toEqual({ code: `GOOGLE_HTTP_${status}` });
+    expect(calls).toBe(expectedCalls);
+  } finally { vi.useRealTimers(); }
+});
+
 test("boss grading sends the displayed case and a server-only, non-exclusive solution guide", async () => {
   let prompt;
   await gradeWithGemini(BOSS, { solution: "Periksa setiap syarat satu per satu." }, {
