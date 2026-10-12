@@ -7,6 +7,7 @@ export async function setup(options = {}) {
   db.public.none(
     fs.readFileSync("migrations/003_participant_passwords.sql", "utf8"),
   );
+  db.public.none(fs.readFileSync("migrations/004_recovery_code.sql", "utf8"));
   const { Pool } = db.adapters.createPg();
   const { buildApp } = await import("../../src/server/app.js");
   return buildApp({ db: new Pool(), ...options });

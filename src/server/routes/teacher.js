@@ -34,7 +34,7 @@ async function roster(db, query = {}, includeMissionDetails = false) {
         rows: missionRows,
         ...summary
       } = report;
-      const { password_hash, ...publicParticipant } = p;
+      const { password_hash, recovery_code_hash, ...publicParticipant } = p;
       return {
         ...publicParticipant,
         hasPassword: Boolean(password_hash),
@@ -94,7 +94,7 @@ export async function teacherRoutes(app) {
     try {
       await client.query("BEGIN");
       const { rows } = await client.query(
-        "UPDATE participants SET password_hash=$1 WHERE id=$2 RETURNING id,real_name,alias,class_name,attendance",
+        "UPDATE participants SET password_hash=$1,recovery_code_hash=NULL WHERE id=$2 RETURNING id,real_name,alias,class_name,attendance",
         [passwordHash(password), req.params.id],
       );
       if (!rows[0]) fail(404, "Murid tidak ditemukan");
@@ -123,7 +123,10 @@ export async function teacherRoutes(app) {
       );
       if (!rows[0]) fail(404, "Sesi tidak ditemukan");
       const old = rows[0].document;
-      if (old.status !== "pending_review" && !(old.status === "complete" && old.review?.source === "ai"))
+      if (
+        old.status !== "pending_review" &&
+        !(old.status === "complete" && old.review?.source === "ai")
+      )
         fail(409, "Karya sudah dinilai atau belum dikirim");
       let graded;
       try {
@@ -200,9 +203,8 @@ export async function teacherRoutes(app) {
     if (!rows[0]) fail(404, "Peserta tidak ditemukan");
     return {
       data: {
-        participant: (({ password_hash, ...participant }) => participant)(
-          rows[0],
-        ),
+        participant: (({ password_hash, recovery_code_hash, ...participant }) =>
+          participant)(rows[0]),
         ...(await loadProgress(app.db, req.params.id)),
       },
     };

@@ -6,7 +6,7 @@ import { hash, fail } from "./auth.js";
 import { authRoutes } from "./routes/auth.js";
 import { progressRoutes } from "./routes/progress.js";
 import { teacherRoutes } from "./routes/teacher.js";
-export async function buildApp({ db, aiGrader } = {}) {
+export async function buildApp({ db, aiGrader, authRateLimitMax = 10 } = {}) {
   const app = Fastify({ logger: false, bodyLimit: 1024 * 1024 });
   app.decorate("db", db || getPool());
   await app.register(cookie);
@@ -69,7 +69,7 @@ export async function buildApp({ db, aiGrader } = {}) {
       .code(404)
       .send({ error: { code: "NOT_FOUND", message: "Tidak ditemukan" } }),
   );
-  await authRoutes(app);
+  await authRoutes(app, authRateLimitMax);
   await progressRoutes(app, aiGrader);
   await teacherRoutes(app);
   return app;

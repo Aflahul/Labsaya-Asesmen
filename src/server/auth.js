@@ -7,6 +7,17 @@ import {
 export const normalize = (s) =>
   s.normalize("NFC").trim().replace(/\s+/g, " ").toLocaleLowerCase("id");
 export const hash = (s) => createHash("sha256").update(s).digest("hex");
+export const newRecoveryCode = () => randomBytes(16).toString("base64url");
+export function verifyRecoveryCode(code, storedHash) {
+  if (typeof code !== "string" || !/^[A-Za-z0-9_-]{22}$/.test(code))
+    return false;
+  const actual = Buffer.from(hash(code), "hex");
+  const expected = Buffer.from(
+    storedHash || hash("invalid-recovery-code"),
+    "hex",
+  );
+  return expected.length === actual.length && timingSafeEqual(actual, expected);
+}
 export const passwordHash = (password) => {
   const salt = randomBytes(16).toString("hex");
   return salt + ":" + scryptSync(password, salt, 64).toString("hex");

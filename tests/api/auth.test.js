@@ -50,6 +50,176 @@ test("student self-registers with a password and can immediately use a private s
   expect(login.statusCode).toBe(200);
   await app.close();
 });
+test("recovery code resets a forgotten password once and ends old sessions", async () => {
+  const app = await setup();
+  const alias = "Bintang";
+  const oldPassword = "password-lama-aman";
+  const newPassword = "password-baru-aman";
+  const registered = await app.inject({
+    method: "POST",
+    url: "/api/register",
+    payload: {
+      realName: "Bintang Sari",
+      alias,
+      className: "X RPL 1",
+      attendance: 2,
+      password: oldPassword,
+    },
+  });
+  expect(registered.statusCode).toBe(201);
+  const code = registered.json().data.recoveryCode;
+  expect(code.length).toBeGreaterThanOrEqual(20);
+  const oldCookie = registered.headers["set-cookie"].split(";")[0];
+  const wrong = await app.inject({
+    method: "POST",
+    url: "/api/recover-password",
+    payload: { alias, code: "wrong-code", newPassword },
+  });
+  expect(wrong.statusCode).toBe(400);
+  const reset = await app.inject({
+    method: "POST",
+    url: "/api/recover-password",
+    payload: { alias, code, newPassword },
+  });
+  expect(reset.statusCode).toBe(200);
+  expect(reset.json().data.recoveryCode).not.toBe(code);
+  expect(
+    (
+      await app.inject({
+        method: "POST",
+        url: "/api/recover-password",
+        payload: { alias, code, newPassword: oldPassword },
+      })
+    ).statusCode,
+  ).toBe(400);
+  expect(
+    (
+      await app.inject({
+        method: "GET",
+        url: "/api/me",
+        headers: { cookie: oldCookie },
+      })
+    ).statusCode,
+  ).toBe(401);
+  expect(
+    (
+      await app.inject({
+        method: "POST",
+        url: "/api/login",
+        payload: { alias, password: oldPassword },
+      })
+    ).statusCode,
+  ).toBe(401);
+  expect(
+    (
+      await app.inject({
+        method: "POST",
+        url: "/api/login",
+        payload: { alias, password: newPassword },
+      })
+    ).statusCode,
+  ).toBe(200);
+  await app.close();
+});
+
+test("signed-in student needs the current password to replace a recovery code", async () => {
+  const app = await setup();
+  const password = "password-murid-aman";
+  const registered = await app.inject({
+    method: "POST",
+    url: "/api/register",
+    payload: {
+      realName: "Rani",
+      alias: "Rani",
+      className: "X",
+      attendance: 3,
+      password,
+    },
+  });
+  const cookie = registered.headers["set-cookie"].split(";")[0];
+  const csrf = registered.json().data.csrf;
+  const firstCode = registered.json().data.recoveryCode;
+  const headers = { cookie, "x-csrf-token": csrf };
+  expect(
+    (
+      await app.inject({
+        method: "POST",
+        url: "/api/recovery-code",
+        headers,
+        payload: { password: "wrong-password" },
+      })
+    ).statusCode,
+  ).toBe(401);
+  const refreshed = await app.inject({
+    method: "POST",
+    url: "/api/recovery-code",
+    headers,
+    payload: { password },
+  });
+  expect(refreshed.statusCode).toBe(200);
+  expect(refreshed.json().data.recoveryCode).not.toBe(firstCode);
+  expect(
+    (
+      await app.inject({
+        method: "POST",
+        url: "/api/recover-password",
+        payload: {
+          alias: "Rani",
+          code: firstCode,
+          newPassword: "new-password-123",
+        },
+      })
+    ).statusCode,
+  ).toBe(400);
+  await app.close();
+});
+
+test("classmates sharing one network can log in without sharing a password-attempt limit", async () => {
+  const app = await setup();
+  for (let i = 0; i < 11; i++) {
+    const alias = `Murid${i}`;
+    const password = `rahasia-murid-${i}-aman`;
+    await app.db.query(
+      "INSERT INTO participants(id,real_name,alias,alias_key,class_name,attendance,password_hash) VALUES($1,$2,$3,$4,$5,$6,$7)",
+      [
+        alias,
+        alias,
+        alias,
+        alias.toLowerCase(),
+        "X",
+        i + 1,
+        (await import("../../src/server/auth.js")).passwordHash(password),
+      ],
+    );
+    const login = await app.inject({
+      method: "POST",
+      url: "/api/login",
+      payload: { alias, password },
+    });
+    expect(login.statusCode).toBe(200);
+  }
+  for (let i = 0; i < 9; i++) {
+    expect(
+      (
+        await app.inject({
+          method: "POST",
+          url: "/api/login",
+          payload: { alias: "Murid0", password: "salah" },
+        })
+      ).statusCode,
+    ).toBe(401);
+  }
+  expect(
+    (
+      await app.inject({
+        method: "POST",
+        url: "/api/login",
+        payload: { alias: "Murid0", password: "salah" },
+      })
+    ).statusCode,
+  ).toBe(429);
+  await app.close();
+});
 test("teacher can still create student accounts with an issued password", async () => {
   const app = await setup();
   const payload = {
@@ -147,6 +317,7 @@ test("teacher can still create student accounts with an issued password", async 
   });
   expect(roster.body).not.toContain(password);
   expect(roster.body).not.toContain("password_hash");
+  expect(roster.body).not.toContain("recovery_code_hash");
   expect(roster.json().data[0].hasPassword).toBe(true);
   const report = await app.inject({
     method: "GET",
@@ -155,6 +326,7 @@ test("teacher can still create student accounts with an issued password", async 
   });
   expect(report.statusCode).toBe(200);
   expect(report.body).not.toContain("password_hash");
+  expect(report.body).not.toContain("recovery_code_hash");
   expect(
     (
       await app.inject({

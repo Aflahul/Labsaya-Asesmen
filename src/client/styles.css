@@ -233,6 +233,22 @@ main {
   color: #d4e3dc;
   margin: 18px 0 6px;
 }
+.password-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+.password-row input {
+  flex: 1;
+}
+.password-row button {
+  flex: none;
+}
+@media (max-width: 420px) {
+  .password-row button {
+    padding-inline: 8px;
+  }
+}
 input,
 select {
   width: 100%;

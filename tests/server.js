@@ -7,6 +7,7 @@ for (const p of [
   "001_accounts.sql",
   "002_assessment.sql",
   "003_participant_passwords.sql",
+  "004_recovery_code.sql",
 ])
   memory.public.none(fs.readFileSync(`migrations/${p}`, "utf8"));
 const { Pool } = memory.adapters.createPg(),
@@ -23,5 +24,5 @@ const aiGrader = process.env.TEST_AI_GRADER === "1"
       model: "gemini-mock",
     })
   : undefined;
-const app = await buildApp({ db, aiGrader });
+const app = await buildApp({ db, aiGrader, authRateLimitMax: 1000 });
 await app.listen({ host: "127.0.0.1", port: 3000 });

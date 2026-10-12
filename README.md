@@ -19,6 +19,8 @@ Jalankan `npm start` setelah `npm run build` untuk aplikasi production lokal pad
 
 Tidak ada kredensial atau akun guru bawaan di aplikasi production. Login guru dibuat pengelola. Murid dapat mendaftar sendiri atau menerima akun dari guru; login memakai nama samaran dan kata sandi, sedangkan nama lengkap disimpan untuk rapor.
 
+Pendaftaran mandiri menampilkan kode pemulihan sekali. Murid dapat mengatur ulang kata sandi sendiri dengan nama samaran dan kode tersebut; kode baru menggantikan kode lama. Akun yang dibuat guru dapat membuat kode setelah masuk melalui Pengaturan. Guru tetap dapat mengatur ulang akun yang kehilangan kata sandi sekaligus kodenya.
+
 ## Aset ilustrasi
 
 Sebanyak 26 aset dari folder Drive yang disetujui disimpan sebagai WebP di `public/game-assets/`. `manifest.json` mencatat nama, ukuran, hash sumber, dan folder asal. Ekspor ulang master PNG dengan `python scripts/prepare-game-assets.py PATH_MASTERS` (Pillow diperlukan). Master asli tidak diubah.

@@ -50,6 +50,7 @@ let auth = null,
   naraState = { open: true, page: 0, mode: "guide" },
   cacheWarning = "",
   displayedFingerprint = "",
+  recoveryCodeToShow = "",
   disconnectMap = () => {};
 const pageNara = {
   home: { open: true, page: 0, mode: "guide" },
@@ -260,15 +261,30 @@ function home() {
     `<section class="home game-home"><div class="hero"><div class="eyebrow">EKSPEDISI MENARA AWAN · INFORMATIKA KELAS X</div><h1>Hidupkan kembali<br><em>Menara Awan.</em></h1><p>Jaringan penghubung lima pulau terputus. Bantu Nara menyambungkannya kembali dengan menyelesaikan tantangan data, algoritma, dan pemrograman.</p><div class="actions"><button class="primary" data-nav="${auth?.role === "participant" ? "map" : "login"}">${auth?.role === "participant" ? "Lanjut" : "Masuk"}</button>${auth?.role === "participant" ? "" : '<button class="ghost" data-nav="register">Daftar</button>'}</div><p class="notice">${auth?.role === "participant" ? "Lanjutkan perjalananmu dari peta." : "Belum punya akun? Daftar sendiri atau minta dibuatkan guru."}</p></div><img class="hero-island" src="/game-assets/island-menara-program.webp" alt="Menara Program melayang di atas awan"></section>${pageGuide("home")}`,
   );
 }
+function passwordInput(id, label, autocomplete = "new-password") {
+  return `<label for="${id}">${label}</label><div class="password-row"><input id="${id}" name="${id}" type="password" minlength="${autocomplete === "current-password" ? 1 : 12}" maxlength="200" required autocomplete="${autocomplete}"><button type="button" class="ghost small" data-toggle-password="${id}" aria-label="Tampilkan ${label.toLowerCase().replace("kata ", "")}" aria-pressed="false">Tampilkan</button></div>`;
+}
+function showRecoveryCode(code) {
+  recoveryCodeToShow = code;
+  route = "recovery-code";
+  shell(
+    `<section class="panel auth-panel"><div class="eyebrow">Keamanan akun</div><h2>Simpan kode pemulihan</h2><p>Kode ini hanya ditampilkan sekali. Salin dan simpan di tempat pribadi. Gunakan jika suatu saat lupa kata sandi. Kode lama otomatis hangus setelah kamu membuat atau memakai kode baru.</p><label for="recovery-code">Kode pemulihan</label><input id="recovery-code" value="${esc(code)}" readonly autocomplete="off" spellcheck="false"><p class="notice">Jangan berikan kode ini kepada orang lain. Jika kode hilang saat kamu masih bisa masuk, buat kode baru di Pengaturan.</p><div class="actions"><button id="copy-recovery-code" class="ghost">Salin kode</button><button class="primary" data-nav="${auth?.role === "participant" ? "map" : "login"}">${auth?.role === "participant" ? "Lanjut ke peta" : "Masuk"}</button></div><p id="error" role="status" class="notice"></p></section>`,
+  );
+}
 function authForm(kind) {
   const teacher = kind === "teacher-login";
   shell(
-    `<section class="panel auth-panel"><div class="eyebrow">${teacher ? "Ruang pendidik" : "Identitas penjelajah"}</div><h2 style="margin-top:12px">${teacher ? "Masuk halaman guru" : "Selamat datang kembali"}</h2><p>${teacher ? "Masuk dengan akun guru yang dibuat administrator sekolah." : "Masuk dengan nama samaran dan kata sandimu."}</p><form id="auth-form" data-kind="${kind}">${teacher ? '<label for="username">Username guru</label><input id="username" name="username" required autocomplete="username">' : '<label for="alias">Nama samaran</label><input id="alias" name="alias" maxlength="100" required autocomplete="username">'}<label for="password">Kata sandi</label><input id="password" name="password" type="password" required autocomplete="current-password"><p id="error" role="alert" class="error"></p><div class="actions"><button class="primary" type="submit">Masuk</button><button type="button" class="ghost" data-nav="home">Kembali</button></div></form>${teacher ? "" : '<p class="notice">Belum punya akun? <button type="button" class="ghost small" data-nav="register">Daftar</button> Lupa kata sandi? Hubungi gurumu untuk mengatur ulang.</p>'}</section>`,
+    `<section class="panel auth-panel"><div class="eyebrow">${teacher ? "Ruang pendidik" : "Identitas penjelajah"}</div><h2 style="margin-top:12px">${teacher ? "Masuk halaman guru" : "Selamat datang kembali"}</h2><p>${teacher ? "Masuk dengan akun guru yang dibuat administrator sekolah." : "Masuk dengan nama samaran dan kata sandimu."}</p><form id="auth-form" data-kind="${kind}">${teacher ? '<label for="username">Username guru</label><input id="username" name="username" required autocomplete="username">' : '<label for="alias">Nama samaran</label><input id="alias" name="alias" maxlength="100" required autocomplete="username">'}${passwordInput("password", "Kata sandi", "current-password")}<p id="error" role="alert" class="error"></p><div class="actions"><button class="primary" type="submit">Masuk</button><button type="button" class="ghost" data-nav="home">Kembali</button></div></form>${teacher ? "" : '<p class="notice">Belum punya akun? <button type="button" class="ghost small" data-nav="register">Daftar</button> <button type="button" class="ghost small" data-nav="recover">Lupa kata sandi?</button></p>'}</section>`,
   );
 }
 function registerForm() {
   shell(
-    `<section class="panel auth-panel"><div class="eyebrow">Identitas penjelajah</div><h2 style="margin-top:12px">Buat akun murid</h2><p>Isi nama lengkap sesuai daftar kelas untuk rapor. Nama samaran dipakai untuk masuk dan tampil di papan peringkat.</p><form id="auth-form" data-kind="register"><label for="realName">Nama lengkap murid</label><input id="realName" name="realName" maxlength="100" autocomplete="name" required><label for="alias">Nama samaran</label><input id="alias" name="alias" maxlength="100" autocomplete="username" required><label for="className">Kelas</label><input id="className" name="className" maxlength="50" required><label for="attendance">Nomor absen</label><input id="attendance" name="attendance" type="number" min="1" max="999" required><label for="password">Kata sandi</label><input id="password" name="password" type="password" minlength="12" maxlength="200" autocomplete="new-password" required><label for="passwordConfirm">Ulangi kata sandi</label><input id="passwordConfirm" name="passwordConfirm" type="password" minlength="12" maxlength="200" autocomplete="new-password" required><p class="notice">Gunakan sedikitnya 12 karakter. Simpan kata sandimu; guru dapat mengatur ulang jika terlupa. Guru perlu mencocokkan identitasmu sebelum memakai rapor sebagai nilai sumatif.</p><p id="error" role="alert" class="error"></p><div class="actions"><button class="primary" type="submit">Daftar</button><button type="button" class="ghost" data-nav="login">Sudah punya akun?</button></div></form></section>`,
+    `<section class="panel auth-panel"><div class="eyebrow">Identitas penjelajah</div><h2 style="margin-top:12px">Buat akun murid</h2><p>Isi nama lengkap sesuai daftar kelas untuk rapor. Nama samaran dipakai untuk masuk dan tampil di papan peringkat.</p><form id="auth-form" data-kind="register"><label for="realName">Nama lengkap murid</label><input id="realName" name="realName" maxlength="100" autocomplete="name" required><label for="alias">Nama samaran</label><input id="alias" name="alias" maxlength="100" autocomplete="username" required><label for="className">Kelas</label><input id="className" name="className" maxlength="50" required><label for="attendance">Nomor absen</label><input id="attendance" name="attendance" type="number" min="1" max="999" required>${passwordInput("password", "Kata sandi")}${passwordInput("passwordConfirm", "Ulangi kata sandi")}<p class="notice">Gunakan sedikitnya 12 karakter. Setelah mendaftar, simpan kode pemulihan yang tampil sekali. Guru perlu mencocokkan identitasmu sebelum memakai rapor sebagai nilai sumatif.</p><p id="error" role="alert" class="error"></p><div class="actions"><button class="primary" type="submit">Daftar</button><button type="button" class="ghost" data-nav="login">Sudah punya akun?</button></div></form></section>`,
+  );
+}
+function recoverForm() {
+  shell(
+    `<section class="panel auth-panel"><div class="eyebrow">Keamanan akun</div><h2>Lupa kata sandi?</h2><p>Masukkan nama samaran dan kode pemulihan yang kamu simpan. Setelah berhasil, kode lama hangus dan kamu akan mendapat kode baru.</p><form id="recover-form"><label for="alias">Nama samaran</label><input id="alias" name="alias" maxlength="100" autocomplete="username" required><label for="code">Kode pemulihan</label><input id="code" name="code" maxlength="100" autocomplete="off" spellcheck="false" required>${passwordInput("newPassword", "Kata sandi baru")}${passwordInput("newPasswordConfirm", "Ulangi kata sandi baru")}<p id="error" role="alert" class="error"></p><div class="actions"><button class="primary" type="submit">Simpan kata sandi baru</button><button type="button" class="ghost" data-nav="login">Kembali</button></div></form><p class="notice">Belum pernah mendapat kode atau kode hilang? Minta bantuan guru untuk mengatur ulang.</p></section>`,
   );
 }
 async function activate(data) {
@@ -415,7 +431,7 @@ function renderMission() {
   world.setScene(m.scene || m.slug);
   world.setProp(m.prop);
   shell(
-    `<div class="topline"><button class="ghost small" data-nav="map">← Peta</button></div><div class="mission-layout"><section class="panel mission-panel"><div class="mission-title"><div><div class="eyebrow">${esc(m.islandName)} · ${m.enrichment ? "BOS OPSIONAL" : m.meeting + " · Misi " + Number(m.id.slice(-2)) + "/3"}</div><h2 id="mission-heading" tabindex="-1">${esc(m.title)}</h2></div><span class="badge">${done ? s.review?.source === "ai" ? "✓ Dinilai Nara" : "✓ Dinilai" : pending ? "◷ Menunggu nilai" : "Sedang dimainkan"}</span></div><div class="mission-progress"><span>Misi ${summary.completed}/15</span><span>Waktu <strong id="timer">${seconds(s.activeMs)}</strong></span><progress max="15" value="${summary.completed}" aria-label="Misi inti selesai"></progress></div><div class="instruction"><strong>Misi kita</strong><p>${esc(s.assessmentRevision < 2 && m.priorInstructions ? m.priorInstructions : m.instructions)}</p><details class="report-question"><summary>Acuan waktu skor permainan: ${s.scoringConfig?.timeBudgetSeconds || m.timeBudgetSeconds} detik</summary><div class="report-answer"><p>${esc(m.timeBudgetReason || "Acuan waktu sesuai beban misi.")}</p><p>Poin waktu permainan penuh sampai batas ini; nilai kompetensi tidak dipotong oleh waktu. Setelahnya, poin turun bertahap hingga 0 pada ${3 * (s.scoringConfig?.timeBudgetSeconds || m.timeBudgetSeconds)} detik. Misi tetap bisa diselesaikan. Sesi yang sudah dimulai memakai acuan saat sesi dibuat.</p></div></details></div><div class="activity" ${done || pending ? "inert" : ""}>${m.missionVersion === 2 ? v2ActivityHtml(m, draftState(s)) : activityHtml(m, s.state)}</div>${done ? `${scoreBreakdown(s, summary.missionGrades[m.id], summary.gameMissionGrades[m.id])}` : pending ? `<p class="feedback" role="status">${s.aiGrade?.status === "unavailable" ? "Penilaian Nara belum tersedia. Tekan Periksa untuk mencoba lagi; guru juga dapat menilai jawabanmu." : "Jawabanmu sudah terkirim. Nara sedang memeriksanya."}</p>` : `<p id="error" class="error" role="alert"></p>`}<div class="mission-controls">${done ? '<button class="primary" id="next">Next</button><button id="replay" title="Ulang pertama gratis; berikutnya mengurangi skor permainan 1 poin">Ulang</button>' : pending ? '<button class="primary" data-nav="map">← Peta</button><button id="refresh-progress">Periksa</button><button data-nav="report">Rapor</button>' : `${!m.written ? '<button id="run">Coba</button>' : ""}<button class="primary" id="submit">Kirim</button><button id="hint">Petunjuk</button><button class="ghost" id="reset">Bersihkan</button>`}</div></section></div>${naraToast(m, naraState, naraState.mode === "hint" ? hint : pending && s.aiGrade?.status === "unavailable" ? "Penilaian otomatis belum tersedia. Jawabanmu aman; tekan Periksa lagi atau minta guru menilai." : done && s.review?.source === "ai" ? s.feedback : done && s.score < 100 ? "Jawaban sudah dinilai. Kamu boleh mencoba lagi; nilai kompetensi memakai bukti terbaik. Ulang pertama gratis; berikutnya mengurangi skor permainan 1 poin." : s.feedback)}`,
+    `<div class="topline"><button class="ghost small" data-nav="map">← Peta</button></div><div class="mission-layout"><section class="panel mission-panel"><div class="mission-title"><div><div class="eyebrow">${esc(m.islandName)} · ${m.enrichment ? "BOS OPSIONAL" : m.meeting + " · Misi " + Number(m.id.slice(-2)) + "/3"}</div><h2 id="mission-heading" tabindex="-1">${esc(m.title)}</h2></div><span class="badge">${done ? (s.review?.source === "ai" ? "✓ Dinilai Nara" : "✓ Dinilai") : pending ? "◷ Menunggu nilai" : "Sedang dimainkan"}</span></div><div class="mission-progress"><span>Misi ${summary.completed}/15</span><span>Waktu <strong id="timer">${seconds(s.activeMs)}</strong></span><progress max="15" value="${summary.completed}" aria-label="Misi inti selesai"></progress></div><div class="instruction"><strong>Misi kita</strong><p>${esc(s.assessmentRevision < 2 && m.priorInstructions ? m.priorInstructions : m.instructions)}</p><details class="report-question"><summary>Acuan waktu skor permainan: ${s.scoringConfig?.timeBudgetSeconds || m.timeBudgetSeconds} detik</summary><div class="report-answer"><p>${esc(m.timeBudgetReason || "Acuan waktu sesuai beban misi.")}</p><p>Poin waktu permainan penuh sampai batas ini; nilai kompetensi tidak dipotong oleh waktu. Setelahnya, poin turun bertahap hingga 0 pada ${3 * (s.scoringConfig?.timeBudgetSeconds || m.timeBudgetSeconds)} detik. Misi tetap bisa diselesaikan. Sesi yang sudah dimulai memakai acuan saat sesi dibuat.</p></div></details></div><div class="activity" ${done || pending ? "inert" : ""}>${m.missionVersion === 2 ? v2ActivityHtml(m, draftState(s)) : activityHtml(m, s.state)}</div>${done ? `${scoreBreakdown(s, summary.missionGrades[m.id], summary.gameMissionGrades[m.id])}` : pending ? `<p class="feedback" role="status">${s.aiGrade?.status === "unavailable" ? "Penilaian Nara belum tersedia. Tekan Periksa untuk mencoba lagi; guru juga dapat menilai jawabanmu." : "Jawabanmu sudah terkirim. Nara sedang memeriksanya."}</p>` : `<p id="error" class="error" role="alert"></p>`}<div class="mission-controls">${done ? '<button class="primary" id="next">Next</button><button id="replay" title="Ulang pertama gratis; berikutnya mengurangi skor permainan 1 poin">Ulang</button>' : pending ? '<button class="primary" data-nav="map">← Peta</button><button id="refresh-progress">Periksa</button><button data-nav="report">Rapor</button>' : `${!m.written ? '<button id="run">Coba</button>' : ""}<button class="primary" id="submit">Kirim</button><button id="hint">Petunjuk</button><button class="ghost" id="reset">Bersihkan</button>`}</div></section></div>${naraToast(m, naraState, naraState.mode === "hint" ? hint : pending && s.aiGrade?.status === "unavailable" ? "Penilaian otomatis belum tersedia. Jawabanmu aman; tekan Periksa lagi atau minta guru menilai." : done && s.review?.source === "ai" ? s.feedback : done && s.score < 100 ? "Jawaban sudah dinilai. Kamu boleh mencoba lagi; nilai kompetensi memakai bukti terbaik. Ulang pertama gratis; berikutnya mengurangi skor permainan 1 poin." : s.feedback)}`,
   );
   if (focusedId)
     document.getElementById(focusedId)?.focus({ preventScroll: true });
@@ -539,7 +555,7 @@ async function leaderboard() {
 }
 function settings() {
   shell(
-    `<section class="panel auth-panel"><div class="eyebrow">Kenyamanan bermain</div><h2 style="margin-top:12px">Pengaturan</h2><div class="group-row"><label for="motion">Kurangi gerakan</label><input id="motion" type="checkbox" style="width:auto" ${localStorage.getItem("pulau:motion") === "true" || matchMedia("(prefers-reduced-motion: reduce)").matches ? "checked" : ""}></div><div class="group-row"><label for="quality">Kualitas efek</label><select id="quality"><option value="normal">Normal</option><option value="low" ${localStorage.getItem("pulau:quality") === "low" ? "selected" : ""}>Rendah</option></select></div><p class="notice">Sesuaikan gerakan dan efek agar nyaman dimainkan di perangkatmu.</p><div class="actions"><button data-nav="home">Kembali</button>${auth?.role === "participant" ? '<button id="download-raw" class="ghost">Cadangan</button><button id="clear-local" class="ghost">Hapus</button>' : ""}</div></section>`,
+    `<section class="panel auth-panel"><div class="eyebrow">Kenyamanan bermain</div><h2 style="margin-top:12px">Pengaturan</h2><div class="group-row"><label for="motion">Kurangi gerakan</label><input id="motion" type="checkbox" style="width:auto" ${localStorage.getItem("pulau:motion") === "true" || matchMedia("(prefers-reduced-motion: reduce)").matches ? "checked" : ""}></div><div class="group-row"><label for="quality">Kualitas efek</label><select id="quality"><option value="normal">Normal</option><option value="low" ${localStorage.getItem("pulau:quality") === "low" ? "selected" : ""}>Rendah</option></select></div><p class="notice">Sesuaikan gerakan dan efek agar nyaman dimainkan di perangkatmu.</p>${auth?.role === "participant" ? `<form id="rotate-recovery-form"><h3>Ganti kode pemulihan</h3><p>Jika kode sebelumnya hilang, buat kode baru. Kode lama langsung hangus.</p>${passwordInput("password", "Kata sandi saat ini", "current-password")}<p id="error" role="alert" class="error"></p><button type="submit">Buat kode baru</button></form>` : ""}<div class="actions"><button data-nav="home">Kembali</button>${auth?.role === "participant" ? '<button id="download-raw" class="ghost">Cadangan</button><button id="clear-local" class="ghost">Hapus</button>' : ""}</div></section>`,
   );
 }
 function navigate(next) {
@@ -548,10 +564,12 @@ function navigate(next) {
   pendingMission = null;
   world.skip();
   world.reset();
+  if (next !== "recovery-code") recoveryCodeToShow = "";
   route = next;
   if (next === "home") home();
   else if (["login", "teacher-login"].includes(next)) authForm(next);
   else if (next === "register") registerForm();
+  else if (next === "recover") recoverForm();
   else if (next === "map") map();
   else if (next === "report") {
     if (auth?.role !== "participant") navigate("login");
@@ -569,6 +587,43 @@ function download(name, text, type) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 app.addEventListener("submit", async (e) => {
+  if (e.target.id === "recover-form") {
+    e.preventDefault();
+    const form = e.target;
+    const body = Object.fromEntries(new FormData(form));
+    if (body.newPassword !== body.newPasswordConfirm) {
+      showError("Kata sandi baru belum sama");
+      return;
+    }
+    delete body.newPasswordConfirm;
+    const submit = form.querySelector('[type="submit"]');
+    submit.disabled = true;
+    try {
+      const result = await api("/recover-password", body);
+      showRecoveryCode(result.recoveryCode);
+    } catch (err) {
+      showError(err.message);
+      submit.disabled = false;
+    }
+    return;
+  }
+  if (e.target.id === "rotate-recovery-form") {
+    e.preventDefault();
+    const form = e.target;
+    const submit = form.querySelector('[type="submit"]');
+    submit.disabled = true;
+    try {
+      const result = await api(
+        "/recovery-code",
+        Object.fromEntries(new FormData(form)),
+      );
+      showRecoveryCode(result.recoveryCode);
+    } catch (err) {
+      showError(err.message);
+      submit.disabled = false;
+    }
+    return;
+  }
   if (e.target.matches(".review-form")) {
     e.preventDefault();
     const form = e.target,
@@ -638,8 +693,10 @@ app.addEventListener("submit", async (e) => {
           : "/login",
       b,
     );
-    await activate(data);
+    const { recoveryCode, ...sessionData } = data;
+    await activate(sessionData);
     if (data.role === "teacher") navigate("teacher");
+    else if (kind === "register") showRecoveryCode(recoveryCode);
     else navigate("map");
   } catch (err) {
     showError(err.message);
@@ -652,6 +709,24 @@ app.addEventListener("click", async (e) => {
   audio.unlock();
   audio.play("click");
   try {
+    if (b.dataset.togglePassword) {
+      const input = document.getElementById(b.dataset.togglePassword);
+      if (!input) return;
+      const visible = input.type === "password";
+      input.type = visible ? "text" : "password";
+      b.textContent = visible ? "Sembunyikan" : "Tampilkan";
+      b.setAttribute(
+        "aria-label",
+        `${visible ? "Sembunyikan" : "Tampilkan"} ${(input.labels?.[0]?.textContent?.toLowerCase() || "sandi").replace("kata ", "")}`,
+      );
+      b.setAttribute("aria-pressed", String(visible));
+      return;
+    }
+    if (b.id === "copy-recovery-code") {
+      await navigator.clipboard.writeText(recoveryCodeToShow);
+      b.textContent = "Tersalin";
+      return;
+    }
     if (b.dataset.nav) {
       navigate(b.dataset.nav);
       return;
@@ -753,8 +828,16 @@ app.addEventListener("click", async (e) => {
         world.skip();
         break;
       case "refresh-progress":
-        if (route === "mission" && current()?.status === "pending_review" && navigator.onLine) {
-          try { await api(`/sessions/${current().id}/grade`, {}); } catch (error) { showError(error.message); }
+        if (
+          route === "mission" &&
+          current()?.status === "pending_review" &&
+          navigator.onLine
+        ) {
+          try {
+            await api(`/sessions/${current().id}/grade`, {});
+          } catch (error) {
+            showError(error.message);
+          }
         }
         await sync();
         if (route === "mission") renderMission();
