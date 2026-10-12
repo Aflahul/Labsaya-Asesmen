@@ -176,11 +176,14 @@ export async function teacherRoutes(app) {
         Kelas: p.class_name,
         Absen: p.attendance,
         "Misi inti": p.summary.completed,
-        "Nilai inti": p.summary.score ?? "Belum lengkap",
+        "Kebijakan nilai": p.summary.scoringPolicy,
+        "Nilai kompetensi akhir": p.summary.score ?? "Belum lengkap",
+        "Skor permainan": p.summary.gameScore ?? "Belum lengkap",
         Ketepatan: p.summary.accuracy ?? "",
         ...Object.fromEntries(
           CORE_MISSIONS.flatMap((m, index) => [
             [`Nilai misi: ${m.title}`, p.missionRows[index]?.Nilai ?? ""],
+            [`Skor game: ${m.title}`, p.missionRows[index]?.SkorGame ?? ""],
             [`Ketepatan: ${m.title}`, p.missionRows[index]?.K ?? ""],
           ]),
         ),

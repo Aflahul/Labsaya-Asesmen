@@ -7,7 +7,7 @@ KKTP final menetapkan status TP dari seluruh indikator esensial (skor 0–4), bu
 ## Keputusan yang sudah berlaku
 
 - Lima pulau, tiga misi inti per pulau; nilai pulau adalah rerata tiga misi dan nilai akhir rerata lima pulau. Bos pengayaan terpisah dan terbuka bila kelima belas misi sudah dinilai dengan nilai akhir sebelum pembulatan ≥90.
-- Sesi terbaik per misi dipakai; setiap pengulangan mengurangi satu poin pada nilai misi. Rekap guru menampilkan sesi, komponen K/H/P/E/W, waktu, petunjuk, kesalahan, percobaan, dan potongan pengulangan.
+- Nilai kompetensi misi memakai ketepatan jawaban terbaik atau rubrik guru terbaik, tanpa potongan proses. Nilai pulau adalah rata-rata tiga misi; nilai akhir adalah rata-rata lima pulau. Portal bos memakai nilai kompetensi sebelum pembulatan. Skor permainan tetap terpisah dan memakai sesi dengan skor permainan tertinggi, dikurangi satu poin per pengulangan. Rekap guru menampilkan kedua nilai beserta sumber sesinya.
 - Akun murid dibuat guru dengan kata sandi acak. Rapor/rekap guru memakai nama lengkap, leaderboard publik hanya nama samaran.
 
 ## Temuan dan tindakan per misi
@@ -32,11 +32,11 @@ Kolom “bukti” merujuk tindakan yang benar-benar dinilai sekarang. Kaitan den
 | Perbaiki Daftar | C4 | Diagnosis `pop(1)`, keluaran kode pada dua daftar. | Dua uji memiliki struktur identik. Tambah kasus yang membedakan perbaikan umum dari jawaban khusus. |
 | Pilih Solusi Terbaik | C5 | Pilihan A/B, tiga bukti uji, alasan tertulis; rubrik guru. | Satu-satunya C5; moderator perlu contoh jangkar nilai dan uji konsistensi antarpenilai. |
 
-## Kebijakan skor yang perlu diputuskan sebelum mengubah nilai akhir
+## Kebijakan skor sumatif yang diputuskan
 
-Formula produksi saat ini: K 60%, petunjuk 10%, percobaan 10%, kesalahan 10%, waktu 10%; lalu potongan 1 poin per pengulangan pada misi. Audit menemukan bahwa 40% bergantung pada perilaku bermain dan satu tindakan keliru dapat memotong dua komponen. Bukti kompetensi (K) serta statistik proses harus disajikan terpisah untuk analisis guru. **Jangan diam-diam mengganti arti “nilai akhir” untuk hasil yang sudah tersimpan.** Jika rumus nilai sumatif diubah, beri versi kebijakan, nilai ulang secara eksplisit dari bukti yang tersedia, dan tunjukkan formula/versi pada rapor serta ekspor.
+Kebijakan `competency-v1`: nilai sumatif game memakai K (ketepatan jawaban atau rubrik guru) terbaik per misi. Rata-rata 15 misi inti menentukan nilai akhir dan syarat bos. Formula lama K 60%, petunjuk 10%, percobaan 10%, kesalahan 10%, waktu 10%, lalu potongan 1 poin per pengulangan, tetap dihitung sebagai **skor permainan**, bukan nilai sumatif. Rapor dan ekspor menampilkan keduanya. Sesi historis tidak diubah; nilai kompetensi dihitung ulang dari komponen K yang tersimpan. Jika bukti K tidak tersedia pada format lama, sistem memakai ketepatan pertama atau skor sesi sebagai fallback historis. Statistik proses membantu guru memeriksa bukti, bukan mengurangi nilai kompetensi. Nilai game ini tetap tidak otomatis menetapkan status TP menurut KKTP.
 
-## Kandidat komposisi kognitif, jika maksudnya menambah C4 dan C5
+## Rencana komposisi kognitif C4 dan C5
 
 Pertahankan 15 misi dan bobot antarmisi setara. Kandidat: **7 C3, 6 C4, 2 C5** (sekarang 10/4/1). Naikkan *Jalankan Gerbang* dan *Pulihkan Pengolah Nilai* ke C4 setelah tugasnya menghasilkan diagnosis, perbaikan, dan uji yang nyata. Ubah *Atur Pengiriman* menjadi C5 hanya bila guru siap menilai evaluasi dua kebijakan tarif memakai rubrik. Sebelum penerapan, cocokkan dengan TP/KKTP sekolah, cek tingkat kesulitan, dan perkirakan beban penilaian tertulis guru. Mengganti label Bloom saja tanpa mengubah bukti tidak menaikkan level kognitif.
 

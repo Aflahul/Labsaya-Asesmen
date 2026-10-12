@@ -67,7 +67,7 @@ test("mission completion exposes all five score components", async ({
   await page.locator("#nara-close").click();
   await page.locator("#submit").click();
   await expect(page.locator(".score-breakdown")).toContainText(
-    "Nilai akhir: 97.5",
+    "Skor permainan sesi: 97.5",
   );
   for (const text of [
     "Ketepatan",

@@ -19,7 +19,8 @@ test("server rejects below90 and pending review, allows exactly90, ignores boss 
   const sessions = CORE_MISSIONS.map((m) => ({
     ...newSession(m, p),
     status: "complete",
-    score: 89.99,
+    score: 100,
+    components: { K: 89.99 },
     completedAt: new Date().toISOString(),
   }));
   for (const s of sessions)
@@ -36,7 +37,7 @@ test("server rejects below90 and pending review, allows exactly90, ignores boss 
     });
   expect((await createBoss()).statusCode).toBe(403);
   const s = sessions.at(-1);
-  s.score = 100;
+  s.components.K = 100;
   s.status = "pending_review";
   const update = () =>
     app.db.query("UPDATE mission_sessions SET document=$1 WHERE id=$2", [
@@ -46,7 +47,7 @@ test("server rejects below90 and pending review, allows exactly90, ignores boss 
   await update();
   expect((await createBoss()).statusCode).toBe(403);
   s.status = "complete";
-  s.score = 90.14;
+  s.components.K = 90.14;
   await update();
   const boss = await createBoss();
   expect(boss.statusCode).toBe(201);

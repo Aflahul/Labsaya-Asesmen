@@ -128,7 +128,7 @@ test("15 core missions, real teacher review, optional boss and unchanged main gr
   await expect(question.locator(".report-answer")).not.toBeVisible();
   await question.locator("summary").click();
   await expect(question.locator(".report-answer")).toBeVisible();
-  await expect(question).toContainText("nilai misi 98");
+  await expect(question).toContainText("skor permainan misi 98");
   await expect(page.locator(".footer-credit a")).toHaveAttribute(
     "href",
     "https://aflahul.vercel.app/",

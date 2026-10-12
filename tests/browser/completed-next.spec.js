@@ -36,10 +36,13 @@ test("completed missions reopen with Next and only Ulang creates a new attempt",
   await page.locator("#submit").click();
   await waitForSaved(page);
   await expect(page.locator(".score-breakdown")).toContainText(
-    "Nilai akhir: 99",
+    "Skor permainan sesi: 100",
   );
   await expect(page.locator(".score-breakdown")).toContainText(
-    "Sesi terbaik 100 − 1 poin (1 kali Ulang)",
+    "Skor permainan terbaik 100 − 1 poin (1 kali Ulang) = 99",
+  );
+  await expect(page.locator(".score-breakdown")).toContainText(
+    "Nilai kompetensi misi: 100",
   );
   await page.reload();
   await page.getByRole("button", { name: "Lanjut", exact: true }).click();
@@ -48,7 +51,7 @@ test("completed missions reopen with Next and only Ulang creates a new attempt",
   await page.locator(`[data-mission="${MISSIONS[0].id}"]`).click();
   await enterMission(page, MISSIONS[0]);
   await expect(page.locator(".score-breakdown")).toContainText(
-    "Nilai akhir: 99",
+    "Skor permainan sesi: 100",
   );
   expect(await count()).toBe(2);
   await page.locator("#next").click();

@@ -30,6 +30,7 @@ test("boss requires all assessed scores and raw mean at least 90", () => {
   expect(unlocked(boss, summarizeProgress({ sessions }))).toBe(false);
   sessions.forEach((s) => {
     s.score = 90;
+    s.components.K = 90;
   });
   expect(unlocked(boss, summarizeProgress({ sessions }))).toBe(true);
   sessions[14].status = "pending_review";

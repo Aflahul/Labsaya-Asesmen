@@ -21,9 +21,9 @@ export const buildReport = (progress) => {
         .map(upgradeScoring)
         .filter((s) => s.missionId === m.id);
       const s =
-        ss
-          .filter((s) => s.status === "complete")
-          .sort((a, b) => b.score - a.score)[0] || ss.at(-1);
+        ss.find((s) => s.id === summary.bestByMission[m.id]?.id) || ss.at(-1);
+      const gameSession =
+        ss.find((s) => s.id === summary.gameBestByMission[m.id]?.id) || s;
       return {
         Misi: m.title,
         Versi: m.missionVersion,
@@ -42,20 +42,23 @@ export const buildReport = (progress) => {
             : s?.status === "pending_review"
               ? "Menunggu penilaian"
               : "Belum selesai",
-        Nilai: summary.missionGrades[m.id]?.score ?? s?.score ?? "",
-        NilaiSesiTerbaik: s?.score ?? "",
-        Pengulangan: summary.missionGrades[m.id]?.replayCount ?? 0,
-        PotonganUlang: summary.missionGrades[m.id]?.replayPenalty ?? 0,
-        K: s?.components?.K ?? "",
-        W: s?.components?.W ?? "",
-        P: s?.components?.P ?? "",
-        H: s?.components?.H ?? "",
-        E: s?.components?.E ?? "",
-        Detik: Math.round((s?.activeMs || 0) / 1000),
-        Percobaan: s?.attempts || 0,
-        Kesalahan: s?.errors || 0,
-        Ulang: s?.resets || 0,
-        Petunjuk: s?.hints || 0,
+        Nilai: summary.missionGrades[m.id]?.score ?? "",
+        SkorGame: summary.gameMissionGrades[m.id]?.score ?? "",
+        NilaiSesiTerbaik: gameSession?.score ?? "",
+        Pengulangan: summary.gameMissionGrades[m.id]?.replayCount ?? 0,
+        PotonganUlang: summary.gameMissionGrades[m.id]?.replayPenalty ?? 0,
+        SesiKompetensi: s?.id ?? "",
+        SesiGame: gameSession?.id ?? "",
+        K: summary.missionGrades[m.id]?.score ?? "",
+        W: gameSession?.components?.W ?? "",
+        P: gameSession?.components?.P ?? "",
+        H: gameSession?.components?.H ?? "",
+        E: gameSession?.components?.E ?? "",
+        Detik: Math.round((gameSession?.activeMs || 0) / 1000),
+        Percobaan: gameSession?.attempts || 0,
+        Kesalahan: gameSession?.errors || 0,
+        Ulang: gameSession?.resets || 0,
+        Petunjuk: gameSession?.hints || 0,
       };
     }),
   };
