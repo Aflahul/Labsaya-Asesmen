@@ -1,4 +1,5 @@
 import { MISSION_EVIDENCE } from "./mission-evidence.js";
+import { MISSION_ALIGNMENT } from "./mission-alignment.js";
 import { upgradeScoring } from "./assessment.js";
 import { MISSIONS, getMission } from "./missions.js";
 import { summarizeProgress } from "./progress.js";
@@ -31,6 +32,9 @@ export const buildReport = (progress) => {
         Kompetensi: m.competency,
         Indikator: m.indicators.join(" "),
         "Bukti yang diperiksa": MISSION_EVIDENCE[m.id] || "",
+        "TP terkait": MISSION_ALIGNMENT[m.id]?.tp || "",
+        "Indikator terkait": MISSION_ALIGNMENT[m.id]?.indicators || "",
+        "Batas bukti": MISSION_ALIGNMENT[m.id]?.limit || "",
         Jenis: m.enrichment ? "Pengayaan" : "Inti",
         Status:
           s?.status === "complete"

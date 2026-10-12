@@ -445,9 +445,13 @@ async function teacher() {
   );
   try {
     teacherRows = await api("/teacher/participants");
+    if (route !== "teacher") return;
     renderTeacher();
   } catch (e) {
-    showError(e.message);
+    if (route !== "teacher") return;
+    shell(
+      `<section class="panel"><div class="eyebrow">Ruang pendidik</div><h2 style="margin-top:12px">Hasil asesmen belum dapat dimuat</h2><p class="error" role="alert">${esc(e.message)}</p><div class="actions"><button data-nav="teacher">Coba lagi</button></div></section>`,
+    );
   }
 }
 function filteredTeachers() {
@@ -493,11 +497,15 @@ async function leaderboard() {
   );
   try {
     const rows = await api("/leaderboard");
+    if (route !== "leaderboard") return;
     shell(
       `<section class="panel"><div class="eyebrow">Penjelajah Menara Awan</div><h2 style="margin-top:12px">Peringkat penjelajah</h2><p>Hanya nama samaran yang ditampilkan di sini; nama lengkap digunakan pada rapor asesmen yang dapat dilihat murid terkait dan guru. Peringkat muncul setelah 15 misi inti tuntas. Nilai sama memperoleh peringkat sama; pengayaan tidak memengaruhi peringkat.</p>${table(rows.map((r) => ({ Peringkat: r.rank, "Nama samaran": r.alias, "Nilai inti": r.score })))}${rows.length ? "" : '<div class="empty">Belum ada ekspedisi inti yang tuntas. Jadilah penjelajah pertama!</div>'}<div class="actions"><button data-nav="home">Kembali</button></div></section>`,
     );
   } catch (e) {
-    showError(e.message);
+    if (route !== "leaderboard") return;
+    shell(
+      `<section class="panel"><div class="eyebrow">Penjelajah Menara Awan</div><h2 style="margin-top:12px">Peringkat penjelajah</h2><p class="error" role="alert">${esc(e.message)}</p><div class="actions"><button data-nav="leaderboard">Coba lagi</button><button data-nav="home">Kembali</button></div></section>`,
+    );
   }
 }
 function settings() {

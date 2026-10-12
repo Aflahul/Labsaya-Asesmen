@@ -3,6 +3,15 @@ import { test, expect } from "@playwright/test";
 test("teacher creates a student and resets access without exposing stored hashes", async ({
   page,
 }) => {
+  let failOnce = true;
+  await page.route("**/api/teacher/participants", async (route) => {
+    if (failOnce) {
+      failOnce = false;
+      await route.abort();
+    } else {
+      await route.continue();
+    }
+  });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
   await expect(
@@ -12,6 +21,11 @@ test("teacher creates a student and resets access without exposing stored hashes
   await page.getByLabel("Username guru").fill("guru");
   await page.getByLabel("Kata sandi").fill("test-password-only");
   await page.locator("#auth-form button[type=submit]").click();
+  await expect(page.getByRole("alert")).toContainText("Failed to fetch");
+  await page.getByRole("button", { name: "Coba lagi" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Perkembangan belajar murid" }),
+  ).toBeVisible();
   await expect(page.locator("#student-create-form")).not.toBeVisible();
   await page.getByText("Buat akun murid").click();
   const form = page.locator("#student-create-form");

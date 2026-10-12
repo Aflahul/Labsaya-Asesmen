@@ -35,7 +35,7 @@ export const ISLANDS = [
     name: "Menara Program",
     slug: "menara-program",
     topic: "Python · evaluasi solusi",
-    meeting: "Pertemuan 9",
+    meeting: "Pertemuan 10",
   },
 ];
 const field = (key, label, options, answer, weight = 1) => ({

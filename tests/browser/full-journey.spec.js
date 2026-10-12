@@ -147,6 +147,9 @@ test("15 core missions, real teacher review, optional boss and unchanged main gr
   });
   await help.locator(":scope > summary").click();
   await expect(question.locator(".report-answer")).not.toBeVisible();
+  await page.getByRole("button", { name: "Peringkat" }).click();
+  await expect(page.getByRole("row").filter({ hasText: alias })).toBeVisible();
+  await expect(page.locator("main")).not.toContainText("Siswa Lengkap");
   expect(errors).toEqual([]);
   await context.close();
 });
