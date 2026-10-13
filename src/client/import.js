@@ -29,6 +29,7 @@ export function validateImport(raw, participantId) {
     ids.add(input.id);
     let s = newSession(m, participantId, {
       baselineMultiplier: input.scoringConfig.baselineMultiplier,
+      ...(input.assessmentPolicy === "indicator-v1" ? {assessmentPolicy: "indicator-v1", masteryCheck: Boolean(input.masteryCheck)} : {}),
     });
     s.id = input.id;
     s.source = input.source === "offline" ? "offline" : "online";

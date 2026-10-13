@@ -141,20 +141,24 @@ export function reduceV2(old, e, m) {
   s.activeMs = Math.max(s.activeMs, e.activeMs);
   s.feedback = "";
   if (e.type === "action") {
-    const r = actionV2(m, s.state, e.payload);
+    const r = s.masteryCheck && e.payload.op === "answer" && e.payload.key === "response" && typeof e.payload.value === "string" && e.payload.value.length <= 5000
+      ? {state: {...s.state, answers: {response: e.payload.value}}, errors: []}
+      : actionV2(m, s.state, e.payload);
+    if (s.masteryCheck && !r.errors.length) s.masteryCheck.answer = e.payload.value;
     s.state = r.state;
     if (r.errors.length) {
       s.errors++;
       s.feedback = r.errors.join(" ");
     }
   }
-  if (e.type === "hint") s.hints++;
+  if (e.type === "hint") {s.hints++; if (s.masteryCheck) s.masteryCheck.hints++;}
   if (e.type === "reset") {
     s.resets++;
     s.state = initialV2(m);
+    if (s.masteryCheck) { s.state.answers = {}; s.masteryCheck.answer = ""; }
   }
   if (["run", "submit"].includes(e.type)) {
-    const r = evaluateV2(m, s.state, s.assessmentRevision);
+    const r = s.masteryCheck ? {ready: Boolean(s.masteryCheck.answer.trim()), pending: true, accuracy: null, feedback: s.masteryCheck.answer.trim() ? "Jawaban pemeriksaan mandiri tersimpan untuk dinilai." : "Tuliskan satu langkah yang kamu pahami dahulu."} : evaluateV2(m, s.state, s.assessmentRevision);
     const newAttempt = e.type === "run" || !s.state.tested;
     if (newAttempt) {
       s.attempts++;

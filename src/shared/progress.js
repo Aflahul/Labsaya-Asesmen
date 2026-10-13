@@ -1,3 +1,4 @@
+import { summarizeIndicators } from "./indicator-assessment.js";
 import { upgradeScoring } from "./assessment.js";
 import { MISSIONS, CORE_MISSIONS, ISLANDS } from "./missions.js";
 const valid = new Set(MISSIONS.map((m) => m.id));
@@ -102,13 +103,25 @@ export function summarizeProgress({ sessions = [] }) {
   const totals = { activeMs: 0, attempts: 0, errors: 0, resets: 0, hints: 0 };
   for (const s of sessions.filter((s) => valid.has(s.missionId)))
     for (const k in totals) totals[k] += s[k] || 0;
+  const activityCompletedByMission = {};
+  for (const s of sessions) if(valid.has(s.missionId) && (s.activityCompletedAt || s.status === "complete")) activityCompletedByMission[s.missionId] = s;
+  const hasIndicators = sessions.some(s=>s.assessmentPolicy === "indicator-v1");
+  const activityDone = CORE_MISSIONS.filter(m=>activityCompletedByMission[m.id]);
+  const achievements = Object.keys(activityCompletedByMission);
+  if (hasIndicators) for (const id of achievements) gameMissionGrades[id] = {bestScore: 100, score: 100, replayCount: Math.max(0,(starts[id]?.size||1)-1), replayPenalty: 0};
   return {
+    xp: activityDone.length * 100,
+    enrichmentXp: achievements.filter(id=>MISSIONS.find(m=>m.id===id)?.enrichment).length*100,
+    achievements,
+    activityCompletedByMission,
+    indicatorResults: summarizeIndicators(sessions),
+    hasIndicators,
     missionGrades,
     gameMissionGrades,
     latestByMission,
     bestByMission,
     gameBestByMission,
-    completed: done.length,
+    completed: activityDone.length,
     coreCount: CORE_MISSIONS.length,
     rawScore,
     score: rawScore === null ? null : Math.round(rawScore * 100) / 100,
@@ -119,7 +132,7 @@ export function summarizeProgress({ sessions = [] }) {
     accuracy: done.length
       ? Math.round(mean(done.map((m) => missionGrades[m.id])) * 100) / 100
       : null,
-    bossUnlocked: rawScore !== null && rawScore >= 90,
+    bossUnlocked: hasIndicators ? activityDone.length === CORE_MISSIONS.length : rawScore !== null && rawScore >= 90,
     pendingReview: sessions.filter(
       (s) => valid.has(s.missionId) && s.status === "pending_review",
     ).length,
@@ -136,6 +149,6 @@ export function unlocked(m, summary) {
   if (m.missionVersion !== 2) return false;
   if (m.enrichment) return summary.bossUnlocked === true;
   return CORE_MISSIONS.filter((x) => x.island < m.island).every(
-    (x) => summary.bestByMission[x.id],
+    (x) => summary.activityCompletedByMission?.[x.id] || summary.bestByMission[x.id],
   );
 }

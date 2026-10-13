@@ -1,3 +1,4 @@
+import { missionMasteryCheck } from "./mastery-checks.js";
 import { getMission } from "./missions.js";
 import { scoreMission } from "./mission-scoring.js";
 import { initialV2, reduceV2 } from "./v2-evaluator.js";
@@ -35,6 +36,7 @@ export function newSession(
     assessmentRevision: m.missionVersion === 2 ? 2 : 1,
     ...(config.assessmentPolicy === "indicator-v1" && m.missionVersion === 2 ? { assessmentPolicy: "indicator-v1" } : {}),
     countedSession: m.missionVersion === 2,
+    ...(config.assessmentPolicy === "indicator-v1" && config.masteryCheck ? {masteryCheck: {...missionMasteryCheck(m.id), answer: "", hints: 0}} : {}),
     scoringConfig: {
       ...config,
       elements: m.elements,

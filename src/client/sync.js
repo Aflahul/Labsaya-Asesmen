@@ -66,6 +66,7 @@ export async function syncProgress({ progress, api, onStatus = () => {} }) {
         id: s.id,
         missionId: s.missionId,
         source: s.source || "offline",
+        masteryCheck: Boolean(s.masteryCheck),
       });
       s.serverCreated = true;
       s.scoringConfig = created.scoringConfig;
