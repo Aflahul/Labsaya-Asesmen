@@ -27,3 +27,12 @@ test('transfer answer and assistance are replayable without trusting imported AI
  s=reduceSession(s,event('hint'),m);s=reduceSession(s,event('submit'),m);
  expect(s.masteryCheck.answer).toBe('String Float 4 False');expect(s.masteryCheck.hints).toBe(1);expect(s.indicatorAssessment.status).toBe('pending');
 });
+test('a fresh session after prior exposure is still practice, not proof of independence',async()=>{
+ const {buildAssessmentEvidence}=await import('../../src/shared/indicator-assessment.js');
+ const s=newSession(m,'p',{assessmentPolicy:'indicator-v1',previousExposure:true});s.state.answers=m.rules.answers;
+ expect(buildAssessmentEvidence(m,s).mode).toBe('practice');
+});
+test('new ability reports do not derive numeric competency totals from the old accuracy formula',()=>{
+ const s=sent('2026-01-01');s.score=100;s.components={K:100};
+ const summary=summarizeProgress({sessions:[s]});expect(summary.score).toBeNull();expect(summary.scoringPolicy).toBe('indicator-v1');expect(summary.bestByMission[m.id]).toBeUndefined();
+});

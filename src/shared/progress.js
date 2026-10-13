@@ -12,6 +12,7 @@ export function summarizeProgress({ sessions = [] }) {
   for (const s of sessions) {
     const competency = competencyOf(s);
     if (
+      s.assessmentPolicy === "indicator-v1" ||
       !valid.has(s.missionId) ||
       s.status !== "complete" ||
       !Number.isFinite(s.score) ||
@@ -124,11 +125,12 @@ export function summarizeProgress({ sessions = [] }) {
     completed: activityDone.length,
     coreCount: CORE_MISSIONS.length,
     rawScore,
-    score: rawScore === null ? null : Math.round(rawScore * 100) / 100,
+    archivedScore: rawScore === null ? null : Math.round(rawScore * 100) / 100,
+    score: hasIndicators || rawScore === null ? null : Math.round(rawScore * 100) / 100,
     gameRawScore,
     gameScore:
       gameRawScore === null ? null : Math.round(gameRawScore * 100) / 100,
-    scoringPolicy: "competency-v1",
+    scoringPolicy: hasIndicators ? "indicator-v1" : "competency-v1",
     accuracy: done.length
       ? Math.round(mean(done.map((m) => missionGrades[m.id])) * 100) / 100
       : null,

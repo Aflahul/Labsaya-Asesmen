@@ -2,7 +2,7 @@
 export function updateDraft(session, mission, key, value) {
   if (session.status !== "active") throw Error("Karya sudah dikirim");
   const code = key === "code" && mission.code;
-  const written = mission.written?.some(([name]) => name === key);
+  const written = mission.written?.some(([name]) => name === key) || (session.masteryCheck && key === "response");
   if (
     (!code && !written) ||
     typeof value !== "string" ||

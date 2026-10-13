@@ -368,6 +368,6 @@ export function getIndicatorRubric(missionId) {
   return {version:1, indicators:catalog[missionId].map(([key,label,fields,requiredEvidence,tp,indicator,coverage]) => ({
     id: `${missionId}.${key}`, key, label, fields, requiredEvidence,
     tpLinks:[{tp,indicator,coverage}],
-    descriptors:{1:`Bukti masih bertentangan dengan: ${requiredEvidence}`,2:`Sebagian sesuai, tetapi belum lengkap: ${requiredEvidence}`,3:`Memenuhi pada kasus misi: ${requiredEvidence}`,4:`Memenuhi dan menerapkan pada kasus baru disertai penjelasan yang sesuai: ${requiredEvidence}`}
+    descriptors:{1:`Masih ada kesalahan mendasar dalam ${label.toLowerCase()}.`,2:`Sebagian langkah dalam ${label.toLowerCase()} sudah sesuai; masih ada bagian penting yang perlu diperbaiki.`,3:`${label} dengan benar pada kasus misi, berdasarkan bukti jawaban dan hasil uji.`,4:`${label} pada kasus baru secara mandiri, disertai penjelasan yang sesuai.`}
   }))};
 }

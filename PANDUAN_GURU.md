@@ -54,3 +54,13 @@ Sesi lima pulau yang sudah tersimpan dihitung ulang dari bukti event saat dibaca
 ## Akun guru
 
 Akun produksi dibuat administrator melalui `npm run teacher:create` setelah `DATABASE_URL` dikonfigurasi. Tidak ada akun guru bawaan untuk produksi. Akun `guru` dengan kata sandi `test-password-only` hanya tersedia pada server pengujian `node tests/server.js` dan datanya sementara.
+
+## Kebijakan indikator (sesi baru)
+
+Rapor Kemampuan menampilkan hasil per indikator, bukti jawaban, status penilaian, dan kaitan TP. Nilai lama ada dalam Arsip nilai lama. Indikator pendukung/sebagian tidak menyatakan seluruh TP tuntas. Tingkat 1 perlu latihan, 2 mulai berkembang, 3 memenuhi pada kasus ini, 4 menerapkan pada kasus baru. Belum cukup bukti tidak sama dengan nilai nol.
+
+Di Ruang Guru, pilih kelas untuk melihat jumlah murid pada kelompok eksklusif: memenuhi mandiri, perlu penguatan, berhasil dengan bantuan, belum cukup bukti, dan menunggu penilaian/tinjauan. Murid yang belum mengerjakan tetap masuk denominator kelas. Pencarian nama/opsi inti selesai menyaring tabel akun; rekap indikator memakai seluruh kelas yang dipilih. Klik kelompok lalu Buka untuk meninjau jawaban, bantuan dan ketiga penilai. Ambang default 3/4 dapat diubah melalui Simpan Ambang; perubahan tersimpan dengan versi dan tidak mengubah bukti asli.
+
+Koreksi indikator melalui form Tinjauan indikator. Pilih tingkat atau Belum cukup bukti, tulis alasan dan feedback maksimal 400 karakter. Centang verifikasi mandiri hanya setelah memeriksa kemampuan murid secara langsung. Keputusan guru menjadi hasil berlaku dan hasil sebelumnya tetap tersimpan. Ekspor Indikator memuat jumlah dan daftar murid tiap kelompok.
+
+Setiap misi selesai memberi 100 XP sekali. Ulang, petunjuk, kesalahan dan waktu tidak memotong XP. Bos dibuka setelah 15 aktivitas inti selesai; XP pengayaan terpisah. XP bukan nilai kemampuan. Jawaban setelah Coba/petunjuk atau mengulang kasus yang telah dilihat menjadi latihan; Uji Mandiri memakai kasus baru. Petunjuk selama Uji Mandiri mengubah hasilnya menjadi latihan berbantuan. Bukti mandiri terbaru yang valid dipakai, bukan rata-rata semua percobaan; riwayat tetap dapat diperiksa. Awasi pemeriksaan mandiri di kelas karena aplikasi tidak dapat membuktikan tidak adanya bantuan di luar aplikasi.

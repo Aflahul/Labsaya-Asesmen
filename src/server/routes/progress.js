@@ -58,7 +58,7 @@ export async function progressRoutes(app, aiGrader, indicatorGrader) {
     const config = (
       await app.db.query("SELECT value FROM settings WHERE name='scoring'")
     ).rows[0]?.value || { baselineMultiplier: 1 };
-    const s = newSession(m, a.user_id, { ...config, assessmentPolicy: "indicator-v1", masteryCheck: b.masteryCheck === true });
+    const s = newSession(m, a.user_id, { ...config, assessmentPolicy: "indicator-v1", masteryCheck: b.masteryCheck === true, previousExposure: progress.sessions.some(s=>s.missionId===m.id && (s.activityCompletedAt || s.status === "complete" || s.hints || s.events?.some(e=>e.type === "run"))) });
     s.id = b.id;
     s.source = b.source === "offline" ? "offline" : "online";
     await app.db.query(

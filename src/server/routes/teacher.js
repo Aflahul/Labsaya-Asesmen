@@ -1,10 +1,12 @@
+import { getIndicatorRubric } from "../../shared/indicator-rubrics.js";
+import { buildAssessmentEvidence,limitNaraFeedback } from "../../shared/indicator-assessment.js";
 import { randomUUID, randomBytes } from "node:crypto";
 import { normalize, passwordHash, requiredText } from "../auth.js";
 import { upgradeScoring } from "../../shared/assessment.js";
 import { CORE_MISSIONS, getMission } from "../../shared/missions.js";
 import { gradeReview } from "../../shared/v2-evaluator.js";
 import { summarizeProgress } from "../../shared/progress.js";
-import { buildReport, toCsv } from "../../shared/reports.js";
+import { buildReport, toCsv, buildIndicatorClassReport, indicatorExportRows } from "../../shared/reports.js";
 import { loadProgress } from "./progress.js";
 import { fail } from "../auth.js";
 const freshPassword = () => randomBytes(18).toString("base64url");
@@ -53,6 +55,32 @@ async function roster(db, query = {}, includeMissionDetails = false) {
     );
 }
 export async function teacherRoutes(app) {
+  app.get("/api/teacher/indicators", async req=>{
+    app.requireRole(req,"teacher");
+    const cfg=(await app.db.query("SELECT value FROM settings WHERE name='indicator-threshold'")).rows[0]?.value||{threshold:3,version:1};
+    const report=buildIndicatorClassReport(await roster(app.db),{className:req.query.class||'',threshold:cfg.threshold,thresholdVersion:cfg.version});
+    return {data:report};
+  });
+  app.get("/api/teacher/indicators/export",async(req,reply)=>{
+    app.requireRole(req,"teacher");
+    const cfg=(await app.db.query("SELECT value FROM settings WHERE name='indicator-threshold'")).rows[0]?.value||{threshold:3,version:1};
+    const report=buildIndicatorClassReport(await roster(app.db),{className:req.query.class||'',threshold:cfg.threshold,thresholdVersion:cfg.version});
+    reply.type('text/csv;charset=utf-8').header('Content-Disposition','attachment; filename="indikator-kelas.csv"');
+    return toCsv(indicatorExportRows(report));
+  });
+  app.put("/api/teacher/indicator-config",async req=>{
+    app.requireRole(req,"teacher");
+    const threshold=req.body?.threshold;
+    if(!Number.isInteger(threshold)||threshold<1||threshold>4)fail(400,'Ambang tingkat harus 1–4');
+    const client=await app.db.connect();
+    try{
+      await client.query('BEGIN');
+      const old=(await client.query("SELECT value FROM settings WHERE name='indicator-threshold' FOR UPDATE")).rows[0]?.value||{threshold:3,version:1};
+      const value={threshold,version:old.version+1,at:new Date().toISOString()};
+      await client.query("INSERT INTO settings(name,value) VALUES('indicator-threshold',$1) ON CONFLICT(name) DO UPDATE SET value=EXCLUDED.value",[JSON.stringify(value)]);
+      await client.query('COMMIT');return {data:value};
+    }catch(e){await client.query('ROLLBACK');throw e;}finally{client.release();}
+  });
   app.post("/api/teacher/participants", async (req, reply) => {
     app.requireRole(req, "teacher");
     const b = req.body || {};
@@ -123,6 +151,20 @@ export async function teacherRoutes(app) {
       );
       if (!rows[0]) fail(404, "Sesi tidak ditemukan");
       const old = rows[0].document;
+      if(old.assessmentPolicy==='indicator-v1') {
+        if(!old.activityCompletedAt)fail(409,'Jawaban belum dikirim');
+        const rubric=getIndicatorRubric(old.missionId),proposals=req.body?.indicators;
+        if(!Array.isArray(proposals)||proposals.length!==rubric.indicators.length)fail(400,'Rubrik indikator belum lengkap');
+        const indicators=rubric.indicators.map(i=>{
+          const rows=proposals.filter(p=>p.id===i.id),p=rows[0];
+          if(rows.length!==1|| !(p.level===null||Number.isInteger(p.level)&&p.level>=1&&p.level<=4)||typeof p.reason!=='string'||!p.reason.trim()||p.reason.length>1000)fail(400,'Nilai atau alasan indikator tidak valid');
+          const keys=old.masteryCheck?['response']:i.fields;
+          return {id:i.id,level:p.level,evidenceStatus:p.level===null?'insufficient':'present',reason:p.reason.trim(),references:keys.filter(k=>old.state.answers[k]).map(key=>({key,quote:Array.from(old.state.answers[key]).slice(0,300).join('')})),status:'teacher'};
+        });
+        if(typeof req.body.comment!=='string'||!req.body.comment.trim()||req.body.comment.length>3000)fail(400,'Tuliskan umpan balik guru');
+        const graded={...old,indicatorHistory:[...(old.indicatorHistory||[]),old.indicatorAssessment],indicatorAssessment:{...old.indicatorAssessment,status:'teacher',source:'teacher',teacherId:teacher.user_id,at:new Date().toISOString(),leaseUntil:0,indicators,feedback:limitNaraFeedback(req.body.comment),evidenceMode:req.body.independent===true?'teacher_observation':buildAssessmentEvidence(getMission(old.missionId),old).mode},feedback:limitNaraFeedback(req.body.comment)};
+        await client.query('UPDATE mission_sessions SET document=$1,updated_at=$2 WHERE id=$3',[JSON.stringify(graded),new Date(),old.id]);await client.query('COMMIT');return {data:graded};
+      }
       if (
         old.status !== "pending_review" &&
         !(old.status === "complete" && old.review?.source === "ai")
@@ -181,7 +223,8 @@ export async function teacherRoutes(app) {
         "Misi inti": p.summary.completed,
         "Kebijakan nilai": p.summary.scoringPolicy,
         "Nilai kompetensi akhir": p.summary.score ?? "Belum lengkap",
-        "Skor permainan": p.summary.gameScore ?? "Belum lengkap",
+        "XP inti": p.summary.xp,
+        "Skor permainan arsip": p.summary.gameScore ?? "",
         Ketepatan: p.summary.accuracy ?? "",
         ...Object.fromEntries(
           CORE_MISSIONS.flatMap((m, index) => [
@@ -223,8 +266,8 @@ export async function teacherRoutes(app) {
   app.get("/api/leaderboard", async () => {
     const rows = await roster(app.db);
     const entries = rows
-      .filter((p) => p.summary.score !== null)
-      .map((p) => ({ alias: p.alias, score: p.summary.score }))
+      .filter((p) => p.summary.completed === CORE_MISSIONS.length)
+      .map((p) => ({ alias: p.alias, score: p.summary.xp }))
       .sort((a, b) => b.score - a.score || a.alias.localeCompare(b.alias));
     let rank = 0,
       prev;

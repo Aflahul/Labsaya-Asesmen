@@ -1,3 +1,5 @@
+import { summarizeIndicators } from "./indicator-assessment.js";
+import { getIndicatorRubric } from "./indicator-rubrics.js";
 import { MISSION_EVIDENCE } from "./mission-evidence.js";
 import { MISSION_ALIGNMENT } from "./mission-alignment.js";
 import { upgradeScoring } from "./assessment.js";
@@ -7,6 +9,7 @@ export const buildReport = (progress) => {
   const summary = summarizeProgress(progress);
   return {
     ...summary,
+    indicatorRows: summarizeIndicators(progress.sessions || []),
     rows: [
       ...MISSIONS,
       ...Array.from(
@@ -86,3 +89,23 @@ export const exportJson = (progress) =>
     null,
     2,
   );
+
+export const INDICATOR_GROUPS = {independent:'Memenuhi mandiri',needs_support:'Perlu penguatan',assisted:'Berhasil dengan bantuan',insufficient:'Belum cukup bukti',pending:'Menunggu penilaian/tinjauan'};
+export function buildIndicatorClassReport(participants,{className='',threshold=3,thresholdVersion=1}={}) {
+ const roster=participants.filter(p=>!className||p.class_name===className);
+ const results=roster.map(p=>({participant:p,results:p.sessions?summarizeIndicators(p.sessions,threshold):(p.summary?.indicatorResults||[])}));
+ const rows=MISSIONS.flatMap(m=>getIndicatorRubric(m.id).indicators.map(i=>{
+  const groups=Object.fromEntries(Object.keys(INDICATOR_GROUPS).map(k=>[k,[]]));
+  for(const {participant:p,results:r} of results){
+   const result=r.find(x=>x.id===i.id);
+   let group=result?.group||'insufficient';
+   if(result?.level!==null&&result?.level!==undefined&&['independent','assisted','needs_support'].includes(group))group=result.level<threshold?'needs_support':result.evidenceMode==='practice'?'assisted':'independent';
+   groups[group].push({id:p.id,name:p.real_name||p.realName||p.alias||p.id,className:p.class_name,level:result?.level??null,sessionId:result?.sessionId});
+  }
+  return {...i,missionId:m.id,missionTitle:m.title,enrichment:Boolean(m.enrichment),groups};
+ }));
+ return {denominator:roster.length,className,threshold,thresholdVersion,rows};
+}
+export function indicatorExportRows(report) {
+ return report.rows.map(r=>({Misi:r.missionTitle,Indikator:r.id,Kemampuan:r.label,TP:r.tpLinks.map(x=>x.tp).join('; '),'Indikator TP':r.tpLinks.map(x=>x.indicator||'Prasyarat').join('; '),'Cakupan bukti':r.tpLinks.map(x=>x.coverage).join('; '),'Jumlah murid':report.denominator,'Ambang tingkat':report.threshold,'Versi ambang':report.thresholdVersion,...Object.fromEntries(Object.entries(INDICATOR_GROUPS).flatMap(([key,label])=>[[label,r.groups[key].length],[`${label}: murid`,r.groups[key].map(p=>p.name).join('; ')]]))}));
+}

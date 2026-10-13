@@ -34,3 +34,7 @@ Service worker hanya cache aset aplikasi, tidak cache `/api/*`. Versi baru menun
 - `/api` mengembalikan HTML: periksa deployment functions dan rewrites; jangan meneruskan API ke SPA fallback.
 - Progres lokal belum terlihat di halaman guru: peserta harus online dan mendapat status tersinkron. Jangan menganggap cache lokal sudah tersimpan di Neon.
 - Login lewat nama dapat disalahgunakan orang yang mengetahui kedua nama; gunakan untuk asesmen formatif dengan supervisi, bukan ujian berisiko tinggi.
+
+## Rilis kebijakan indikator
+
+Tidak memerlukan migrasi tabel: tambahan rubrik/asesmen disimpan pada dokumen sesi JSON dan ambang pada tabel settings. Semua sesi baru menggunakan indicator-v1; arsip tetap tersimpan. Jalankan npm test, npm run build, TEST_INDICATOR_GRADER=1 npm run test:browser dan TEST_INDICATOR_GRADER=1 npm run test:offline. Provider sintetis tidak memvalidasi API key/kuota produksi; periksa ketiga provider dengan akun sintetis sebelum memakai hasil sebagai asesmen sumatif. Jangan mempromosikan label sepakat jika penilaian masih parsial. Gemini dipanggil setiap submission; periksa kuota dan biaya yang sesuai.

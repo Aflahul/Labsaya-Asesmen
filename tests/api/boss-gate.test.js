@@ -68,7 +68,7 @@ test("server rejects below90 and pending review, allows exactly90, ignores boss 
     await app.inject({ method: "GET", url: "/api/leaderboard" })
   ).json().data;
   expect(after).toEqual(before);
-  expect(after[0].score).toBeCloseTo(90);
+  expect(after[0].score).toBe(1500);
   expect(after[0].alias).toBe("Bos");
   expect(Object.keys(after[0]).sort()).toEqual(["alias", "rank", "score"]);
   await app.close();

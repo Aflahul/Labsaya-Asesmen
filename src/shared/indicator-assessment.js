@@ -14,7 +14,7 @@ export function buildAssessmentEvidence(mission,session) {
  const check=session.masteryCheck;
  const result=evaluateV2(mission,session.state,session.assessmentRevision);
  return {answers:check?{response:check.answer}:session.state.answers,
-   mode:check && !check.hints ? 'independent_check' : !check && !(session.hints || session.events?.some(e=>e.type==='run')) ? 'independent_submission' : 'practice',
+   mode:check && !check.hints ? 'independent_check' : !check && !(session.hints || session.scoringConfig?.previousExposure || session.events?.some(e=>e.type==='run')) ? 'independent_submission' : 'practice',
    check:check?missionMasteryCheck(mission.id):null,
    assistance:{hints:session.hints||0,checkHints:check?.hints||0},
    fieldResults:check?{}:Object.fromEntries(mission.rules.fields.map(f=>[f.key,session.state.answers[f.key]===mission.rules.answers[f.key]])),
@@ -80,13 +80,13 @@ export function summarizeIndicators(sessions, threshold=3) {
  return MISSIONS.flatMap(m=>getIndicatorRubric(m.id).indicators.map(i=>{
   const candidates=sessions.filter(s=>s.missionId===m.id&&s.assessmentPolicy===INDICATOR_POLICY&&s.activityCompletedAt).sort((a,b)=>(b.indicatorAssessment?.at||b.completedAt||'').localeCompare(a.indicatorAssessment?.at||a.completedAt||''));
   const valid=s=>s.indicatorAssessment?.indicators?.find(x=>x.id===i.id&&['agreed','provisional','teacher'].includes(x.status||s.indicatorAssessment.status));
-  const independent=candidates.find(s=>['independent_check','independent_submission'].includes(s.indicatorAssessment?.evidenceMode)&&valid(s));
+  const independent=candidates.find(s=>['independent_check','independent_submission','teacher_observation'].includes(s.indicatorAssessment?.evidenceMode)&&valid(s));
   const selected=independent||candidates.find(valid);
   const result=selected&&valid(selected);
   const latest=candidates[0];
   const newestResult=latest?.indicatorAssessment?.indicators?.find(x=>x.id===i.id);
   const unresolved=latest&&!valid(latest)&&(!independent||['independent_check','independent_submission'].includes(latest.indicatorAssessment?.evidenceMode));
   let group=unresolved?'pending':!result||result.level===null?'insufficient':result.level<threshold?'needs_support':independent?'independent':'assisted';
-  return {...i,missionId:m.id,missionTitle:m.title,enrichment:Boolean(m.enrichment),level:result?.level??null,evidenceStatus:result?.evidenceStatus||'insufficient',group,sessionId:selected?.id||latest?.id,references:result?.references||[],reason:result?.reason||'Belum ada bukti penilaian indikator.',status:unresolved?newestResult?.status||latest.indicatorAssessment?.status:result?.status||'insufficient',pendingStatus:latest?.indicatorAssessment?.status,threshold};
+  return {...i,evidenceMode:selected?.indicatorAssessment?.evidenceMode||"practice",missionId:m.id,missionTitle:m.title,enrichment:Boolean(m.enrichment),level:result?.level??null,evidenceStatus:result?.evidenceStatus||'insufficient',group,sessionId:selected?.id||latest?.id,references:result?.references||[],reason:result?.reason||'Belum ada bukti penilaian indikator.',status:unresolved?newestResult?.status||latest.indicatorAssessment?.status:result?.status||'insufficient',pendingStatus:latest?.indicatorAssessment?.status,threshold};
  }));
 }

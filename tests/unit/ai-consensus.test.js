@@ -45,3 +45,14 @@ test('all providers run independently and retry retains successful reviews',asyn
  const second=await gradeWithConsensus(m,evidence,{providerGrader,previousReviews:first.providerReviews});
  expect(seen).toEqual(['google']);expect(second.providerReviews.filter(r=>r.status==='complete')).toHaveLength(2);
 });
+test('status disagreement stays reviewable even when the available numbers match',()=>{
+ const rows=reviews([3,3,3]);rows[2].result.indicators[0]={...rows[2].result.indicators[0],level:null,evidenceStatus:'insufficient'};
+ expect(combineIndicatorReviews(rubric,evidence,rows).status).toBe('needs_review');
+});
+test('transfer prompt uses the new case instead of original numeric answers',async()=>{
+ const {indicatorPrompt}=await import('../../src/server/ai-consensus.js');
+ const e={...evidence,check:{prompt:'3 energi per peti',expectedEvidence:'hasil12'},answers:{response:'4 peti membutuhkan12'}};
+ const prompt=indicatorPrompt(m,e);
+ expect(prompt).toContain('Aturan kasus baru menggantikan');
+ const payload=JSON.parse(prompt.split('\n\n').at(-1));expect(payload.mission.instructions).toBe(e.check.prompt);expect(payload.mission.expectedAnswers).toBeNull();
+});

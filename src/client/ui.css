@@ -1,1 +1,8 @@
 /* Local typography: no external fonts or runtime assets. */
+.indicator-card { padding: 1rem; margin: .75rem 0; border: 1px solid var(--line, #506774); border-radius: 14px; }
+.indicator-card h4 { margin: 0 0 .5rem; }
+.indicator-card blockquote { margin: .5rem 0; padding-left: .75rem; border-left: 3px solid #e8c983; overflow-wrap: anywhere; }
+.indicator-rubric { margin: 1rem 0; }
+.indicator-rubric ol { padding-left: 1.5rem; }
+.nara-toast-message { overflow-wrap: anywhere; }
+.indicator-report details { margin: .5rem 0; }

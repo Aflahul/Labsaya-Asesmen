@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { register, enterMission, fillMission, waitForSaved } from "./helpers.js";
 import { MISSIONS } from "../../src/shared/missions.js";
 
-test("first Ulang is free and the island opens the next unfinished mission", async ({ page }) => {
+test("all Ulang attempts are free and the island opens the next unfinished mission", async ({ page }) => {
   await register(page);
   await enterMission(page, MISSIONS[0]);
   await fillMission(page, MISSIONS[0]);
@@ -20,8 +20,8 @@ test("first Ulang is free and the island opens the next unfinished mission", asy
   await fillMission(page, MISSIONS[0]);
   await page.locator("#submit").click();
   await waitForSaved(page);
-  await expect(page.locator(".score-breakdown")).toContainText("Skor permainan misi: 100");
-  await expect(page.locator(".score-breakdown")).toContainText("Nilai kompetensi misi: 100");
+  await expect(page.locator(".score-breakdown")).toContainText("Pencapaian misi: 100 XP");
+  await expect(page.locator(".score-breakdown")).toContainText("Total XP inti: 100");
   await page.getByRole("button", { name: "Peta", exact: true }).click();
   await page.locator('.island-art[data-island="1"]').click();
   await enterMission(page, MISSIONS[1]);

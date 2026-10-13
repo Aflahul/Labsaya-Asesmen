@@ -1,3 +1,8 @@
+import { indicatorClassHtml, indicatorStudentReportHtml } from "./ui/indicator-report.js";
+import { buildIndicatorClassReport, indicatorExportRows } from "../shared/reports.js";
+import { indicatorMissionHtml } from "./ui/indicator-results.js";
+import { getIndicatorRubric } from "../shared/indicator-rubrics.js";
+import { fallbackNara,buildAssessmentEvidence } from "../shared/indicator-assessment.js";
 import { reportHelp } from "./ui/report-help.js";
 import { connectIslands } from "./ui/map-links.js";
 import { scoreBreakdown } from "./ui/score-breakdown.js";
@@ -43,6 +48,7 @@ let auth = null,
   syncAgain = false,
   syncTimeout,
   teacherRows = [],
+  indicatorThreshold = {threshold: 3, version: 1},
   reportProgress = null,
   reportIdentity = null,
   travelVersion = 0,
@@ -68,7 +74,7 @@ function pageGuide(page) {
                 "Jelajahi lima pulau dan selesaikan misinya.",
                 "Lihat rincian nilai di Rapor.",
               ],
-              help: "Nilai kompetensi berasal dari ketepatan jawaban atau rubrik guru. Rata-rata 15 misi minimal 90 membuka bos pengayaan. Petunjuk, percobaan, kesalahan, dan waktu hanya memengaruhi skor permainan.",
+              help: "Selesaikan 15 misi inti untuk membuka bos pengayaan. Setiap misi memberi 100 XP sekali; mencoba ulang gratis. Kemampuan dinilai per indikator dari bukti jawaban, terpisah dari XP.",
             }
           : {
               goal: "Pilih pulau yang terbuka untuk masuk ke misi berikutnya. Tujuan terakhir kita adalah Pulau Program, tempat Menara Awan berada.",
@@ -314,20 +320,20 @@ function map() {
   world.reset();
   const summary = summarizeProgress(progress);
   const next =
-    CORE_MISSIONS.find((m) => !summary.bestByMission[m.id]) || CORE_MISSIONS[0];
+    CORE_MISSIONS.find((m) => !summary.activityCompletedByMission[m.id]) || CORE_MISSIONS[0];
   const selected =
     ISLANDS.find((i) => i.id === (selectedIsland || next.island)) || ISLANDS[0];
   shell(
     `<div class="topline map-heading"><div><div class="eyebrow">EKSPEDISI ${esc(auth.user.alias)}</div><h2>Pulihkan jalur antarpulau.</h2><p>${summary.completed}/15 misi inti selesai${summary.pendingReview ? " · " + summary.pendingReview + " karya menunggu guru" : ""}</p></div><button class="ghost" data-nav="report">Rapor</button></div><div class="map-stage"><div class="island-grid constellation"><svg class="map-links" viewBox="0 0 1000 620" preserveAspectRatio="none" aria-hidden="true"><path/></svg>${ISLANDS.map(
       (i) => {
         const ms = CORE_MISSIONS.filter((m) => m.island === i.id),
-          done = ms.filter((m) => summary.bestByMission[m.id]).length,
+          done = ms.filter((m) => summary.activityCompletedByMission[m.id]).length,
           open = unlocked(ms[0], summary);
         return `<section class="island-card ${open ? "" : "locked"} ${selected.id === i.id ? "selected" : ""}"><button class="island-art" data-island="${i.id}" aria-label="${open ? "Masuk ke" : "Lihat syarat membuka"} ${esc(i.name)}"><img src="/game-assets/island-${i.slug}.webp" alt=""></button><div class="island-label"><small>${done === 3 ? "✓ PULIH" : open ? "JALUR TERBUKA" : "TERKUNCI"} · ${done}/3</small><button class="island-name" data-island="${i.id}">${esc(i.name)}</button>${i.id === 5 ? "<small>Lokasi Menara Awan</small>" : ""}</div>${selectedIsland === i.id && !open ? `<div class="island-entry" role="status"><p>Selesaikan tiga misi pulau sebelumnya untuk membuka ${esc(i.name)}.</p></div>` : ""}</section>`;
       },
     ).join(
       "",
-    )}</div></div>${summary.completed === 15 ? `<section class="panel ending-card"><img src="/game-assets/ending-network-restored.webp" alt="Jaringan antarpulau kembali bercahaya"><div><div class="eyebrow">EKSPEDISI INTI SELESAI</div><h2>Menara Awan kembali menyala.</h2><p>Nilai kompetensi akhir: <strong>${summary.score}</strong>. Lihat hasil seluruh misimu di Rapor.</p>${summary.bossUnlocked ? `<p>Portal Ruang Arsitek di dalam Menara Awan terbuka. Di sana, kamu dapat mencoba tantangan pengayaan dengan merancang solusi sendiri.</p><button class="primary" data-mission="${BOSS.id}">Tantang</button><p class="notice">Tantangan ini boleh dilewati. Hasilnya tidak mengurangi nilai kompetensimu.</p>` : '<p class="notice">Ingin mencoba lagi? Kamu bisa mengulang misi. Nilai terbaikmu tetap disimpan.</p>'}</div></section>` : ""}`,
+    )}</div></div>${summary.completed === 15 ? `<section class="panel ending-card"><img src="/game-assets/ending-network-restored.webp" alt="Jaringan antarpulau kembali bercahaya"><div><div class="eyebrow">EKSPEDISI INTI SELESAI</div><h2>Menara Awan kembali menyala.</h2><p>XP inti: <strong>${summary.xp}</strong>. Lihat hasil kemampuan per indikator di Rapor.</p>${summary.bossUnlocked ? `<p>Portal Ruang Arsitek di dalam Menara Awan terbuka. Di sana, kamu dapat mencoba tantangan pengayaan dengan merancang solusi sendiri.</p><button class="primary" data-mission="${BOSS.id}">Tantang</button><p class="notice">Tantangan ini boleh dilewati. Hasilnya tidak mengurangi nilai kompetensimu.</p>` : '<p class="notice">Ingin mencoba lagi? Kamu bisa mengulang misi. Riwayat perkembanganmu tetap disimpan.</p>'}</div></section>` : ""}`,
   );
   app.querySelector("main").insertAdjacentHTML("beforeend", pageGuide("map"));
   disconnectMap = connectIslands($(".constellation"));
@@ -369,7 +375,7 @@ async function travel(m) {
     '<button id="begin-mission" class="primary">Mulai</button>';
   if (skippedWithKeyboard) $("#begin-mission").focus({ preventScroll: true });
 }
-function openMission(m, replay = false) {
+function openMission(m, replay = false, masteryCheck = false) {
   const summary = summarizeProgress(progress);
   if (!unlocked(m, summary)) return;
   let s =
@@ -378,7 +384,7 @@ function openMission(m, replay = false) {
       (x) =>
         x.missionId === m.id && ["active", "pending_review"].includes(x.status),
     ) ||
-      summary.bestByMission[m.id]);
+      summary.activityCompletedByMission[m.id] || summary.bestByMission[m.id]);
   if (
     replay &&
     progress.sessions.some(
@@ -389,7 +395,7 @@ function openMission(m, replay = false) {
     return;
   }
   if (!s) {
-    s = newSession(m, auth.user.id);
+    s = newSession(m, auth.user.id, {baselineMultiplier: 1, assessmentPolicy: "indicator-v1", masteryCheck, previousExposure: progress.sessions.some(x=>x.missionId===m.id && (x.activityCompletedAt || x.status === "complete" || x.hints || x.events?.some(e=>e.type === "run")))});
     s.source = navigator.onLine ? "online" : "offline";
     progress.sessions.push(s);
   }
@@ -417,6 +423,7 @@ function fingerprint(s) {
     feedback: s.feedback,
     aiGrade: s.aiGrade,
     review: s.review,
+    indicatorAssessment: s.indicatorAssessment,
   });
 }
 function renderMission() {
@@ -430,6 +437,11 @@ function renderMission() {
     pending = s.status === "pending_review";
   world.setScene(m.scene || m.slug);
   world.setProp(m.prop);
+  if (s.assessmentPolicy === "indicator-v1") {
+    shell(indicatorMissionHtml(m,s,summary,naraToast(m,naraState,naraState.mode === "hint" ? hint : s.feedback)));
+    if (focusedId) document.getElementById(focusedId)?.focus({preventScroll: true});
+    return;
+  }
   shell(
     `<div class="topline"><button class="ghost small" data-nav="map">← Peta</button></div><div class="mission-layout"><section class="panel mission-panel"><div class="mission-title"><div><div class="eyebrow">${esc(m.islandName)} · ${m.enrichment ? "BOS OPSIONAL" : m.meeting + " · Misi " + Number(m.id.slice(-2)) + "/3"}</div><h2 id="mission-heading" tabindex="-1">${esc(m.title)}</h2></div><span class="badge">${done ? (s.review?.source === "ai" ? "✓ Dinilai Nara" : "✓ Dinilai") : pending ? "◷ Menunggu nilai" : "Sedang dimainkan"}</span></div><div class="mission-progress"><span>Misi ${summary.completed}/15</span><span>Waktu <strong id="timer">${seconds(s.activeMs)}</strong></span><progress max="15" value="${summary.completed}" aria-label="Misi inti selesai"></progress></div><div class="instruction"><strong>Misi kita</strong><p>${esc(s.assessmentRevision < 2 && m.priorInstructions ? m.priorInstructions : m.instructions)}</p><details class="report-question"><summary>Acuan waktu skor permainan: ${s.scoringConfig?.timeBudgetSeconds || m.timeBudgetSeconds} detik</summary><div class="report-answer"><p>${esc(m.timeBudgetReason || "Acuan waktu sesuai beban misi.")}</p><p>Poin waktu permainan penuh sampai batas ini; nilai kompetensi tidak dipotong oleh waktu. Setelahnya, poin turun bertahap hingga 0 pada ${3 * (s.scoringConfig?.timeBudgetSeconds || m.timeBudgetSeconds)} detik. Misi tetap bisa diselesaikan. Sesi yang sudah dimulai memakai acuan saat sesi dibuat.</p></div></details></div><div class="activity" ${done || pending ? "inert" : ""}>${m.missionVersion === 2 ? v2ActivityHtml(m, draftState(s)) : activityHtml(m, s.state)}</div>${done ? `${scoreBreakdown(s, summary.missionGrades[m.id], summary.gameMissionGrades[m.id])}` : pending ? `<p class="feedback" role="status">${s.aiGrade?.status === "unavailable" ? "Penilaian Nara belum tersedia. Tekan Periksa untuk mencoba lagi; guru juga dapat menilai jawabanmu." : "Jawabanmu sudah terkirim. Nara sedang memeriksanya."}</p>` : `<p id="error" class="error" role="alert"></p>`}<div class="mission-controls">${done ? '<button class="primary" id="next">Next</button><button id="replay" title="Ulang pertama gratis; berikutnya mengurangi skor permainan 1 poin">Ulang</button>' : pending ? '<button class="primary" data-nav="map">← Peta</button><button id="refresh-progress">Periksa</button><button data-nav="report">Rapor</button>' : `${!m.written ? '<button id="run">Coba</button>' : ""}<button class="primary" id="submit">Kirim</button><button id="hint">Petunjuk</button><button class="ghost" id="reset">Bersihkan</button>`}</div></section></div>${naraToast(m, naraState, naraState.mode === "hint" ? hint : pending && s.aiGrade?.status === "unavailable" ? "Penilaian otomatis belum tersedia. Jawabanmu aman; tekan Periksa lagi atau minta guru menilai." : done && s.review?.source === "ai" ? s.feedback : done && s.score < 100 ? "Jawaban sudah dinilai. Kamu boleh mencoba lagi; nilai kompetensi memakai bukti terbaik. Ulang pertama gratis; berikutnya mengurangi skor permainan 1 poin." : s.feedback)}`,
   );
@@ -445,41 +457,16 @@ function report(p = progress, identity = auth?.user) {
   reportProgress = p;
   reportIdentity = identity;
   const r = buildReport(p);
-  const studentRows = r.rows.map(
-    ({ Misi, Jenis, Status, Nilai, SkorGame, Pengulangan, K, H, P, E, W }) => ({
-      Misi,
-      Jenis,
-      Status,
-      "Nilai kompetensi": Nilai,
-      "Skor permainan": SkorGame,
-      Pengulangan,
-      "Ketepatan/rubrik terbaik": K,
-      "Petunjuk (game)": Number.isFinite(H)
-        ? Math.round(H * 0.1 * 100) / 100
-        : H,
-      "Percobaan (game)": Number.isFinite(P)
-        ? Math.round(P * 0.1 * 100) / 100
-        : P,
-      "Kesalahan (game)": Number.isFinite(E)
-        ? Math.round(E * 0.1 * 100) / 100
-        : E,
-      "Waktu (game)": Number.isFinite(W) ? Math.round(W * 0.1 * 100) / 100 : W,
-    }),
-  );
-  shell(
-    `<section class="panel"><div class="topline"><div><div class="eyebrow">Bukti belajar · Rapor ekspedisi</div><h2 style="margin-top:12px">${esc(identity?.realName || identity?.real_name || "Penjelajah")}</h2><p>${esc(identity?.className || identity?.class_name || "")} · ${esc(identity?.alias || "")} · absen ${esc(identity?.attendance || "")}</p></div><button class="ghost" data-nav="${auth?.role === "teacher" ? "teacher" : "map"}">← Kembali</button></div><div class="summary-grid"><div class="summary-card"><small>Misi inti selesai</small><strong>${r.completed}/15</strong></div><div class="summary-card"><small>Nilai kompetensi akhir · rata-rata 5 pulau</small><strong>${r.score ?? "Belum lengkap"}</strong></div><div class="summary-card"><small>Skor permainan</small><strong>${r.gameScore ?? "Belum lengkap"}</strong></div><div class="summary-card"><small>Total waktu aktif</small><strong>${seconds(r.totals.activeMs)}</strong></div></div><div class="competencies">${r.competencies.map((c) => `<div class="competency">${esc(c.name)}<strong>${c.score ?? "Belum lengkap"}</strong></div>`).join("")}</div>${reportHelp(r, auth?.role === "teacher")}<div class="actions"><button id="csv">Rekap</button><button id="json">Cadangan</button>${auth?.role === "participant" ? '<button id="import-json" class="ghost">Pulihkan</button><input id="json-file" type="file" accept="application/json" hidden>' : ""}</div>${auth?.role === "teacher" ? reviewHtml({ sessions: p.sessions.map((s) => ({ ...s, mission: getMission(s.missionId) })) }) : ""}${
-      p.sessions.some((s) => s.review)
-        ? `<section class="review-feedback"><h3>Umpan balik Nara dan guru</h3>${p.sessions
-            .filter((s) => s.review)
-            .map(
-              (s) =>
-                `<article class="hint"><strong>${esc(getMission(s.missionId).title)} · ${s.score} · ${s.review.source === "ai" ? "Nara (AI)" : "Guru"}</strong><p>${esc(s.review.comment)}</p></article>`,
-            )
-            .join("")}</section>`
-        : ""
-    }${r.legacyCount ? `<p class="notice">Hasil permainan sebelumnya juga tersedia di rapor ini.</p>` : ""}<h3 style="margin-top:30px">Rincian per misi</h3>${table(auth?.role === "teacher" ? r.rows : studentRows)}${auth?.role === "teacher" ? `<h3 style="margin-top:30px">Riwayat sesi dan bukti tindakan</h3>${p.conflicts?.length ? `<p class="error">${p.conflicts.length} konflik perangkat dicadangkan. Ekspor JSON untuk bukti lokal yang belum menjadi nilai server; lanjutkan dari keadaan server atau mainkan ulang.</p>` : ""}<p class="notice">Total ${r.totals.attempts} pemeriksaan · ${r.totals.errors} kesalahan · ${r.totals.resets} ulang · ${r.totals.hints} petunjuk. Metrik ini kumulatif, bukan metrik sesi terbaik.</p>${p.sessions.map((s) => `<details><summary class="notice">${esc(getMission(s.missionId).title)} · ${s.status === "complete" ? `Skor game ${s.score}` : s.status === "pending_review" ? "Menunggu penilaian" : "Belum selesai"} · ${seconds(s.activeMs)} · ${s.errors} kesalahan · ${s.source === "offline" ? "bukti offline" : "bukti perangkat"}${r.bestByMission[s.missionId]?.id === s.id ? " · terbaik" : ""}</summary><pre class="trace">${esc(JSON.stringify({ sessionId: s.id, firstAccuracy: s.firstAccuracy, components: s.components, answer: s.state, events: s.events }, null, 2))}</pre></details>`).join("")}<p class="notice">${r.rows.filter((x) => x.Status !== "Selesai").length} misi belum memiliki bukti penyelesaian. Tugas dengan bantuan/kesalahan berulang layak dikonfirmasi kembali melalui asesmen kinerja guru. C5 dan C6 dinilai Nara (AI) melalui rubrik ketika layanan tersedia; guru dapat mengoreksi atau menilai saat layanan tidak tersedia. Keterampilan pada perangkat nyata dapat dikonfirmasi melalui praktik.</p>` : ""}</section>`,
-  );
+  shell(indicatorStudentReportHtml(r,p,identity,auth?.role === "teacher"));
+  const archives=p.sessions.filter(s=>s.assessmentPolicy !== "indicator-v1");
+  if (archives.length) {
+    const holder=document.createElement("details");holder.innerHTML='<summary>Arsiv nilai lama</summary>'.replace('Arsiv','Arsip') + table(buildReport({...p,sessions:archives}).rows);
+    document.querySelector('main .panel')?.append(holder);
+  }
+  if (auth?.role === "teacher" && archives.length) document.querySelector('main .panel')?.insertAdjacentHTML('beforeend',reviewHtml({sessions:archives.map(s=>({...s,mission:getMission(s.missionId)}))}));
+  return;
 }
+
 async function teacher() {
   if (auth?.role !== "teacher") {
     navigate("teacher-login");
@@ -490,6 +477,8 @@ async function teacher() {
   );
   try {
     teacherRows = await api("/teacher/participants");
+    const indicatorReport = await api("/teacher/indicators");
+    indicatorThreshold = {threshold: indicatorReport.threshold, version: indicatorReport.thresholdVersion};
     if (route !== "teacher") return;
     renderTeacher();
   } catch (e) {
@@ -507,13 +496,16 @@ function filteredTeachers() {
     (p) =>
       (!cls || p.class_name === cls) &&
       (!query || `${p.real_name} ${p.alias}`.toLowerCase().includes(query)) &&
-      (!complete || p.summary.score !== null),
+      (!complete || p.summary.completed === 15),
   );
 }
 function teacherTable() {
   const rows = filteredTeachers();
+  const cls=$("#teacher-class")?.value||"";
+  const container=$("#teacher-indicators");
+  if(container)container.innerHTML=indicatorClassHtml(buildIndicatorClassReport(teacherRows,{className:cls,threshold:indicatorThreshold.threshold,thresholdVersion:indicatorThreshold.version}));
   $("#teacher-table").innerHTML =
-    `<p class="notice">${rows.length} peserta sesuai filter · data terakhir dimuat ${new Date().toLocaleTimeString("id-ID")}</p><div class="table-wrap"><table><thead><tr><th>Nama lengkap</th><th>Nama samaran</th><th>Kelas</th><th>Absen</th><th>Inti</th><th>Ketepatan</th><th>Nilai kompetensi</th><th>Skor game</th><th>Rapor</th><th>Akses</th></tr></thead><tbody>${rows.map((p) => `<tr><td>${esc(p.real_name)}</td><td>${esc(p.alias)}</td><td>${esc(p.class_name)}</td><td>${p.attendance}</td><td>${p.summary.completed}/15</td><td>${p.summary.accuracy ?? "—"}</td><td>${p.summary.score ?? "Belum lengkap"}</td><td>${p.summary.gameScore ?? "Belum lengkap"}</td><td><button class="small" data-report="${esc(p.id)}">Buka</button></td><td><button class="small" data-reset-password="${esc(p.id)}">${p.hasPassword ? "Atur ulang" : "Buat sandi"}</button></td></tr>`).join("")}</tbody></table></div>`;
+    `<p class="notice">${rows.length} peserta sesuai filter · data terakhir dimuat ${new Date().toLocaleTimeString("id-ID")}</p><div class="table-wrap"><table><thead><tr><th>Nama lengkap</th><th>Nama samaran</th><th>Kelas</th><th>Absen</th><th>Inti</th><th>XP inti</th><th>Memenuhi mandiri</th><th>Perlu penguatan</th><th>Rapor</th><th>Akses</th></tr></thead><tbody>${rows.map((p) => `<tr><td>${esc(p.real_name)}</td><td>${esc(p.alias)}</td><td>${esc(p.class_name)}</td><td>${p.attendance}</td><td>${p.summary.completed}/15</td><td>${p.summary.xp}</td><td>${p.summary.indicatorResults.filter(i=>!i.enrichment && i.group === "independent").length}</td><td>${p.summary.indicatorResults.filter(i=>!i.enrichment && i.group === "needs_support").length}</td><td><button class="small" data-report="${esc(p.id)}">Buka</button></td><td><button class="small" data-reset-password="${esc(p.id)}">${p.hasPassword ? "Atur ulang" : "Buat sandi"}</button></td></tr>`).join("")}</tbody></table></div>`;
 }
 function showStudentCredential(result, title) {
   const box = $("#student-credentials");
@@ -530,9 +522,9 @@ function showStudentCredential(result, title) {
   box.append(heading, info, note);
 }
 function renderTeacher() {
-  const scores = teacherRows.filter((p) => p.summary.score !== null);
+  const scores = teacherRows.filter((p) => p.summary.completed === 15);
   shell(
-    `<section class="panel"><div class="eyebrow">Ruang pendidik</div><h2 style="margin-top:12px">Perkembangan belajar murid</h2><p>Lihat hasil misi dan jawaban murid. Cocokkan nama lengkap, kelas, dan nomor absen akun yang didaftarkan mandiri sebelum memakai rapor sebagai nilai sumatif. Jawaban yang belum terkirim dari perangkat murid belum muncul di halaman ini.</p><div class="summary-grid"><div class="summary-card"><small>Peserta terdaftar</small><strong>${teacherRows.length}</strong></div><div class="summary-card"><small>Inti tuntas</small><strong>${scores.length}</strong></div><div class="summary-card"><small>Kelas</small><strong>${new Set(teacherRows.map((p) => p.class_name)).size}</strong></div><div class="summary-card"><small>Rata-rata nilai kompetensi tuntas</small><strong>${scores.length ? Math.round(scores.reduce((a, p) => a + p.summary.score, 0) / scores.length) : "—"}</strong></div></div><div class="inline-form"><label>Kelas<select id="teacher-class"><option value="">Semua kelas</option>${[...new Set(teacherRows.map((p) => p.class_name))].map((c) => `<option>${esc(c)}</option>`).join("")}</select></label><label>Cari peserta<input id="teacher-query" placeholder="Nama lengkap / samaran"></label><label><input id="teacher-complete" type="checkbox" style="width:auto"> Inti tuntas saja</label></div><div class="actions"><button id="teacher-csv">Unduh</button><button id="teacher-refresh">Segarkan</button></div><details class="report-question"><summary>Buat akun murid</summary><p class="notice">Isi nama lengkap untuk rapor asesmen. Nama samaran digunakan untuk masuk dan tampil di papan peringkat publik. Sistem membuat kata sandi acak; berikan kepada murid secara pribadi.</p><form id="student-create-form"><label>Nama lengkap murid<input name="realName" required maxlength="100" autocomplete="name"></label><label>Nama samaran untuk peringkat<input name="alias" required maxlength="100"></label><label>Kelas<input name="className" required maxlength="50"></label><label>Nomor absen<input name="attendance" type="number" min="1" max="999" required></label><p role="alert" class="error"></p><button class="primary" type="submit">Buat akun</button></form></details><div id="student-credentials" class="hint" role="status" hidden></div><div id="teacher-table"></div><details style="margin-top:25px"><summary>Kalibrasi waktu versi lama</summary><p class="notice">Pengaturan ini hanya untuk misi versi lama. Ekspedisi lima pulau memakai acuan waktu per misi dengan bobot 10%.</p><div class="inline-form"><label>Pengali waktu<input id="baseline" type="number" min="0.5" max="3" step="0.1" value="1"></label><button id="calibrate">Simpan</button></div><p id="error" role="alert"></p></details></section>`,
+    `<section class="panel"><div class="eyebrow">Ruang pendidik</div><h2 style="margin-top:12px">Perkembangan belajar murid</h2><p>Lihat hasil misi dan jawaban murid. Cocokkan nama lengkap, kelas, dan nomor absen akun yang didaftarkan mandiri sebelum memakai rapor sebagai nilai sumatif. Jawaban yang belum terkirim dari perangkat murid belum muncul di halaman ini.</p><div class="summary-grid"><div class="summary-card"><small>Peserta terdaftar</small><strong>${teacherRows.length}</strong></div><div class="summary-card"><small>Inti tuntas</small><strong>${scores.length}</strong></div><div class="summary-card"><small>Kelas</small><strong>${new Set(teacherRows.map((p) => p.class_name)).size}</strong></div><div class="summary-card"><small>Murid perlu penguatan</small><strong>${teacherRows.filter(p=>p.summary.indicatorResults.some(i=>!i.enrichment&&i.group === "needs_support")).length}</strong></div></div><div class="inline-form"><label>Kelas<select id="teacher-class"><option value="">Semua kelas</option>${[...new Set(teacherRows.map((p) => p.class_name))].map((c) => `<option>${esc(c)}</option>`).join("")}</select></label><label>Cari peserta<input id="teacher-query" placeholder="Nama lengkap / samaran"></label><label><input id="teacher-complete" type="checkbox" style="width:auto"> Inti tuntas saja</label></div><div class="actions"><button id="teacher-csv">Unduh</button><button id="teacher-refresh">Segarkan</button></div><details class="report-question"><summary>Buat akun murid</summary><p class="notice">Isi nama lengkap untuk rapor asesmen. Nama samaran digunakan untuk masuk dan tampil di papan peringkat publik. Sistem membuat kata sandi acak; berikan kepada murid secara pribadi.</p><form id="student-create-form"><label>Nama lengkap murid<input name="realName" required maxlength="100" autocomplete="name"></label><label>Nama samaran untuk peringkat<input name="alias" required maxlength="100"></label><label>Kelas<input name="className" required maxlength="50"></label><label>Nomor absen<input name="attendance" type="number" min="1" max="999" required></label><p role="alert" class="error"></p><button class="primary" type="submit">Buat akun</button></form></details><div id="student-credentials" class="hint" role="status" hidden></div><div id="teacher-table"></div><div class="actions"><label>Ambang indikator<select id="indicator-threshold">${[1,2,3,4].map(n=>`<option value="${n}" ${n===indicatorThreshold.threshold?"selected":""}>Tingkat ${n}</option>`).join("")}</select></label><button id="save-threshold">Simpan Ambang</button><button id="indicator-csv">Ekspor Indikator</button></div><div id="teacher-indicators"></div><details style="margin-top:25px"><summary>Kalibrasi waktu versi lama</summary><p class="notice">Pengaturan ini hanya untuk misi versi lama. Ekspedisi lima pulau memakai acuan waktu per misi dengan bobot 10%.</p><div class="inline-form"><label>Pengali waktu<input id="baseline" type="number" min="0.5" max="3" step="0.1" value="1"></label><button id="calibrate">Simpan</button></div><p id="error" role="alert"></p></details></section>`,
   );
   teacherTable();
 }
@@ -544,7 +536,7 @@ async function leaderboard() {
     const rows = await api("/leaderboard");
     if (route !== "leaderboard") return;
     shell(
-      `<section class="panel"><div class="eyebrow">Penjelajah Menara Awan</div><h2 style="margin-top:12px">Peringkat penjelajah</h2><p>Hanya nama samaran yang ditampilkan di sini; nama lengkap digunakan pada rapor asesmen yang dapat dilihat murid terkait dan guru. Peringkat muncul setelah 15 misi inti tuntas. Nilai sama memperoleh peringkat sama; pengayaan tidak memengaruhi peringkat.</p>${table(rows.map((r) => ({ Peringkat: r.rank, "Nama samaran": r.alias, "Nilai kompetensi": r.score })))}${rows.length ? "" : '<div class="empty">Belum ada ekspedisi inti yang tuntas. Jadilah penjelajah pertama!</div>'}<div class="actions"><button data-nav="home">Kembali</button></div></section>`,
+      `<section class="panel"><div class="eyebrow">Penjelajah Menara Awan</div><h2 style="margin-top:12px">Peringkat penjelajah</h2><p>Hanya nama samaran yang ditampilkan di sini; nama lengkap digunakan pada rapor asesmen yang dapat dilihat murid terkait dan guru. Peringkat memakai XP dari misi inti yang selesai. XP yang sama memperoleh peringkat sama; pengayaan tidak memengaruhi peringkat.</p>${table(rows.map((r) => ({ Peringkat: r.rank, "Nama samaran": r.alias, "XP inti": r.score })))}${rows.length ? "" : '<div class="empty">Belum ada ekspedisi inti yang tuntas. Jadilah penjelajah pertama!</div>'}<div class="actions"><button data-nav="home">Kembali</button></div></section>`,
     );
   } catch (e) {
     if (route !== "leaderboard") return;
@@ -622,6 +614,15 @@ app.addEventListener("submit", async (e) => {
       showError(err.message);
       submit.disabled = false;
     }
+    return;
+  }
+  if (e.target.matches(".indicator-review-form")) {
+    e.preventDefault();
+    const form=e.target,data=new FormData(form),session=reportProgress.sessions.find(s=>s.id===form.dataset.review),button=form.querySelector('button[type=submit]');button.disabled=true;
+    try {
+      await api(`/teacher/sessions/${session.id}/review`,{indicators:getIndicatorRubric(session.missionId).indicators.map(i=>({id:i.id,level:data.get(i.id)===''?null:Number(data.get(i.id)),reason:data.get('reason:'+i.id)})),comment:data.get('comment'),independent:data.get('independent')==='on'});
+      const fresh=await api(`/teacher/participants/${session.participantId}/report`);report(fresh,fresh.participant);
+    } catch(err){form.querySelector('[role=status]').textContent=err.message;button.disabled=false;}
     return;
   }
   if (e.target.matches(".review-form")) {
@@ -753,7 +754,7 @@ app.addEventListener("click", async (e) => {
       const ms = CORE_MISSIONS.filter((m) => m.island === islandId);
       const summary = summarizeProgress(progress);
       if (unlocked(ms[0], summary)) {
-        travel(ms.find((m) => !summary.bestByMission[m.id]) || ms[0]);
+        travel(ms.find((m) => !summary.activityCompletedByMission[m.id]) || ms[0]);
       } else {
         selectedIsland = islandId;
         map();
@@ -830,7 +831,7 @@ app.addEventListener("click", async (e) => {
       case "refresh-progress":
         if (
           route === "mission" &&
-          current()?.status === "pending_review" &&
+          (current()?.status === "pending_review" || current()?.indicatorAssessment) &&
           navigator.onLine
         ) {
           try {
@@ -859,8 +860,7 @@ app.addEventListener("click", async (e) => {
       case "hint": {
         const s = current(),
           m = getMission(s.missionId);
-        hint =
-          m.guidance?.hint || m.hints[Math.min(s.hints, m.hints.length - 1)];
+        hint = s.assessmentPolicy === "indicator-v1" ? (s.masteryCheck ? "Lies lagi aturan pada kasus baru. Pisahkan data yang masuk, langkah menghitung, dan hasil yang diminta. Mulai dari satu bagian yang kamu pahami, lalu jelaskan alasanmu. Karena kamu memakai petunjuk, jawaban ini akan dicatat sebagai latihan dengan bantuan; kamu boleh mencoba Uji Mandiri lagi.".replace("Lies", "Baca") : fallbackNara(getIndicatorRubric(m.id),buildAssessmentEvidence(m,s))) : m.guidance?.hint || m.hints[Math.min(s.hints, m.hints.length - 1)];
         emit("hint");
         break;
       }
@@ -875,13 +875,16 @@ app.addEventListener("click", async (e) => {
         } else travel(MISSIONS[MISSIONS.findIndex((x) => x.id === m.id) + 1]);
         break;
       }
+      case "mastery-check":
+        openMission(getMission(current().missionId), true, true);
+        break;
       case "replay":
         openMission(getMission(current().missionId), true);
         break;
       case "csv":
         download(
           "rapor-pulau-logika.csv",
-          toCsv(buildReport(reportProgress).rows),
+          toCsv(buildReport(reportProgress).indicatorRows.map(i=>({Misi:i.missionTitle,Indikator:i.id,Kemampuan:i.label,Tingkat:i.level??"",Status:i.group,TP:i.tpLinks.map(x=>x.tp).join("; "),Bukti:i.references.map(x=>x.quote).join("; ")}))),
           "text/csv;charset=utf-8",
         );
         break;
@@ -895,6 +898,12 @@ app.addEventListener("click", async (e) => {
       case "import-json":
         $("#json-file").click();
         break;
+      case "save-threshold": {
+        const config=await api('/teacher/indicator-config',{threshold:Number($("#indicator-threshold").value)},'PUT');indicatorThreshold={threshold:config.threshold,version:config.version};teacherTable();break;
+      }
+      case "indicator-csv": {
+        const r=buildIndicatorClassReport(teacherRows,{className:$("#teacher-class")?.value||'',threshold:indicatorThreshold.threshold,thresholdVersion:indicatorThreshold.version});download('indikator-kelas.csv',toCsv(indicatorExportRows(r)),'text/csv;charset=utf-8');break;
+      }
       case "teacher-csv": {
         const params = new URLSearchParams();
         const cls = $("#teacher-class")?.value || "";

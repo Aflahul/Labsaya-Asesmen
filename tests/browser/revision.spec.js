@@ -56,21 +56,18 @@ for (const width of [390, 1440]) {
     });
   });
 }
-test("mission completion is compact and the full scoring explanation is in report Q&A", async ({ page }) => {
+test("mission completion separates XP from capability indicators", async ({ page }) => {
   await register(page);
   await enterMission(page, MISSIONS[0]);
   await fillMission(page, MISSIONS[0]);
   await page.locator("#submit").click();
-  await expect(page.locator(".score-breakdown")).toContainText("Nilai kompetensi misi: 100");
-  await expect(page.locator(".score-breakdown")).toContainText("Skor permainan misi: 100");
+  await expect(page.locator(".score-breakdown")).toContainText("Pencapaian misi: 100 XP");
+  await expect(page.locator(".score-breakdown")).toContainText("Total XP inti: 100");
   await expect(page.locator(".score-breakdown")).not.toContainText("Ketepatan");
   await page.getByRole("button", { name: "Peta", exact: true }).click();
   await page.locator("main [data-nav=report]").click();
-  await page.locator(".report-help > summary").click();
-  const detail = page.locator(".report-question").filter({ hasText: "Bagaimana membaca rincian skor sesi?" });
-  await detail.locator("summary").click();
-  await expect(detail).toContainText("Ketepatan");
-  await expect(detail).toContainText("waktu aktif");
+  await expect(page.locator("main")).toContainText("XP menunjukkan pencapaian permainan");
+  await expect(page.locator(".indicator-card").first()).toContainText("Memilih tipe data");
 });
 test("rak contents stay hidden while selecting answers and appear after Coba", async ({ page }) => {
   await register(page);
