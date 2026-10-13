@@ -1,3 +1,4 @@
+import { presentAssessment } from './assessment-presentation.js';
 import { getMasteryCheckGuide } from "./mastery-check-guide.js";
 import { createHash,randomUUID } from 'node:crypto';
 import { getMission } from '../shared/missions.js';
@@ -37,16 +38,17 @@ async function gradeClaimed(db,id,grader) {
  let result;
  try {
   const proposed=await grader(mission,evidence,{previousReviews:current.indicatorAssessment.providerReviews||[]});
-  const reviews=['groq','openrouter','google'].map(provider=>{
+  const reviews=['groq','google'].map(provider=>{
    const p=proposed.providerReviews?.find(p=>p.provider===provider);
    if(p?.status==='complete')return {...p,result:validateIndicatorGrade(getIndicatorRubric(mission.id),evidence,p.result)};
    return {provider,status:'unavailable',attempts:p?.attempts||1,error:p?.error||'RESPONSE_OR_NETWORK_ERROR'};
   });
-  result=combineIndicatorReviews(getIndicatorRubric(mission.id),evidence,reviews);
+  result=combineIndicatorReviews(getIndicatorRubric(mission.id),evidence,reviews,2);
  }catch{
   const previous=current.indicatorAssessment.providerReviews||[];
-  result=combineIndicatorReviews(getIndicatorRubric(mission.id),evidence,['groq','openrouter','google'].map(provider=>previous.find(p=>p.provider===provider&&p.status==='complete')||{provider,status:'unavailable',attempts:(previous.find(p=>p.provider===provider)?.attempts||0)+1,error:'RESPONSE_OR_NETWORK_ERROR'}));
+  result=combineIndicatorReviews(getIndicatorRubric(mission.id),evidence,['groq','google'].map(provider=>previous.find(p=>p.provider===provider&&p.status==='complete')||{provider,status:'unavailable',attempts:(previous.find(p=>p.provider===provider)?.attempts||0)+1,error:'RESPONSE_OR_NETWORK_ERROR'}),2);
  }
+ result=await presentAssessment(mission,evidence,result);
  const save=await db.connect();
  try{
   await save.query('BEGIN');

@@ -69,14 +69,14 @@ export function validateIndicatorGrade(rubric,evidence,proposal) {
  }
  return {indicators,feedback};
 }
-export function combineIndicatorReviews(rubric,evidence,providerReviews) {
+export function combineIndicatorReviews(rubric,evidence,providerReviews,expectedReviewers=3) {
  const valid=providerReviews.filter(r=>r.status==='complete');
  const indicators=rubric.indicators.map(i=>{
   const rows=valid.map(r=>r.result.indicators.find(x=>x.id===i.id));
   const levels=rows.map(x=>x.level).filter(x=>x!==null).sort((a,b)=>a-b);
   const conflicting=rows.some(x=>x.evidenceStatus!==rows[0]?.evidenceStatus)||levels.length>0&&levels.at(-1)-levels[0]>=2;
   const level=levels.length?levels[Math.floor(levels.length/2)]:null;
-  const status=!valid.length?'unavailable':conflicting?'needs_review':valid.length<3?'partial':new Set(levels).size>1?'provisional':'agreed';
+  const status=!valid.length?'unavailable':conflicting?'needs_review':valid.length<expectedReviewers?'partial':new Set(levels).size>1?'provisional':'agreed';
   const representative=rows.find(r=>r.level===level)||rows[0];
   return {id:i.id,level,evidenceStatus:level===null?'insufficient':'present',references:representative?.references||[],reason:representative?.reason||'Penilaian belum tersedia.',status,reviewerCount:valid.length};
  });

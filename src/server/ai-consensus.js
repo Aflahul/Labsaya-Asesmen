@@ -52,7 +52,7 @@ export async function gradeIndicatorProvider(provider,mission,evidence,{fetchImp
 }
 export async function gradeWithConsensus(mission,evidence,{providerGrader=gradeIndicatorProvider,previousReviews=[]}={}) {
  const rubric=getIndicatorRubric(mission.id);
- const providerReviews=await Promise.all(['groq','openrouter','google'].map(async provider=>{
+ const providerReviews=await Promise.all(['groq','google'].map(async provider=>{
   const previous=previousReviews.find(r=>r.provider===provider);
   if(previous?.status==='complete'||previous?.attempts>=2)return previous;
   const attempts=(previous?.attempts||0)+1;
@@ -66,5 +66,5 @@ export async function gradeWithConsensus(mission,evidence,{providerGrader=gradeI
    return {provider,model:model||error.model,status:'unavailable',attempts,error:code};
   }
  }));
- return combineIndicatorReviews(rubric,evidence,providerReviews);
+ return combineIndicatorReviews(rubric,evidence,providerReviews,2);
 }

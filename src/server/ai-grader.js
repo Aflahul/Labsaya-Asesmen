@@ -145,7 +145,7 @@ export async function gradeWithFallback(mission, answers, {
   fetchImpl = fetch,
 } = {}) {
   let lastError;
-  for (const [provider, config] of [["groq", groq], ["openrouter", openrouter], ["google", google]]) {
+  for (const [provider, config] of [["groq", groq], ["google", google]]) {
     if (provider !== "google" && !config.apiKey) continue;
     try {
       return provider === "google"

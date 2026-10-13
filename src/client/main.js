@@ -83,7 +83,7 @@ function pageGuide(page) {
                 "Misi yang belum selesai akan terbuka lebih dulu.",
                 "Selesaikan tiga misi untuk membuka pulau berikutnya.",
               ],
-              help: "Nilai misi memakai bukti kompetensi terbaik. Nilai pulau adalah rata-rata tiga misi; nilai akhir rata-rata lima pulau. Setelah 15 misi dinilai dengan nilai akhir minimal 90, portal Ruang Arsitek di dalam Menara Awan terbuka. Ulang pertama gratis; mulai Ulang kedua, skor permainan berkurang 1 poin.",
+              help: "Selesaikan 15 misi inti untuk membuka Ruang Arsitek di Menara Awan. Setiap misi memberi 100 XP sekali. Kamu boleh mencoba ulang dan memakai petunjuk tanpa kehilangan XP. Lihat perkembangan kemampuanmu di Rapor.",
             },
     },
     pageNara[page],

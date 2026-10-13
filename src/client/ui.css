@@ -3,6 +3,8 @@
 .indicator-card h4 { margin: 0 0 .5rem; }
 .indicator-card blockquote { margin: .5rem 0; padding-left: .75rem; border-left: 3px solid #e8c983; overflow-wrap: anywhere; }
 .indicator-rubric { margin: 1rem 0; }
-.indicator-rubric ol { padding-left: 1.5rem; }
+.indicator-rubric ul { padding-left: 1.5rem; line-height: 1.65; }
+.indicator-rubric li { margin: .5rem 0; }
+.indicator-card p { line-height: 1.65; max-width: 65ch; }
 .nara-toast-message { overflow-wrap: anywhere; }
 .indicator-report details { margin: .5rem 0; }

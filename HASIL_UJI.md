@@ -69,3 +69,9 @@ Uji nyata pada akun kelas UJI SISTEM - BUKAN MURID membuktikan tiga provider com
 OpenRouter diperbaiki karena model gratis tidak mendukung response_format dan reasoning default menghabiskan budget output. Adapter menggunakan JSON tervalidasi, thinking opsional dimatikan untuk model Lightning yang terkonfigurasi, deadline 120 detik, max_tokens 4096, dan lease 150 detik. Key tetap di Vercel; nilainya tidak diambil atau dicetak. Mode gratis/price ceiling nol tetap dipertahankan.
 
 Verifikasi patch terakhir: npm test 155/155; build berhasil; tiga browser flow Nara/indikator/draft 3/3. Arahan jawaban pilihan yang seluruhnya benar diarahkan ke tombol Uji Mandiri agar murid tidak disuruh memilih nilai yang tidak tersedia pada soal.
+
+## Penyederhanaan tampilan murid dan pesan akhir Gemini
+
+OpenRouter dinonaktifkan pada penilaian baru serta fallback lama. Groq dan Gemini menilai dua kali secara independen; Gemini kemudian menyusun satu pesan akhir dan penjelasan pendek per indikator tanpa mengubah tingkat atau bukti. Rincian teknis tetap tersedia untuk guru. Daftar deskriptor 1–4, kutipan mentah, nama model, dan pesan kegagalan tidak ditampilkan kepada murid. Teks pengulangan di instruksi misi dihapus; aturan XP tetap sama.
+
+Verifikasi: 158/158 uji unit/API, build berhasil, 3/3 browser alur hasil kemampuan/Nara/draft. Dua uji tampilan misi ringkas juga lolos. Uji ini mencakup penyusunan pesan yang gagal tanpa menghapus nilai, koreksi guru saat proses berjalan, dan tidak ada panggilan OpenRouter pada penilaian baru.

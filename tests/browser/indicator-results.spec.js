@@ -1,13 +1,17 @@
 import {test,expect} from '@playwright/test';
 import {register,enterMission,fillMission,waitForSaved} from './helpers.js';
 import {MISSIONS} from '../../src/shared/missions.js';
-test('three reviews persist, learner sees capabilities, free replay and independent transfer',async({page})=>{
+test('learner sees concise final capabilities, free replay and independent transfer',async({page})=>{
  test.skip(process.env.TEST_INDICATOR_GRADER!=='1','Synthetic three-provider grading fixture');
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await register(page);await enterMission(page,MISSIONS[0]);await fillMission(page,MISSIONS[0]);await page.locator('#submit').click();await waitForSaved(page);
- await expect(page.locator('.indicator-results')).toContainText('tiga penilai sepakat');await expect(page.locator('.score-breakdown')).toContainText('100 XP');
+ await expect(page.locator('.indicator-results')).toContainText('Hasil kemampuanmu');await expect(page.locator('.score-breakdown')).toContainText('100 XP');
+ await expect(page.locator('.indicator-results')).not.toContainText(/penilai|model|Groq|OpenRouter|Gemini|HTTP_/);
+ await expect(page.locator('.instruction')).not.toContainText('Mengulang gratis');
+ await expect(page.locator('.indicator-rubric li')).toHaveCount(2);
+ await expect(page.locator('.indicator-rubric ol')).toHaveCount(0);
  await expect.poll(()=>page.locator('.nara-toast-message').innerText()).toContain('Uji Mandiri');
- const msg=await page.locator('.nara-toast-message').innerText();expect(Array.from(msg).length).toBeGreaterThanOrEqual(300);expect(Array.from(msg).length).toBeLessThanOrEqual(400);
+ const msg=await page.locator('.nara-toast-message').innerText();expect(Array.from(msg).length).toBeGreaterThan(0);expect(Array.from(msg).length).toBeLessThanOrEqual(400);
  await page.setViewportSize({width:390,height:844});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  await page.locator('#mastery-check').click();await page.locator('[data-answer=response]').fill('Nomor kontak String karena nol awal dipertahankan, berat Float, paket 4 dan belum disetujui False.');await page.locator('#submit').click();await waitForSaved(page);
  await expect(page.locator('.indicator-results')).toContainText('4/4');await expect(page.locator('.score-breakdown')).toContainText('Total XP inti: 100');
