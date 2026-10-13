@@ -10,6 +10,15 @@ export function indicatorPrompt(mission,evidence) {
  JSON.stringify({mission:{title:mission.title,fields:mission.rules.fields.map(({key,label,options})=>({key,label,options})),instructions:evidence.check?.prompt||mission.instructions,caseRules:evidence.check?undefined:mission.caseRules,teacherGuide:evidence.check?.expectedEvidence||(mission.id==='v2p05m04'?BOSS_GRADING_GUIDE:mission.teacherGuide),expectedAnswers:evidence.check?null:mission.rules.answers},rubric:getIndicatorRubric(mission.id),evidence})
  ].join('\n\n');
 }
+const SAFE_OUTPUT_ERRORS = new Set(['EMPTY_OUTPUT','OUTPUT_TRUNCATED','OUTPUT_FENCED_JSON']);
+export function indicatorFailureCode(error) {
+ if(SAFE_OUTPUT_ERRORS.has(error?.code))return error.code;
+ if(/^(KEY_MISSING|MODEL_INVALID|HTTP_[1-5]\d\d)$/.test(error?.message||''))return error.message;
+ if(['AbortError','TimeoutError'].includes(error?.name))return 'TIMEOUT';
+ if(error instanceof SyntaxError)return 'JSON_INVALID';
+ const codes={'Rubrik indikator tidak lengkap':'RUBRIC_INCOMPLETE','ID indikator tidak sesuai':'INDICATOR_ID_INVALID','Tingkat indikator tidak valid':'LEVEL_INVALID','Alasan indikator tidak lengkap':'REASON_INVALID','Bukti indikator tidak sesuai jawaban':'REFERENCE_INVALID','Bukti indikator belum dirujuk':'REFERENCE_MISSING','Umpan balik indikator tidak valid':'FEEDBACK_INVALID'};
+ return codes[error?.message]||'RESPONSE_OR_NETWORK_ERROR';
+}
 export async function gradeIndicatorProvider(provider,mission,evidence,{fetchImpl=fetch}={}) {
  const configs={groq:{key:process.env.GROQ_API_KEY,model:process.env.GROQ_AI_MODEL||'openai/gpt-oss-120b',url:'https://api.groq.com/openai/v1/chat/completions'},openrouter:{key:process.env.OPENROUTER_API_KEY,model:process.env.OPENROUTER_AI_MODEL||'nvidia/nemotron-3.5-lightning:free',url:'https://openrouter.ai/api/v1/chat/completions'},google:{key:process.env.GOOGLE_API_KEY||process.env.GOOGLE_AI_API_KEY,model:process.env.GOOGLE_AI_MODEL||'gemini-flash-latest'}};
  const c=configs[provider];
@@ -21,6 +30,8 @@ export async function gradeIndicatorProvider(provider,mission,evidence,{fetchImp
  body:JSON.stringify(google?{contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{temperature:0,responseMimeType:'application/json'}}:{model:c.model,messages:[{role:'system',content:prompt}],temperature:0,...(provider==='groq'?{response_format:{type:'json_object'}}:{}),...(provider==='openrouter'?{max_tokens:4096,provider:{require_parameters:true,max_price:{prompt:0,completion:0}}}:{})}),signal:AbortSignal.timeout(provider==='openrouter'?120000:45000)});
  if(!response.ok)throw Error(`HTTP_${response.status}`);
  const json=await response.json(),raw=google?json.candidates?.[0]?.content?.parts?.map(p=>p.text||'').join(''):json.choices?.[0]?.message?.content;
+ if(typeof raw!=='string'||!raw.trim())throw Object.assign(Error('No output'),{code:json.choices?.[0]?.finish_reason==='length'?'OUTPUT_TRUNCATED':'EMPTY_OUTPUT'});
+ if(raw.trim().startsWith('```'))throw Object.assign(Error('Fenced JSON'),{code:'OUTPUT_FENCED_JSON'});
  return {...JSON.parse(raw),model:c.model};
 }
 export async function gradeWithConsensus(mission,evidence,{providerGrader=gradeIndicatorProvider,previousReviews=[]}={}) {
@@ -33,7 +44,7 @@ export async function gradeWithConsensus(mission,evidence,{providerGrader=gradeI
    const proposal=await providerGrader(provider,mission,evidence);
    return {provider,model:proposal.model,status:'complete',attempts,result:validateIndicatorGrade(rubric,evidence,proposal)};
   }catch(error){
-   const code=/^(KEY_MISSING|MODEL_INVALID|HTTP_[1-5]\d\d)$/.test(error.message)?error.message:['AbortError','TimeoutError'].includes(error.name)?'TIMEOUT':'RESPONSE_OR_NETWORK_ERROR';
+   const code=indicatorFailureCode(error);
    return {provider,status:'unavailable',attempts,error:code};
   }
  }));

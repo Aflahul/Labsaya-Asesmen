@@ -87,3 +87,11 @@ test('OpenRouter may take over a minute but still has a bounded 120-second deadl
   expect(atMinute).toBe(false);expect(aborted).toBe(true);
  }finally{timeout.mockRestore();vi.useRealTimers();vi.unstubAllEnvs();}
 });
+test('provider diagnostics distinguish JSON and evidence errors without exposing output text',async()=>{
+ const {indicatorFailureCode}=await import('../../src/server/ai-consensus.js');
+ expect(indicatorFailureCode(new SyntaxError('private model text'))).toBe('JSON_INVALID');
+ expect(indicatorFailureCode(Error('Bukti indikator tidak sesuai jawaban'))).toBe('REFERENCE_INVALID');
+ expect(indicatorFailureCode(Error('Rubrik indikator tidak lengkap'))).toBe('RUBRIC_INCOMPLETE');
+ expect(indicatorFailureCode(Error('HTTP_404'))).toBe('HTTP_404');
+ expect(indicatorFailureCode(Error('private secret'))).toBe('RESPONSE_OR_NETWORK_ERROR');
+});
