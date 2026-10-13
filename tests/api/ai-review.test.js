@@ -22,12 +22,12 @@ test("AI grades submitted work with validated rubric and Nara feedback; repeated
   let calls = 0;
   const app = await setup({ aiGrader: async () => {
     calls++;
-    return { marks: { decision: 30, evidence: 30, reason: 25 }, feedback: "Kamu sudah memilih rancangan yang kuat. Lengkapi satu pengujian agar alasanmu makin jelas.", reasons: { decision: "Pilihan sesuai", evidence: "Satu kasus kurang", reason: "Alasan baik" }, model: "gemini-test" };
+    return { marks: { decision: 30, evidence: 30, reason: 25 }, feedback: "Kamu sudah memilih rancangan yang kuat. Lengkapi satu pengujian agar alasanmu makin jelas.", reasons: { decision: "Pilihan sesuai", evidence: "Satu kasus kurang", reason: "Alasan baik" }, model: "groq-test", provider: "groq" };
   } });
   const { session, headers } = await pending(app);
   const first = await app.inject({ method: "POST", url: `/api/sessions/${session.id}/grade`, headers });
   expect(first.statusCode).toBe(200);
-  expect(first.json().data).toMatchObject({ status: "complete", firstAccuracy: 85, review: { source: "ai", marks: { decision: 30, evidence: 30, reason: 25 } } });
+  expect(first.json().data).toMatchObject({ status: "complete", firstAccuracy: 85, review: { source: "ai", provider: "groq", model: "groq-test", marks: { decision: 30, evidence: 30, reason: 25 } } });
   expect(first.json().data.feedback).toContain("Kamu sudah memilih");
   const second = await app.inject({ method: "POST", url: `/api/sessions/${session.id}/grade`, headers });
   expect(second.json().data.status).toBe("complete");

@@ -1,9 +1,9 @@
 import { getMission } from "../shared/missions.js";
 import { upgradeScoring } from "../shared/assessment.js";
 import { gradeReview } from "../shared/v2-evaluator.js";
-import { gradeWithGemini, validateAiGrade, aiFailureDetails } from "./ai-grader.js";
+import { gradeWithFallback, validateAiGrade, aiFailureDetails } from "./ai-grader.js";
 
-export async function gradePendingSession(db, sessionId, grader = gradeWithGemini) {
+export async function gradePendingSession(db, sessionId, grader = gradeWithFallback) {
   const current = (await db.query("SELECT document FROM mission_sessions WHERE id=$1", [sessionId])).rows[0]?.document;
   if (!current) return null;
   if (current.status !== "pending_review") return upgradeScoring(current);
@@ -12,7 +12,7 @@ export async function gradePendingSession(db, sessionId, grader = gradeWithGemin
   let result;
   try {
     const proposal = await grader(mission, current.state.answers);
-    result = { ...validateAiGrade(mission, proposal), model: proposal.model };
+    result = { ...validateAiGrade(mission, proposal), model: proposal.model, provider: proposal.provider };
   } catch (error) {
     console.error("[AI_GRADING_FAILURE]", { missionId: mission.id, ...aiFailureDetails(error) });
     const client = await db.connect();
@@ -45,6 +45,7 @@ export async function gradePendingSession(db, sessionId, grader = gradeWithGemin
     const graded = gradeReview(upgradeScoring(row), mission, result.marks, result.feedback, null, {
       source: "ai",
       model: result.model || "gemini",
+      provider: result.provider,
       reasons: result.reasons,
     });
     graded.aiGrade = { status: "complete", at: graded.completedAt };

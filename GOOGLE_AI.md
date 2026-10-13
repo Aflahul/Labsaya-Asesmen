@@ -1,6 +1,12 @@
 # Mengaktifkan penilaian Nara (AI)
 
-Misi 15 (*Pilih Solusi Terbaik*) dan bos (*Ruang Arsitek*) menggunakan rubrik yang sudah ditentukan. Saat murid menekan **Kirim**, server menyimpan jawaban, meminta Google Gemini menilai tiap kriteria, memvalidasi rentang nilainya, lalu menyimpan nilai dan feedback. Nara menyampaikan feedback itu kepada murid. Guru dapat melihat jawaban, alasan per kriteria, dan mengoreksi nilai AI di rapor. Koreksi menyimpan keputusan AI sebelumnya sebagai riwayat.
+Misi 15 (*Pilih Solusi Terbaik*) dan bos (*Ruang Arsitek*) menggunakan rubrik yang sudah ditentukan. Saat murid menekan **Kirim**, server menyimpan jawaban, mencoba **Groq → OpenRouter → Gemini**, memvalidasi rentang nilainya, lalu menyimpan nilai dan feedback dari penyedia pertama yang berhasil. Nara menyampaikan feedback itu kepada murid. Guru dapat melihat jawaban, alasan per kriteria, dan mengoreksi nilai AI di rapor. Koreksi menyimpan keputusan AI sebelumnya sebagai riwayat.
+
+## Penyedia gratis lebih dahulu
+
+Tambahkan `GROQ_API_KEY` dan `OPENROUTER_API_KEY` sebagai Secret Production di Vercel. Gunakan `GROQ_AI_MODEL=openai/gpt-oss-120b` dan `OPENROUTER_AI_MODEL=nvidia/nemotron-3.5-lightning:free`, atau model lain yang tersedia dan mendukung JSON. Server menolak ID OpenRouter tanpa akhiran `:free` dan membatasi harga input/output ke nol. Key cadangan yang belum dipasang dilewati. Nama variabel tidak memakai awalan `VITE_`.
+
+Groq diberi waktu 20 detik, OpenRouter 25 detik, dan Gemini 120 detik. Kegagalan HTTP, timeout, koneksi, atau hasil yang tidak sesuai rubrik memindahkan permintaan ke penyedia berikutnya. Gemini berbayar hanya dipanggil setelah layanan gratis gagal atau tidak dikonfigurasi. Jika semuanya gagal, jawaban tetap menunggu penilaian guru. Semua memakai soal, rubrik, aturan tone, dan batas feedback 250 karakter yang sama. Penyedia dan model dicatat di riwayat review; log `[AI_PROVIDER_FAILURE]` hanya memuat ID misi, penyedia, dan diagnostik aman.
 
 ## Memasang kunci di Vercel
 
@@ -15,7 +21,7 @@ Feedback Nara memakai nada guru bijak dengan growth mindset: menyebut bukti jawa
 
 Jika kunci belum dipasang, kuota habis, atau layanan gagal, jawaban tetap tersimpan sebagai **Menunggu penilaian**. Murid dapat menekan **Periksa** untuk mencoba lagi dan guru tetap dapat menilai lewat rapor. Jangan menganggap skor AI sebagai bukti tunggal ketercapaian TP; guru dapat meninjau dan mengoreksinya.
 
-Jika Google mengembalikan HTTP 503, server menunggu satu detik lalu mencoba ulang satu kali dalam batas waktu total 120 detik yang sama. Kesalahan kuota atau izin tidak dicoba ulang otomatis. Jika percobaan ulang tetap gagal, jawaban tetap menunggu penilaian.
+Dalam alur tiga penyedia, setiap penyedia dipanggil satu kali. Percobaan ulang 503 khusus fungsi Gemini mandiri tidak dipakai dalam alur ini agar durasi seluruh permintaan tetap di bawah batas fungsi Vercel 180 detik.
 
 ## Memeriksa kuota dan kegagalan
 

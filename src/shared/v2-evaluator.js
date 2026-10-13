@@ -205,6 +205,7 @@ export function gradeReview(session, m, marks, comment, teacherId, metadata = {}
       at: new Date().toISOString(),
       source: metadata.source || "teacher",
       ...(metadata.model ? { model: metadata.model } : {}),
+      ...(metadata.provider ? { provider: metadata.provider } : {}),
       ...(metadata.reasons ? { reasons: metadata.reasons } : {}),
     },
     feedback: metadata.source === "ai" ? comment.trim() : "Karya sudah dinilai guru. " + comment.trim(),
