@@ -59,3 +59,13 @@ Implementasi: tiga penilai independen untuk tiap submission baru, validasi bukti
 Tidak ada perubahan database/deployment produksi. Branch feat/indicator-assessment menyimpan perubahan yang diuji.
 
 Verifikasi akhir: `npm test` 148/148 lolos (31 file). Setelah perubahan feedback terakhir, tiga tes browser Nara/indikator/draft diulang dan semuanya lolos; suite browser lengkap sebelumnya 25/25 lolos, ditambah 1/1 offline. `npm run build` berhasil dan acuan jawaban transfer tidak ditemukan pada bundle client.
+
+## Rilis produksi — 14 Oktober 2026
+
+Branch main sudah menerima fitur indikator dan perbaikan kompatibilitas OpenRouter. Deployment Vercel untuk asesmen-labs berhasil melalui Git integration. Homepage 200 dan bundle indicator-v1 terverifikasi; API me menolak pengguna tanpa login dengan 401 sesuai rancangan. Rapor akun sintetis tampil pada viewport ponsel tanpa overflow horizontal atau error JavaScript.
+
+Uji nyata pada akun kelas UJI SISTEM - BUKAN MURID membuktikan tiga provider complete pada misi pertama: Groq openai/gpt-oss-120b, OpenRouter nvidia/nemotron-3.5-lightning:free, dan Google gemini-flash-latest. Kedua indikator berstatus agreed dan hasil tetap tersimpan setelah GET progress. Ini uji integrasi, bukan bukti kalibrasi seluruh rubrik oleh guru.
+
+OpenRouter diperbaiki karena model gratis tidak mendukung response_format dan reasoning default menghabiskan budget output. Adapter menggunakan JSON tervalidasi, thinking opsional dimatikan untuk model Lightning yang terkonfigurasi, deadline 120 detik, max_tokens 4096, dan lease 150 detik. Key tetap di Vercel; nilainya tidak diambil atau dicetak. Mode gratis/price ceiling nol tetap dipertahankan.
+
+Verifikasi patch terakhir: npm test 155/155; build berhasil; tiga browser flow Nara/indikator/draft 3/3. Arahan jawaban pilihan yang seluruhnya benar diarahkan ke tombol Uji Mandiri agar murid tidak disuruh memilih nilai yang tidak tersedia pada soal.

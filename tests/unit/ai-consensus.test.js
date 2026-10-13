@@ -111,3 +111,8 @@ test('complete JSON fences are accepted but prose or incomplete JSON is rejected
  expect(parseIndicatorJson('```json\n'+JSON.stringify(p)+'\n```')).toEqual(p);
  expect(()=>parseIndicatorJson('Penjelasan\n'+JSON.stringify(p))).toThrow();expect(()=>parseIndicatorJson('```json\n{"indicators":')).toThrow();
 });
+test('all-correct choice answers get an available next action instead of an invented problem',()=>{
+ const mm=getMission('v2p01m01'),rr=getIndicatorRubric(mm.id),e={answers:mm.rules.answers,fieldResults:Object.fromEntries(mm.rules.fields.map(f=>[f.key,true])),mode:'independent_submission'};
+ const p={indicators:rr.indicators.map(i=>({id:i.id,level:3,evidenceStatus:'present',references:[{key:i.fields[0],quote:e.answers[i.fields[0]]}],reason:'Pilihan sesuai.'})),feedback:'Masalah utama: ubah jumlah paket menjadi 4 pada pilihan.'};
+ const r=validateIndicatorGrade(rr,e,p);expect(r.feedback).toContain('Uji Mandiri');expect(r.feedback).not.toContain('Masalah utama');expect(r.feedback).toContain('String');expect(Array.from(r.feedback).length).toBeLessThanOrEqual(400);
+});

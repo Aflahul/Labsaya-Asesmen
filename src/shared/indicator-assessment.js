@@ -60,7 +60,14 @@ export function validateIndicatorGrade(rubric,evidence,proposal) {
   return {id:i.id,level,evidenceStatus,references:unknown?[]:references,reason:unknown?'Belum ada penjelasan yang cukup untuk menilai kemampuan ini.':p.reason.trim()};
  });
  if(typeof proposal.feedback!=='string'||!proposal.feedback.trim()||Array.from(proposal.feedback).length>2000)throw Error('Umpan balik indikator tidak valid');
- return {indicators,feedback:indicators.some(i=>i.level===null)?fallbackNara(rubric,evidence,indicators.find(i=>i.level===null).id):limitNaraFeedback(proposal.feedback)};
+ const allChoicesCorrect=!evidence.check && rubric.indicators.every(i=>i.fields.every(key=>evidence.fieldResults?.[key]===true)) && indicators.every(i=>i.level>=3);
+ let feedback=indicators.some(i=>i.level===null)?fallbackNara(rubric,evidence,indicators.find(i=>i.level===null).id):limitNaraFeedback(proposal.feedback);
+ if(allChoicesCorrect){
+   const missionId=rubric.indicators[0].id.split('.')[0];
+   const lead=missionId==='v2p01m01'?'Nomor teleponmu String, berat Float, jumlah paket 3, dan persetujuan True: semuanya sesuai.':'Jawabanmu sesuai pada kasus misi ini.';
+   feedback=limitNaraFeedback(`${lead} Sekarang tekan Uji Mandiri untuk mencoba kasus baru. ${missionMasteryCheck(missionId).prompt} Jelaskan pilihanmu dengan kalimat sendiri; kamu boleh mencoba lagi tanpa kehilangan XP.`);
+ }
+ return {indicators,feedback};
 }
 export function combineIndicatorReviews(rubric,evidence,providerReviews) {
  const valid=providerReviews.filter(r=>r.status==='complete');
