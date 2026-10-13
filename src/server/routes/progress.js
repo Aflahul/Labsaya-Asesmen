@@ -11,6 +11,7 @@ import {
 import { summarizeProgress, unlocked } from "../../shared/progress.js";
 import { validateEvent, canonicalJson } from "../../shared/contracts.js";
 import { fail } from "../auth.js";
+import { gradeIndicatorSession } from "../assessment-submissions.js";
 import { gradePendingSession } from "../ai-review.js";
 export async function loadProgress(db, id) {
   const { rows } = await db.query(
@@ -22,7 +23,7 @@ export async function loadProgress(db, id) {
     sessions: rows.map((r) => upgradeScoring(r.document)),
   };
 }
-export async function progressRoutes(app, aiGrader) {
+export async function progressRoutes(app, aiGrader, indicatorGrader) {
   app.get("/api/progress", async (req) => {
     const a = app.requireRole(req, "participant");
     return { data: await loadProgress(app.db, a.user_id) };
@@ -57,7 +58,7 @@ export async function progressRoutes(app, aiGrader) {
     const config = (
       await app.db.query("SELECT value FROM settings WHERE name='scoring'")
     ).rows[0]?.value || { baselineMultiplier: 1 };
-    const s = newSession(m, a.user_id, config);
+    const s = newSession(m, a.user_id, { ...config, assessmentPolicy: "indicator-v1" });
     s.id = b.id;
     s.source = b.source === "offline" ? "offline" : "online";
     await app.db.query(
@@ -116,14 +117,14 @@ export async function progressRoutes(app, aiGrader) {
           [JSON.stringify(s), new Date(), s.id],
         );
       await client.query("COMMIT");
-      gradeAfterCommit = changed && s.status === "pending_review" && m.written && events.some((e) => e.type === "submit");
+      gradeAfterCommit = changed && events.some((e) => e.type === "submit") && (s.assessmentPolicy === "indicator-v1" ? Boolean(s.activityCompletedAt) : s.status === "pending_review" && m.written);
     } catch (e) {
       await client.query("ROLLBACK");
       throw e;
     } finally {
       client.release();
     }
-    if (gradeAfterCommit) s = await gradePendingSession(app.db, s.id, aiGrader);
+    if (gradeAfterCommit) s = s.assessmentPolicy === "indicator-v1" ? await gradeIndicatorSession(app.db, s.id, indicatorGrader) : await gradePendingSession(app.db, s.id, aiGrader);
     return { data: { session: s, accepted: events.map((e) => e.id) } };
   });
   app.post("/api/sessions/:id/grade", {
@@ -134,7 +135,7 @@ export async function progressRoutes(app, aiGrader) {
     if (!rows[0]) fail(404, "Sesi tidak ditemukan");
     if (rows[0].participant_id !== a.user_id) fail(403, "Sesi bukan milik Anda");
     if (rows[0].document.status === "active") fail(409, "Karya belum dikirim");
-    const session = await gradePendingSession(app.db, req.params.id, aiGrader);
+    const session = rows[0].document.assessmentPolicy === "indicator-v1" ? await gradeIndicatorSession(app.db, req.params.id, indicatorGrader) : await gradePendingSession(app.db, req.params.id, aiGrader);
     return { data: session };
   });
 }

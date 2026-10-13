@@ -165,9 +165,14 @@ export function reduceV2(old, e, m) {
     s.state.tested = true;
     if (e.type === "submit" && r.ready) {
       s.firstAccuracy = r.accuracy;
-      s.status = r.pending ? "pending_review" : "complete";
+      const indicators = s.assessmentPolicy === "indicator-v1";
+      s.status = indicators ? "complete" : r.pending ? "pending_review" : "complete";
       s.submittedAt = new Date().toISOString();
-      s.completedAt = r.pending ? null : s.submittedAt;
+      s.completedAt = indicators ? s.submittedAt : r.pending ? null : s.submittedAt;
+      if (indicators) {
+        s.activityCompletedAt = s.submittedAt;
+        s.indicatorAssessment = {status: "pending", providerReviews: [], indicators: []};
+      }
       if (!r.pending) {
         const { score, ...components } = scoreMission(s, r.accuracy);
         s.score = score;

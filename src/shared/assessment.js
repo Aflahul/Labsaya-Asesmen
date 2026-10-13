@@ -33,6 +33,7 @@ export function newSession(
     missionId: m.id,
     missionVersion: m.missionVersion,
     assessmentRevision: m.missionVersion === 2 ? 2 : 1,
+    ...(config.assessmentPolicy === "indicator-v1" && m.missionVersion === 2 ? { assessmentPolicy: "indicator-v1" } : {}),
     countedSession: m.missionVersion === 2,
     scoringConfig: {
       ...config,
