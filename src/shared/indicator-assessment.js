@@ -14,14 +14,18 @@ export function buildAssessmentEvidence(mission,session) {
  const check=session.masteryCheck;
  const result=evaluateV2(mission,session.state,session.assessmentRevision);
  return {answers:check?{response:check.answer}:session.state.answers,
-   mode:check && !check.hints ? 'independent_check' : !check && !(session.hints || session.scoringConfig?.previousExposure || session.events?.some(e=>e.type==='run')) ? 'independent_submission' : 'practice',
+   mode:check && !check.hints && !session.scoringConfig?.previousCheckExposure ? 'independent_check' : !check && !(session.hints || session.scoringConfig?.previousExposure || session.events?.some(e=>e.type==='run')) ? 'independent_submission' : 'practice',
    check:check?missionMasteryCheck(mission.id):null,
    assistance:{hints:session.hints||0,checkHints:check?.hints||0},
    fieldResults:check?{}:Object.fromEntries(mission.rules.fields.map(f=>[f.key,session.state.answers[f.key]===mission.rules.answers[f.key]])),
    runs:check?[]:result.runs||[]};
 }
-export function fallbackNara(rubric,evidence) {
- const i=rubric.indicators.find(i=>i.fields.some(k=>isUnknown(evidence.answers[k])))||rubric.indicators[0];
+export function fallbackNara(rubric,evidence,priorityId) {
+ const i=rubric.indicators.find(i=>i.id===priorityId)||rubric.indicators.find(i=>i.fields.some(k=>isUnknown(evidence.answers[k])))||rubric.indicators.find(i=>i.fields.some(k=>evidence.fieldResults?.[k]===false))||rubric.indicators[0];
+ if(evidence.check) return limitNaraFeedback(`Kita mulai dari satu bagian pada kasus baru ini. Pilih satu data yang masuk, lalu tulis aturan yang perlu diperiksa sebelum menghasilkan jawaban. Kamu boleh memakai kalimat biasa. Setelah itu, coba satu contoh dari soal dan jelaskan mengapa hasilnya sesuai aturan. Jika belum yakin, tulis bagian yang membuatmu bingung agar guru dapat membantumu.`);
+ const allUnknown=Object.values(evidence.answers).every(isUnknown);
+ if(i.id==='v2p05m04.reason'&&!allUnknown) return 'Kita periksa satu batas dulu. Aturannya, berat kargo paling banyak 10 kg. Jika berat tepat 10 kg dan syarat lain terpenuhi, apakah pesawat boleh berangkat? Bandingkan dengan berat 11 kg. Coba jelaskan perbedaannya dengan kalimatmu sendiri. Dari contoh itu, kamu bisa mulai menulis alasan mengapa langkah programmu sesuai aturan.';
+ if(i.id==='v2p05m04.tests'&&!allUnknown) return 'Mulai dari data A saja: 6 paket, berat 10 kg, energi 12 unit, dan disetujui. Setiap paket memerlukan 2 unit energi. Coba hitung kebutuhan energinya dahulu, lalu bandingkan dengan energi yang tersedia. Setelah itu, periksa berat dan persetujuannya. Menurutmu, apakah semua syarat terpenuhi? Tulis keputusan dan satu alasannya.';
  if(rubric.indicators[0].id.startsWith('v2p05m04')) return 'Kita mulai dari contoh kecil. Kalau berat kargo diisi −2 kg, apakah berat itu masuk akal? Sebelum menghitung energi, program perlu memastikan datanya bisa digunakan. Coba tulis: jika berat kurang dari 0, program harus menampilkan pesan apa? Kamu boleh menjawab dengan kalimat biasa, lalu kita lanjutkan langkah berikutnya.';
  return limitNaraFeedback(`Kita periksa satu bagian dulu: ${i.label.toLowerCase()}. ${missionMasteryCheck(i.id.split('.')[0]).prompt} Tulis satu langkah yang kamu pahami; kamu boleh memakai kalimat sendiri.`);
 }
@@ -56,7 +60,7 @@ export function validateIndicatorGrade(rubric,evidence,proposal) {
   return {id:i.id,level,evidenceStatus,references:unknown?[]:references,reason:unknown?'Belum ada penjelasan yang cukup untuk menilai kemampuan ini.':p.reason.trim()};
  });
  if(typeof proposal.feedback!=='string'||!proposal.feedback.trim()||Array.from(proposal.feedback).length>2000)throw Error('Umpan balik indikator tidak valid');
- return {indicators,feedback:indicators.every(i=>i.level===null)?fallbackNara(rubric,evidence):limitNaraFeedback(proposal.feedback)};
+ return {indicators,feedback:indicators.some(i=>i.level===null)?fallbackNara(rubric,evidence,indicators.find(i=>i.level===null).id):limitNaraFeedback(proposal.feedback)};
 }
 export function combineIndicatorReviews(rubric,evidence,providerReviews) {
  const valid=providerReviews.filter(r=>r.status==='complete');
@@ -78,7 +82,7 @@ export function combineIndicatorReviews(rubric,evidence,providerReviews) {
 
 export function summarizeIndicators(sessions, threshold=3) {
  return MISSIONS.flatMap(m=>getIndicatorRubric(m.id).indicators.map(i=>{
-  const candidates=sessions.filter(s=>s.missionId===m.id&&s.assessmentPolicy===INDICATOR_POLICY&&s.activityCompletedAt).sort((a,b)=>(b.indicatorAssessment?.at||b.completedAt||'').localeCompare(a.indicatorAssessment?.at||a.completedAt||''));
+  const candidates=sessions.filter(s=>s.missionId===m.id&&s.assessmentPolicy===INDICATOR_POLICY&&s.activityCompletedAt).sort((a,b)=>(b.submittedAt||b.activityCompletedAt||b.completedAt||'').localeCompare(a.submittedAt||a.activityCompletedAt||a.completedAt||''));
   const valid=s=>s.indicatorAssessment?.indicators?.find(x=>x.id===i.id&&['agreed','provisional','teacher'].includes(x.status||s.indicatorAssessment.status));
   const independent=candidates.find(s=>['independent_check','independent_submission','teacher_observation'].includes(s.indicatorAssessment?.evidenceMode)&&valid(s));
   const selected=independent||candidates.find(valid);

@@ -4,7 +4,7 @@ import { MISSIONS, CORE_MISSIONS, ISLANDS } from "./missions.js";
 const valid = new Set(MISSIONS.map((m) => m.id));
 const competencyOf = (session) =>
   session.components?.K ?? session.firstAccuracy ?? session.score;
-export function summarizeProgress({ sessions = [] }) {
+export function summarizeProgress({ sessions = [], indicatorThreshold = {threshold:3,version:1} }) {
   sessions = sessions.map(upgradeScoring);
   const latestByMission = {},
     bestByMission = {},
@@ -104,6 +104,7 @@ export function summarizeProgress({ sessions = [] }) {
   const totals = { activeMs: 0, attempts: 0, errors: 0, resets: 0, hints: 0 };
   for (const s of sessions.filter((s) => valid.has(s.missionId)))
     for (const k in totals) totals[k] += s[k] || 0;
+  const activeByMission = Object.fromEntries(sessions.filter(s=>valid.has(s.missionId)&&s.status === "active").map(s=>[s.missionId,s]));
   const activityCompletedByMission = {};
   for (const s of sessions) if(valid.has(s.missionId) && (s.activityCompletedAt || s.status === "complete")) activityCompletedByMission[s.missionId] = s;
   const hasIndicators = sessions.some(s=>s.assessmentPolicy === "indicator-v1");
@@ -115,7 +116,9 @@ export function summarizeProgress({ sessions = [] }) {
     enrichmentXp: achievements.filter(id=>MISSIONS.find(m=>m.id===id)?.enrichment).length*100,
     achievements,
     activityCompletedByMission,
-    indicatorResults: summarizeIndicators(sessions),
+    activeByMission,
+    indicatorThreshold,
+    indicatorResults: summarizeIndicators(sessions,indicatorThreshold.threshold),
     hasIndicators,
     missionGrades,
     gameMissionGrades,

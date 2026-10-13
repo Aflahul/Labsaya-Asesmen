@@ -9,6 +9,7 @@ function adopt(local, remote) {
 export async function syncProgress({ progress, api, onStatus = () => {} }) {
   onStatus("Menyinkronkan…");
   const remote = await api("/progress");
+  if(remote.indicatorThreshold) progress.indicatorThreshold=remote.indicatorThreshold;
   for (const server of remote.sessions) {
     const local = progress.sessions.find((s) => s.id === server.id);
     if (!local) {

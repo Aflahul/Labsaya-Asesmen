@@ -45,3 +45,17 @@ Ini bukti lokal, belum smoke test deployment Vercel atau database Neon nyata. Be
 - Tampilan toast dan tombol pulau pada ponsel diperiksa dari screenshot.
 - Suite awal tertahan pada pendaftaran tablet setelah banyak akun uji dibuat dalam satu menit. Helper tes kini mengikuti header Retry-After pada respons 429, lalu mencoba sekali lagi; batas pendaftaran produksi tetap sama. Suite lengkap sesudah perbaikan lulus.
 - Setelah penyederhanaan label tombol: 64 tes unit/API dan seluruh 12 tes browser lulus lagi. Pemeriksaan label memastikan maksimal dua kata pada tombol beranda, pendaftaran, peta, dan seluruh misi. Build akhir berhasil; screenshot peta ponsel dengan tombol Masuk diperiksa.
+
+## Asesmen indikator — 14 Oktober 2026
+
+Implementasi: tiga penilai independen untuk tiap submission baru, validasi bukti/hasil deterministik, status partial/disagreement, Nara maksimal 400 karakter, XP unik tanpa penalti, transfer dan bantuan tercatat, rekap indikator misi/TP, koreksi/history serta ambang konsisten.
+
+- Suite browser lengkap: 25 lolos; tes offline sengaja dilewati dalam mode dev dan diuji terpisah.
+- Build produksi dan tes offline: build berhasil, 1 tes offline lolos (asset/draft reload dan sinkronisasi).
+- Regresi review: acuan transfer server-only, ordering waktu submission, threshold lintas laporan, API role/ownership, idempotency/concurrency, AI terlambat tidak menimpa guru.
+- Regresi pedagogis: tidak tahu tidak mendapat nilai/praise palsu, termasuk ketika hanya bagian alasan yang belum dijelaskan; 350 karakter feedback dipertahankan pada jalur baru maupun pending arsip.
+- Pengujian provider memakai fixture sintetis; credential Groq/OpenRouter/Google tidak tersedia di workspace. Tidak mengklaim akurasi model nyata atau kalibrasi guru. Korpus referensi tersedia untuk penilaian guru.
+
+Tidak ada perubahan database/deployment produksi. Branch feat/indicator-assessment menyimpan perubahan yang diuji.
+
+Verifikasi akhir: `npm test` 148/148 lolos (31 file). Setelah perubahan feedback terakhir, tiga tes browser Nara/indikator/draft diulang dan semuanya lolos; suite browser lengkap sebelumnya 25/25 lolos, ditambah 1/1 offline. `npm run build` berhasil dan acuan jawaban transfer tidak ditemukan pada bundle client.

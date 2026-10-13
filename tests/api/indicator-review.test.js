@@ -39,3 +39,8 @@ test('all provider failures keep evidence and activity completion without a zero
  const {s,headers}=await seed(app);const r=await app.inject({method:'POST',url:`/api/sessions/${s.id}/grade`,headers});
  expect(r.json().data.indicatorAssessment.status).toBe('unavailable');expect(r.json().data.activityCompletedAt).toBeTruthy();expect(r.body).not.toContain('secret provider failure');await app.close();
 });
+test('student session never exposes transfer answer guide',async()=>{
+ const app=await setup();const {headers}=await seed(app);
+ const r=await app.inject({method:'POST',url:'/api/sessions',headers,payload:{id:crypto.randomUUID(),missionId:'v2p01m01',masteryCheck:true}});
+ expect(r.statusCode).toBe(201);expect(r.body).not.toContain('expectedEvidence');expect(r.json().data.masteryCheck.prompt).toContain('00721');await app.close();
+});

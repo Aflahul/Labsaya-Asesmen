@@ -19,6 +19,7 @@ async function roster(db, query = {}, includeMissionDetails = false) {
       "SELECT participant_id, document FROM mission_sessions ORDER BY updated_at",
     )
   ).rows;
+  const indicatorThreshold=(await db.query("SELECT value FROM settings WHERE name='indicator-threshold'")).rows[0]?.value || {threshold:3,version:1};
   const byId = new Map();
   for (const r of docs) {
     if (!byId.has(r.participant_id)) byId.set(r.participant_id, []);
@@ -28,8 +29,8 @@ async function roster(db, query = {}, includeMissionDetails = false) {
     .map((p) => {
       const sessions = byId.get(p.id) || [];
       const report = includeMissionDetails
-        ? buildReport({ sessions })
-        : summarizeProgress({ sessions });
+        ? buildReport({ sessions, indicatorThreshold })
+        : summarizeProgress({ sessions, indicatorThreshold });
       const {
         latestByMission,
         bestByMission,

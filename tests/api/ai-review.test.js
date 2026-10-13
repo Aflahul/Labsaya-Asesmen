@@ -64,13 +64,13 @@ test("Gemini request sends only task evidence and rejects invalid rubric output"
   const prompt = JSON.parse(request.options.body).contents[0].parts[0].text;
   expect(prompt).toContain("guru bijak");
   expect(prompt).toContain("growth mindset");
-  expect(prompt).toContain("maksimal 250 karakter");
+  expect(prompt).toContain("maksimal 400 karakter");
   expect(request.options.headers["x-goog-api-key"]).toBe("test-key");
   expect(request.options.body).not.toContain("DewiAI");
   expect(() => validateAiGrade(mission, { ...result, marks: { ...result.marks, decision: 300 } })).toThrow();
 });
 
-test("long AI feedback keeps a complete sentence within 250 characters without discarding marks", () => {
+test("long AI feedback keeps a complete sentence within 400 characters without discarding marks", () => {
   const firstSentence = "Kamu sudah menuliskan empat pengujian.";
   const result = validateAiGrade(mission, {
     marks: { decision: 0, evidence: 10, reason: 0 },
@@ -80,7 +80,7 @@ test("long AI feedback keeps a complete sentence within 250 characters without d
   expect(result.feedback).toBe(firstSentence);
   expect(result.marks.evidence).toBe(10);
   const withoutSentence = validateAiGrade(mission, { ...result, feedback: "Periksa kembali ".repeat(30) });
-  expect(Array.from(withoutSentence.feedback).length).toBeLessThanOrEqual(250);
+  expect(Array.from(withoutSentence.feedback).length).toBeLessThanOrEqual(400);
   expect(withoutSentence.feedback).toMatch(/…$/);
 });
 
@@ -256,4 +256,9 @@ test("teacher can correct an AI grade and the previous decision remains auditabl
   expect(response.json().data).toMatchObject({ firstAccuracy: 100, review: { source: "teacher", teacherId: "t" } });
   expect(response.json().data.reviewHistory[0].source).toBe("ai");
   await app.close();
+});
+test('Nara preserves a needed explanation of 350 characters for archived pending work too',()=>{
+ const feedback='Mulai dari contoh kecil. '.padEnd(350,'a');
+ const r=validateAiGrade(mission,{marks:{decision:0,evidence:0,reason:0},reasons:{decision:'Belum ada bukti',evidence:'Belum ada bukti',reason:'Belum ada bukti'},feedback});
+ expect(r.feedback).toBe(feedback);
 });

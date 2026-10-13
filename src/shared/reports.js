@@ -9,7 +9,7 @@ export const buildReport = (progress) => {
   const summary = summarizeProgress(progress);
   return {
     ...summary,
-    indicatorRows: summarizeIndicators(progress.sessions || []),
+    indicatorRows: summarizeIndicators(progress.sessions || [],progress.indicatorThreshold?.threshold),
     rows: [
       ...MISSIONS,
       ...Array.from(
@@ -104,8 +104,25 @@ export function buildIndicatorClassReport(participants,{className='',threshold=3
   }
   return {...i,missionId:m.id,missionTitle:m.title,enrichment:Boolean(m.enrichment),groups};
  }));
- return {denominator:roster.length,className,threshold,thresholdVersion,rows};
+ const tpMap=new Map();
+ for(const row of rows)for(const link of row.tpLinks){
+   const id=`${link.tp}:${link.indicator||'prasyarat'}:${row.enrichment?'pengayaan':'inti'}`;
+   if(!tpMap.has(id))tpMap.set(id,{id,label:link.indicator||`${link.tp} · Prasyarat`,indicator:link.indicator,missionTitle:'Gabungan bukti misi',enrichment:row.enrichment,tpLinks:[link],members:[]});
+   tpMap.get(id).members.push(row);
+ }
+ const tpRows=[...tpMap.values()].map(row=>{
+   const groups=Object.fromEntries(Object.keys(INDICATOR_GROUPS).map(k=>[k,[]]));
+   for(const p of roster){
+     const classified=row.members.map(r=>Object.entries(r.groups).find(([,people])=>people.some(x=>x.id===p.id)));
+     const labels=classified.map(([key])=>key);
+     const group=['needs_support','pending','insufficient','assisted','independent'].find(key=>labels.includes(key));
+     const levels=classified.flatMap(([,people])=>people.filter(x=>x.id===p.id&&x.level!==null).map(x=>x.level));
+     groups[group].push({id:p.id,name:p.real_name||p.realName||p.alias||p.id,level:levels.length?Math.min(...levels):null});
+   }
+   return {...row,groups,fullCoverage:row.members.every(r=>r.tpLinks.every(l=>l.coverage==='direct')),mappedIndicatorIds:row.members.map(r=>r.id)};
+ });
+ return {denominator:roster.length,className,threshold,thresholdVersion,rows,tpRows};
 }
 export function indicatorExportRows(report) {
- return report.rows.map(r=>({Misi:r.missionTitle,Indikator:r.id,Kemampuan:r.label,TP:r.tpLinks.map(x=>x.tp).join('; '),'Indikator TP':r.tpLinks.map(x=>x.indicator||'Prasyarat').join('; '),'Cakupan bukti':r.tpLinks.map(x=>x.coverage).join('; '),'Jumlah murid':report.denominator,'Ambang tingkat':report.threshold,'Versi ambang':report.thresholdVersion,...Object.fromEntries(Object.entries(INDICATOR_GROUPS).flatMap(([key,label])=>[[label,r.groups[key].length],[`${label}: murid`,r.groups[key].map(p=>p.name).join('; ')]]))}));
+ return [...(report.tpRows||[]),...report.rows].map(r=>({'Lingkup':r.members?'Gabungan indikator TP':'Indikator misi',Misi:r.missionTitle,Indikator:r.id,Kemampuan:r.label,TP:r.tpLinks.map(x=>x.tp).join('; '),'Indikator TP':r.tpLinks.map(x=>x.indicator||'Prasyarat').join('; '),'Cakupan bukti':r.tpLinks.map(x=>x.coverage).join('; '),'Jumlah murid':report.denominator,'Ambang tingkat':report.threshold,'Versi ambang':report.thresholdVersion,...Object.fromEntries(Object.entries(INDICATOR_GROUPS).flatMap(([key,label])=>[[label,r.groups[key].length],[`${label}: murid`,r.groups[key].map(p=>p.name).join('; ')]]))}));
 }

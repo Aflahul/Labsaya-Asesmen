@@ -36,3 +36,21 @@ test('new ability reports do not derive numeric competency totals from the old a
  const s=sent('2026-01-01');s.score=100;s.components={K:100};
  const summary=summarizeProgress({sessions:[s]});expect(summary.score).toBeNull();expect(summary.scoringPolicy).toBe('indicator-v1');expect(summary.bestByMission[m.id]).toBeUndefined();
 });
+test('late grading of an old submission cannot replace newer independent evidence',()=>{
+ const older=sent('2026-10-01','independent_check',1),newer=sent('2026-10-02','independent_check',4);
+ older.submittedAt='2026-10-01';older.indicatorAssessment.at='2026-10-03';newer.submittedAt='2026-10-02';
+ const r=summarizeIndicators([older,newer]);expect(r[0].level).toBe(4);expect(r[0].sessionId).toBe(newer.id);
+});
+test('persisted threshold applies to individual progress summaries',()=>{
+ const s=sent('2026-01-01','independent_check',3);const r=summarizeProgress({sessions:[s],indicatorThreshold:{threshold:4,version:2}});
+ expect(r.indicatorResults[0].group).toBe('needs_support');
+});
+test('transfer sessions reject normal mission fields instead of converting them into transfer answers',()=>{
+ let s=newSession(m,'p',{assessmentPolicy:'indicator-v1',masteryCheck:true});
+ s=reduceSession(s,{id:crypto.randomUUID(),sessionId:s.id,seq:1,type:'action',activeMs:0,payload:{op:'answer',key:'phone',value:'String'}},m);
+ expect(s.masteryCheck.answer).toBe('');expect(s.errors).toBe(1);
+});
+test('repeating the same exposed transfer case does not create fresh independent proof',async()=>{
+ const {buildAssessmentEvidence}=await import('../../src/shared/indicator-assessment.js');const s=newSession(m,'p',{assessmentPolicy:'indicator-v1',masteryCheck:true,previousCheckExposure:true});s.masteryCheck.answer='String Float 4 False';
+ expect(buildAssessmentEvidence(m,s).mode).toBe('practice');
+});

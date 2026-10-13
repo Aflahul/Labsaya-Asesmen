@@ -56,3 +56,7 @@ test('transfer prompt uses the new case instead of original numeric answers',asy
  expect(prompt).toContain('Aturan kasus baru menggantikan');
  const payload=JSON.parse(prompt.split('\n\n').at(-1));expect(payload.mission.instructions).toBe(e.check.prompt);expect(payload.mission.expectedAnswers).toBeNull();
 });
+test('an unknown reasoning section gets targeted guidance even when other sections contain evidence',()=>{
+ const e={...evidence,answers:{...evidence.answers,reason:'tidak tahu'}};const p=proposal(3);p.indicators.at(-1).references=[{key:'reason',quote:'tidak tahu'}];p.feedback='Kamu sudah menjelaskan alasan dengan baik.';
+ const r=validateIndicatorGrade(rubric,e,p);expect(r.feedback).not.toContain('sudah menjelaskan alasan');expect(r.feedback).toContain('10 kg');
+});

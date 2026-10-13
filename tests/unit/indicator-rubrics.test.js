@@ -1,3 +1,4 @@
+import { getMasteryCheckGuide } from '../../src/server/mastery-check-guide.js';
 import { test, expect } from 'vitest';
 import { MISSIONS } from '../../src/shared/missions.js';
 import { getIndicatorRubric } from '../../src/shared/indicator-rubrics.js';
@@ -15,7 +16,7 @@ test('all missions including boss have specific indicators, descriptors and tran
       for (const link of i.tpLinks) expect(['direct','partial','supporting']).toContain(link.coverage);
       const check = getMasteryCheck(m.id, i.id);
       expect(check.prompt.length).toBeGreaterThan(20);
-      expect(check.expectedEvidence.length).toBeGreaterThan(10);
+      expect(getMasteryCheckGuide(m.id).length).toBeGreaterThan(10);
     }
   }
   expect(new Set(ids).size).toBe(ids.length);

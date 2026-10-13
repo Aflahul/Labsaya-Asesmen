@@ -1,3 +1,4 @@
+import { getMasteryCheckGuide } from "./mastery-check-guide.js";
 import { createHash,randomUUID } from 'node:crypto';
 import { getMission } from '../shared/missions.js';
 import { canonicalJson } from '../shared/contracts.js';
@@ -21,11 +22,13 @@ async function gradeClaimed(db,id,grader) {
    await client.query('ROLLBACK');return current;
   }
   mission=getMission(current.missionId);
-  if(!current.masteryCheck){
+  {
    const previous=(await client.query('SELECT document FROM mission_sessions WHERE participant_id=$1 AND mission_id=$2',[current.participantId,current.missionId])).rows;
-   current.scoringConfig.previousExposure ||= previous.some(({document:s})=>s.id!==current.id&&(s.activityCompletedAt||s.status==='complete'||s.hints||s.events?.some(e=>e.type==='run')));
+   if(current.masteryCheck) current.scoringConfig.previousCheckExposure ||= previous.some(({document:s})=>s.id!==current.id && s.masteryCheck && (s.activityCompletedAt || s.masteryCheck.hints));
+   else current.scoringConfig.previousExposure ||= previous.some(({document:s})=>s.id!==current.id&&(s.activityCompletedAt||s.status==='complete'||s.hints||s.events?.some(e=>e.type==='run')));
   }
   evidence=buildAssessmentEvidence(mission,current);
+  if(evidence.check) evidence.check.expectedEvidence=getMasteryCheckGuide(mission.id);
   fingerprint=createHash('sha256').update(canonicalJson({missionId:mission.id,revision:current.assessmentRevision,rubric:getIndicatorRubric(mission.id),evidence})).digest('hex');
   if(old?.fingerprint===fingerprint&&old.providerReviews?.every(r=>r.status==='complete'||r.attempts>=2)){await client.query('ROLLBACK');return current;}
   claimToken=randomUUID();current.indicatorAssessment={...old,fingerprint,claimToken,leaseUntil:Date.now()+60000,status:'grading'};

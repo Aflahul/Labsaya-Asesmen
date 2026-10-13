@@ -141,8 +141,8 @@ export function reduceV2(old, e, m) {
   s.activeMs = Math.max(s.activeMs, e.activeMs);
   s.feedback = "";
   if (e.type === "action") {
-    const r = s.masteryCheck && e.payload.op === "answer" && e.payload.key === "response" && typeof e.payload.value === "string" && e.payload.value.length <= 5000
-      ? {state: {...s.state, answers: {response: e.payload.value}}, errors: []}
+    const r = s.masteryCheck ? (e.payload.op === "answer" && e.payload.key === "response" && typeof e.payload.value === "string" && e.payload.value.length <= 5000
+      ? {state: {...s.state, answers: {response: e.payload.value}}, errors: []} : {state: s.state, errors: ["Tindakan tidak sesuai pemeriksaan mandiri"]})
       : actionV2(m, s.state, e.payload);
     if (s.masteryCheck && !r.errors.length) s.masteryCheck.answer = e.payload.value;
     s.state = r.state;

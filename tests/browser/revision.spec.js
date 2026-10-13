@@ -23,7 +23,7 @@ for (const width of [390, 1440]) {
       /prop-cargo-crate/,
     );
     await page.getByRole("button", { name: "Peta", exact: true }).click();
-    await expect(nara).toContainText("Pilih pulau yang terbuka untuk langsung masuk ke misi berikutnya.");
+    await expect(nara).toContainText("Pilih pulau yang terbuka untuk masuk ke misi berikutnya.");
     await page.locator("#nara-close").click();
     await expect
       .poll(() => page.locator(".map-links path").getAttribute("d"))

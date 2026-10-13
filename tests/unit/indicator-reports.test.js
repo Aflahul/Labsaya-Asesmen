@@ -15,3 +15,9 @@ test('versioned threshold changes category, not evidence or original result',()=
  expect(r.rows.find(x=>x.id===indicator).groups.needs_support).toHaveLength(1);expect(r.thresholdVersion).toBe(2);
  expect(indicatorExportRows(r)[0]['Jumlah murid']).toBe(1);
 });
+test('curricular TP indicators aggregate multiple mission indicators without counting a learner twice',()=>{
+ const m1='v2p02m03',m2='v2p03m03';
+ const ss=[m1,m2].map((missionId,n)=>({id:'s'+n,missionId,assessmentPolicy:'indicator-v1',activityCompletedAt:'2026-01-01',indicatorAssessment:{status:'agreed',evidenceMode:'independent_check',indicators:getIndicatorRubric(missionId).indicators.map(i=>({id:i.id,level:n?3:1,status:'agreed',evidenceStatus:'present'}))}}));
+ const r=buildIndicatorClassReport([{id:'a',real_name:'A',sessions:ss},{id:'b',real_name:'B',sessions:[]}]);
+ const tp=r.tpRows.find(x=>x.indicator==='BK.5.5'&&!x.enrichment);expect(tp.groups.needs_support).toHaveLength(1);expect(tp.groups.insufficient).toHaveLength(1);expect(Object.values(tp.groups).flat()).toHaveLength(2);expect(tp.fullCoverage).toBe(false);
+});

@@ -19,3 +19,14 @@ test('teacher can inspect every indicator, configure threshold and correct with 
  const denied=await app.inject({url:'/api/teacher/indicators',headers:{cookie:login.headers['set-cookie'].split(';')[0]}});expect(denied.statusCode).toBe(403);
  await app.close();
 });
+test('threshold 4 is shared by roster, learner progress, class report and individual report',async()=>{
+ const app=await setup();const login=await loginSeededParticipant(app,{realName:'A',alias:'Threshold',className:'X',attendance:1});const id=login.json().data.user.id,m=getMission('v2p01m01');
+ let s=newSession(m,id,{assessmentPolicy:'indicator-v1'});s.status='complete';s.activityCompletedAt='2026-01-01';s.indicatorAssessment={status:'agreed',at:'2026-01-01',evidenceMode:'independent_check',indicators:getIndicatorRubric(m.id).indicators.map(i=>({id:i.id,level:3,status:'agreed',evidenceStatus:'present'}))};
+ await app.db.query('INSERT INTO mission_sessions(id,participant_id,mission_id,document) VALUES($1,$2,$3,$4)',[s.id,id,m.id,JSON.stringify(s)]);
+ const headers=await teacher(app);await app.inject({method:'PUT',url:'/api/teacher/indicator-config',headers,payload:{threshold:4}});
+ const roster=(await app.inject({url:'/api/teacher/participants',headers})).json().data;
+ expect(roster[0].summary.indicatorResults[0].group).toBe('needs_support');
+ const student=(await app.inject({url:'/api/progress',headers:{cookie:login.headers['set-cookie'].split(';')[0]}})).json().data;
+ const report=(await app.inject({url:`/api/teacher/participants/${id}/report`,headers})).json().data;
+ expect(student.indicatorThreshold.threshold).toBe(4);expect(report.indicatorThreshold.threshold).toBe(4);await app.close();
+});
