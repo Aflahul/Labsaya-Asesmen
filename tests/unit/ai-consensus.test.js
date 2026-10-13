@@ -116,3 +116,15 @@ test('all-correct choice answers get an available next action instead of an inve
  const p={indicators:rr.indicators.map(i=>({id:i.id,level:3,evidenceStatus:'present',references:[{key:i.fields[0],quote:e.answers[i.fields[0]]}],reason:'Pilihan sesuai.'})),feedback:'Masalah utama: ubah jumlah paket menjadi 4 pada pilihan.'};
  const r=validateIndicatorGrade(rr,e,p);expect(r.feedback).toContain('Uji Mandiri');expect(r.feedback).not.toContain('Masalah utama');expect(r.feedback).toContain('String');expect(Array.from(r.feedback).length).toBeLessThanOrEqual(400);
 });
+test('OpenRouter uses its supported function interface and reads validated grade arguments',async()=>{
+ const {vi}=await import('vitest');const {gradeIndicatorProvider}=await import('../../src/server/ai-consensus.js');vi.stubEnv('OPENROUTER_API_KEY','test');
+ try{
+  const result=await gradeIndicatorProvider('openrouter',m,evidence,{fetchImpl:async(_url,options)=>{
+   const body=JSON.parse(options.body);expect(body.tool_choice).toMatchObject({type:'function',function:{name:'submit_indicator_grade'}});
+   expect(body.tools[0].function.parameters.properties.indicators.items.properties.id.enum).toEqual(rubric.indicators.map(i=>i.id));
+   expect(body.messages.map(m=>m.role)).toEqual(['system','user']);
+   return {ok:true,json:async()=>({choices:[{message:{content:'Not the grading payload',tool_calls:[{type:'function',function:{name:'submit_indicator_grade',arguments:JSON.stringify(proposal(3))}}]}}]})};
+  }});
+  expect(validateIndicatorGrade(rubric,evidence,result).indicators).toHaveLength(4);
+ }finally{vi.unstubAllEnvs();}
+});

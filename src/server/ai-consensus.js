@@ -19,8 +19,18 @@ export function indicatorFailureCode(error) {
  if(/^(KEY_MISSING|MODEL_INVALID|HTTP_[1-5]\d\d)$/.test(error?.message||''))return error.message;
  if(['AbortError','TimeoutError'].includes(error?.name))return 'TIMEOUT';
  if(error instanceof SyntaxError)return 'JSON_INVALID';
- const codes={'Rubrik indikator tidak lengkap':'RUBRIC_INCOMPLETE','ID indikator tidak sesuai':'INDICATOR_ID_INVALID','Tingkat indikator tidak valid':'LEVEL_INVALID','Alasan indikator tidak lengkap':'REASON_INVALID','Bukti indikator tidak sesuai jawaban':'REFERENCE_INVALID','Bukti indikator belum dirujuk':'REFERENCE_MISSING','Umpan balik indikator tidak valid':'FEEDBACK_INVALID'};
+ const codes={'Rubrik indikator tidak lengkap':'RUBRIC_INCOMPLETE','ID indikator tidak sesuai':'INDICATOR_ID_INVALID','Tingkat indikator tidak valid':'LEVEL_INVALID','Alasan indikator tidak lengkap':'REASON_INVALID','Bukti indikator tidak sesuai jawaban':'REFERENCE_INVALID','Bukti indikator belum dirujuk':'REFERENCE_MISSING','Umpan balik indikator tidak valid':'FEEDBACK_INVALID','Fungsi penilaian tidak sesuai':'TOOL_INVALID'};
  return codes[error?.message]||'RESPONSE_OR_NETWORK_ERROR';
+}
+function indicatorTool(mission,evidence) {
+ const rubric=getIndicatorRubric(mission.id),keys=evidence.check?['response']:[...new Set(rubric.indicators.flatMap(i=>i.fields))];
+ return {type:'function',function:{name:'submit_indicator_grade',description:'Kirim hasil penilaian per indikator berdasarkan bukti jawaban dan rubrik.',parameters:{type:'object',additionalProperties:false,properties:{
+  indicators:{type:'array',minItems:rubric.indicators.length,maxItems:rubric.indicators.length,items:{type:'object',additionalProperties:false,properties:{
+   id:{type:'string',enum:rubric.indicators.map(i=>i.id)},level:{type:['integer','null'],enum:[1,2,3,4,null]},evidenceStatus:{type:'string',enum:['present','insufficient']},
+   references:{type:'array',items:{type:'object',additionalProperties:false,properties:{key:{type:'string',enum:keys},quote:{type:'string',minLength:1,maxLength:1000}},required:['key','quote']}},
+   reason:{type:'string',minLength:1,maxLength:1000}
+  },required:['id','level','evidenceStatus','references','reason']}},feedback:{type:'string',minLength:1,maxLength:400}
+ },required:['indicators','feedback']}}};
 }
 export async function gradeIndicatorProvider(provider,mission,evidence,{fetchImpl=fetch}={}) {
  const configs={groq:{key:process.env.GROQ_API_KEY,model:process.env.GROQ_AI_MODEL||'openai/gpt-oss-120b',url:'https://api.groq.com/openai/v1/chat/completions'},openrouter:{key:process.env.OPENROUTER_API_KEY,model:process.env.OPENROUTER_AI_MODEL||'nvidia/nemotron-3.5-lightning:free',url:'https://openrouter.ai/api/v1/chat/completions'},google:{key:process.env.GOOGLE_API_KEY||process.env.GOOGLE_AI_API_KEY,model:process.env.GOOGLE_AI_MODEL||'gemini-flash-latest'}};
@@ -28,11 +38,15 @@ export async function gradeIndicatorProvider(provider,mission,evidence,{fetchImp
  if(!c?.key)throw Error('KEY_MISSING');
  if(!/^[a-zA-Z0-9._:/-]+$/.test(c.model)||provider==='openrouter'&&!c.model.endsWith(':free'))throw Error('MODEL_INVALID');
  const prompt=indicatorPrompt(mission,evidence),google=provider==='google';
+ const parts=prompt.split('\n\n'),context=parts.pop(),instructions=parts.join('\n\n');
+ const messages=[{role:'system',content:instructions+(provider==='openrouter'?' Gunakan fungsi submit_indicator_grade untuk mengirim hasilnya.':'')},{role:'user',content:context}];
  const response=await fetchImpl(google?`https://generativelanguage.googleapis.com/v1beta/models/${c.model}:generateContent`:c.url,{
  method:'POST',headers:google?{'Content-Type':'application/json','x-goog-api-key':c.key}:{'Content-Type':'application/json',Authorization:`Bearer ${c.key}`},
- body:JSON.stringify(google?{contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{temperature:0,responseMimeType:'application/json'}}:{model:c.model,messages:[{role:'system',content:prompt}],temperature:0,...(provider==='groq'?{response_format:{type:'json_object'}}:{}),...(provider==='openrouter'?{max_tokens:4096,...(c.model==='nvidia/nemotron-3.5-lightning:free'?{reasoning:{enabled:false}}:{}),provider:{require_parameters:true,max_price:{prompt:0,completion:0}}}:{})}),signal:AbortSignal.timeout(provider==='openrouter'?120000:45000)});
+ body:JSON.stringify(google?{contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{temperature:0,responseMimeType:'application/json'}}:{model:c.model,messages,temperature:0,...(provider==='groq'?{response_format:{type:'json_object'}}:{}),...(provider==='openrouter'?{max_tokens:4096,tools:[indicatorTool(mission,evidence)],tool_choice:{type:'function',function:{name:'submit_indicator_grade'}},...(c.model==='nvidia/nemotron-3.5-lightning:free'?{reasoning:{enabled:false}}:{}),provider:{require_parameters:true,max_price:{prompt:0,completion:0}}}:{})}),signal:AbortSignal.timeout(provider==='openrouter'?120000:45000)});
  if(!response.ok)throw Error(`HTTP_${response.status}`);
- const json=await response.json(),raw=google?json.candidates?.[0]?.content?.parts?.map(p=>p.text||'').join(''):json.choices?.[0]?.message?.content;
+ const json=await response.json(),message=json.choices?.[0]?.message,tool=message?.tool_calls?.[0]?.function;
+ if(tool&&tool.name!=='submit_indicator_grade')throw Object.assign(Error('Fungsi penilaian tidak sesuai'),{model:c.model});
+ const raw=google?json.candidates?.[0]?.content?.parts?.map(p=>p.text||'').join(''):tool?.arguments||message?.content;
  if(typeof raw!=='string'||!raw.trim())throw Object.assign(Error('No output'),{model:c.model,code:json.choices?.[0]?.finish_reason==='length'?'OUTPUT_TRUNCATED':'EMPTY_OUTPUT'});
  try {return {...parseIndicatorJson(raw),model:c.model};}catch(error){throw Object.assign(error,{model:c.model});}
 }
