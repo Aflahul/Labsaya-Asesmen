@@ -31,7 +31,7 @@ async function gradeClaimed(db,id,grader) {
   if(evidence.check) evidence.check.expectedEvidence=getMasteryCheckGuide(mission.id);
   fingerprint=createHash('sha256').update(canonicalJson({missionId:mission.id,revision:current.assessmentRevision,rubric:getIndicatorRubric(mission.id),evidence})).digest('hex');
   if(old?.fingerprint===fingerprint&&old.providerReviews?.every(r=>r.status==='complete'||r.attempts>=2)){await client.query('ROLLBACK');return current;}
-  claimToken=randomUUID();current.indicatorAssessment={...old,fingerprint,claimToken,leaseUntil:Date.now()+60000,status:'grading'};
+  claimToken=randomUUID();current.indicatorAssessment={...old,fingerprint,claimToken,leaseUntil:Date.now()+150000,status:'grading'};
   await client.query('UPDATE mission_sessions SET document=$1,updated_at=$2 WHERE id=$3',[JSON.stringify(current),new Date(),id]);await client.query('COMMIT');
  }catch(e){await client.query('ROLLBACK');throw e;}finally{client.release();}
  let result;

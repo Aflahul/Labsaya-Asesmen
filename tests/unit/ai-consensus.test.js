@@ -77,3 +77,13 @@ test('grading prompt explains UI text serialization and includes student-facing 
  const prompt=indicatorPrompt(mm,{answers:mm.rules.answers,mode:'independent_submission'});expect(prompt).toContain('Pilihan UI selalu dikirim sebagai string');
  const p=JSON.parse(prompt.split('\n\n').at(-1));expect(p.mission.fields.find(f=>f.key==='count').label).toContain('jumlah_paket');
 });
+test('OpenRouter may take over a minute but still has a bounded 120-second deadline',async()=>{
+ const {vi}=await import('vitest');const {gradeIndicatorProvider}=await import('../../src/server/ai-consensus.js');vi.stubEnv('OPENROUTER_API_KEY','test');vi.useFakeTimers();
+ const timeout=vi.spyOn(AbortSignal,'timeout').mockImplementation(ms=>{const c=new AbortController();setTimeout(()=>c.abort(new DOMException('deadline','TimeoutError')),ms);return c.signal;});let aborted=false;
+ try{
+  const grading=gradeIndicatorProvider('openrouter',m,evidence,{fetchImpl:async(_url,options)=>new Promise((_resolve,reject)=>options.signal.addEventListener('abort',()=>{aborted=true;reject(options.signal.reason);})),});
+  const rejection=expect(grading).rejects.toMatchObject({name:'TimeoutError'});
+  await vi.advanceTimersByTimeAsync(60000);const atMinute=aborted;await vi.advanceTimersByTimeAsync(60000);await rejection;
+  expect(atMinute).toBe(false);expect(aborted).toBe(true);
+ }finally{timeout.mockRestore();vi.useRealTimers();vi.unstubAllEnvs();}
+});

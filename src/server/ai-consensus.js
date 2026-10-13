@@ -18,7 +18,7 @@ export async function gradeIndicatorProvider(provider,mission,evidence,{fetchImp
  const prompt=indicatorPrompt(mission,evidence),google=provider==='google';
  const response=await fetchImpl(google?`https://generativelanguage.googleapis.com/v1beta/models/${c.model}:generateContent`:c.url,{
  method:'POST',headers:google?{'Content-Type':'application/json','x-goog-api-key':c.key}:{'Content-Type':'application/json',Authorization:`Bearer ${c.key}`},
- body:JSON.stringify(google?{contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{temperature:0,responseMimeType:'application/json'}}:{model:c.model,messages:[{role:'system',content:prompt}],temperature:0,...(provider==='groq'?{response_format:{type:'json_object'}}:{}),...(provider==='openrouter'?{provider:{require_parameters:true,max_price:{prompt:0,completion:0}}}:{})}),signal:AbortSignal.timeout(45000)});
+ body:JSON.stringify(google?{contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{temperature:0,responseMimeType:'application/json'}}:{model:c.model,messages:[{role:'system',content:prompt}],temperature:0,...(provider==='groq'?{response_format:{type:'json_object'}}:{}),...(provider==='openrouter'?{max_tokens:4096,provider:{require_parameters:true,max_price:{prompt:0,completion:0}}}:{})}),signal:AbortSignal.timeout(provider==='openrouter'?120000:45000)});
  if(!response.ok)throw Error(`HTTP_${response.status}`);
  const json=await response.json(),raw=google?json.candidates?.[0]?.content?.parts?.map(p=>p.text||'').join(''):json.choices?.[0]?.message?.content;
  return {...JSON.parse(raw),model:c.model};
