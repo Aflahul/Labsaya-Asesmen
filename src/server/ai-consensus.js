@@ -10,6 +10,9 @@ export function indicatorPrompt(mission,evidence) {
  JSON.stringify({mission:{title:mission.title,fields:mission.rules.fields.map(({key,label,options})=>({key,label,options})),instructions:evidence.check?.prompt||mission.instructions,caseRules:evidence.check?undefined:mission.caseRules,teacherGuide:evidence.check?.expectedEvidence||(mission.id==='v2p05m04'?BOSS_GRADING_GUIDE:mission.teacherGuide),expectedAnswers:evidence.check?null:mission.rules.answers},rubric:getIndicatorRubric(mission.id),evidence})
  ].join('\n\n');
 }
+export function parseIndicatorJson(raw) {
+ return JSON.parse(raw.trim().replace(/^```(?:json)?\s*([\s\S]*?)\s*```$/i,'$1'));
+}
 const SAFE_OUTPUT_ERRORS = new Set(['EMPTY_OUTPUT','OUTPUT_TRUNCATED','OUTPUT_FENCED_JSON']);
 export function indicatorFailureCode(error) {
  if(SAFE_OUTPUT_ERRORS.has(error?.code))return error.code;
@@ -27,12 +30,11 @@ export async function gradeIndicatorProvider(provider,mission,evidence,{fetchImp
  const prompt=indicatorPrompt(mission,evidence),google=provider==='google';
  const response=await fetchImpl(google?`https://generativelanguage.googleapis.com/v1beta/models/${c.model}:generateContent`:c.url,{
  method:'POST',headers:google?{'Content-Type':'application/json','x-goog-api-key':c.key}:{'Content-Type':'application/json',Authorization:`Bearer ${c.key}`},
- body:JSON.stringify(google?{contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{temperature:0,responseMimeType:'application/json'}}:{model:c.model,messages:[{role:'system',content:prompt}],temperature:0,...(provider==='groq'?{response_format:{type:'json_object'}}:{}),...(provider==='openrouter'?{max_tokens:4096,provider:{require_parameters:true,max_price:{prompt:0,completion:0}}}:{})}),signal:AbortSignal.timeout(provider==='openrouter'?120000:45000)});
+ body:JSON.stringify(google?{contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{temperature:0,responseMimeType:'application/json'}}:{model:c.model,messages:[{role:'system',content:prompt}],temperature:0,...(provider==='groq'?{response_format:{type:'json_object'}}:{}),...(provider==='openrouter'?{max_tokens:4096,...(c.model==='nvidia/nemotron-3.5-lightning:free'?{reasoning:{enabled:false}}:{}),provider:{require_parameters:true,max_price:{prompt:0,completion:0}}}:{})}),signal:AbortSignal.timeout(provider==='openrouter'?120000:45000)});
  if(!response.ok)throw Error(`HTTP_${response.status}`);
  const json=await response.json(),raw=google?json.candidates?.[0]?.content?.parts?.map(p=>p.text||'').join(''):json.choices?.[0]?.message?.content;
- if(typeof raw!=='string'||!raw.trim())throw Object.assign(Error('No output'),{code:json.choices?.[0]?.finish_reason==='length'?'OUTPUT_TRUNCATED':'EMPTY_OUTPUT'});
- if(raw.trim().startsWith('```'))throw Object.assign(Error('Fenced JSON'),{code:'OUTPUT_FENCED_JSON'});
- return {...JSON.parse(raw),model:c.model};
+ if(typeof raw!=='string'||!raw.trim())throw Object.assign(Error('No output'),{model:c.model,code:json.choices?.[0]?.finish_reason==='length'?'OUTPUT_TRUNCATED':'EMPTY_OUTPUT'});
+ try {return {...parseIndicatorJson(raw),model:c.model};}catch(error){throw Object.assign(error,{model:c.model});}
 }
 export async function gradeWithConsensus(mission,evidence,{providerGrader=gradeIndicatorProvider,previousReviews=[]}={}) {
  const rubric=getIndicatorRubric(mission.id);
@@ -40,12 +42,14 @@ export async function gradeWithConsensus(mission,evidence,{providerGrader=gradeI
   const previous=previousReviews.find(r=>r.provider===provider);
   if(previous?.status==='complete'||previous?.attempts>=2)return previous;
   const attempts=(previous?.attempts||0)+1;
+  let model;
   try {
    const proposal=await providerGrader(provider,mission,evidence);
+   model=proposal.model;
    return {provider,model:proposal.model,status:'complete',attempts,result:validateIndicatorGrade(rubric,evidence,proposal)};
   }catch(error){
    const code=indicatorFailureCode(error);
-   return {provider,status:'unavailable',attempts,error:code};
+   return {provider,model:model||error.model,status:'unavailable',attempts,error:code};
   }
  }));
  return combineIndicatorReviews(rubric,evidence,providerReviews);

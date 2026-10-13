@@ -95,3 +95,19 @@ test('provider diagnostics distinguish JSON and evidence errors without exposing
  expect(indicatorFailureCode(Error('HTTP_404'))).toBe('HTTP_404');
  expect(indicatorFailureCode(Error('private secret'))).toBe('RESPONSE_OR_NETWORK_ERROR');
 });
+test('Nemotron grading disables optional thinking so the answer is not consumed by reasoning tokens',async()=>{
+ const {vi}=await import('vitest');const {gradeIndicatorProvider}=await import('../../src/server/ai-consensus.js');vi.stubEnv('OPENROUTER_API_KEY','test');vi.stubEnv('OPENROUTER_AI_MODEL','nvidia/nemotron-3.5-lightning:free');
+ try{
+  const result=await gradeIndicatorProvider('openrouter',m,evidence,{fetchImpl:async(_url,options)=>{
+   const body=JSON.parse(options.body);
+   if(body.reasoning?.enabled!==false)return {ok:true,json:async()=>({choices:[{finish_reason:'length',message:{content:''}}]})};
+   return {ok:true,json:async()=>({choices:[{finish_reason:'stop',message:{content:JSON.stringify(proposal(3))}}]})};
+  }});
+  expect(result.indicators).toHaveLength(4);
+ }finally{vi.unstubAllEnvs();}
+});
+test('complete JSON fences are accepted but prose or incomplete JSON is rejected',async()=>{
+ const {parseIndicatorJson}=await import('../../src/server/ai-consensus.js');const p=proposal(3);
+ expect(parseIndicatorJson('```json\n'+JSON.stringify(p)+'\n```')).toEqual(p);
+ expect(()=>parseIndicatorJson('Penjelasan\n'+JSON.stringify(p))).toThrow();expect(()=>parseIndicatorJson('```json\n{"indicators":')).toThrow();
+});
