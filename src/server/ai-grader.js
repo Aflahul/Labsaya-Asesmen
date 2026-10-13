@@ -126,7 +126,7 @@ async function gradeWithChatApi(mission, answers, provider, { apiKey, model }, f
       model,
       messages: [{ role: "system", content: gradingPrompt(mission, answers) + '\n\nKembalikan hanya JSON: {"marks":{kunci_kriteria:skor},"reasons":{kunci_kriteria:"alasan"},"feedback":"pesan Nara"}. Gunakan semua kunci kriteria rubrik, tanpa tambahan.' }],
       temperature: 0,
-      response_format: { type: "json_object" },
+      ...(provider === "groq" ? { response_format: { type: "json_object" } } : {}),
       ...(provider === "openrouter" ? { provider: { require_parameters: true, max_price: { prompt: 0, completion: 0 } } } : {}),
     }),
     signal: AbortSignal.timeout(provider === "groq" ? 20000 : 25000),

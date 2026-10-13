@@ -19,7 +19,7 @@ test.each([429, 503])("Groq %s falls through to OpenRouter with the same rubric"
     const body = JSON.parse(options.body);
     expect(body.model).toBe(config.openrouter.model);
     expect(body.messages[0].content).toContain(BOSS.title);
-    expect(body.response_format.type).toBe("json_object");
+    expect(body.response_format).toBeUndefined();
     return { ok: true, json: async () => ({ choices: [{ message: { content: JSON.stringify(grade) } }] }) };
   });
   expect(await gradeWithFallback(BOSS, {}, { ...config, fetchImpl })).toMatchObject({ provider: "openrouter", marks: grade.marks });

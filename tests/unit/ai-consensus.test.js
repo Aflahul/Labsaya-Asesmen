@@ -60,3 +60,20 @@ test('an unknown reasoning section gets targeted guidance even when other sectio
  const e={...evidence,answers:{...evidence.answers,reason:'tidak tahu'}};const p=proposal(3);p.indicators.at(-1).references=[{key:'reason',quote:'tidak tahu'}];p.feedback='Kamu sudah menjelaskan alasan dengan baik.';
  const r=validateIndicatorGrade(rubric,e,p);expect(r.feedback).not.toContain('sudah menjelaskan alasan');expect(r.feedback).toContain('10 kg');
 });
+test('OpenRouter Nemotron routes without unsupported JSON mode while grades remain validated',async()=>{
+ const {vi}=await import('vitest');const {gradeIndicatorProvider}=await import('../../src/server/ai-consensus.js');vi.stubEnv('OPENROUTER_API_KEY','router-test-key');
+ try {
+  const result=await gradeIndicatorProvider('openrouter',m,evidence,{fetchImpl:async(_url,options)=>{
+   const body=JSON.parse(options.body);
+   if(body.response_format)return {ok:false,status:404};
+   expect(body.provider.require_parameters).toBe(true);expect(body.provider.max_price).toEqual({prompt:0,completion:0});
+   return {ok:true,json:async()=>({choices:[{message:{content:JSON.stringify(proposal(3))}}]})};
+  }});
+  expect(validateIndicatorGrade(rubric,evidence,result).indicators).toHaveLength(4);
+ }finally{vi.unstubAllEnvs();}
+});
+test('grading prompt explains UI text serialization and includes student-facing field labels',async()=>{
+ const {indicatorPrompt}=await import('../../src/server/ai-consensus.js');const mm=getMission('v2p01m01');
+ const prompt=indicatorPrompt(mm,{answers:mm.rules.answers,mode:'independent_submission'});expect(prompt).toContain('Pilihan UI selalu dikirim sebagai string');
+ const p=JSON.parse(prompt.split('\n\n').at(-1));expect(p.mission.fields.find(f=>f.key==='count').label).toContain('jumlah_paket');
+});

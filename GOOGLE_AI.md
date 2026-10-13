@@ -13,3 +13,7 @@ Nara maksimal 400 karakter Unicode termasuk spasi. Gunakan 300–400 jika penjel
 Untuk menguji integrasi tanpa layanan eksternal: `TEST_INDICATOR_GRADER=1 npm run test:browser`. Ini menggunakan tiga penilai sintetis pada server tes; bukan bukti akurasi model nyata. Korpus `tests/fixtures/indicator-calibration.js` adalah referensi pengembang yang masih memerlukan penilaian guru. Sebelum penggunaan sebagai asesmen sumatif, bandingkan hasil setiap model dengan jawaban yang dinilai guru dan perbaiki deskriptor bila tidak konsisten.
 
 Sesi lama mempertahankan kebijakan, nilai dan review arsip. Penilaian ulang sesi lama tetap memakai jalur fallback lama, dengan batas feedback Nara yang diperbarui menjadi 400 karakter. Jangan membuat nilai indikator historis dari nilai total. Semua sesi baru dibuat memakai `indicator-v1` oleh server dan client; nilai hanya dipercaya setelah server membangun ulang bukti dari event.
+
+## Kompatibilitas OpenRouter Nemotron
+
+Nemotron 3.5 Lightning free tidak mendukung response_format. Adapter OpenRouter tidak mengirim parameter itu; prompt meminta JSON dan server tetap memvalidasi semua indikator, rentang serta kutipan bukti sebelum menyimpan hasil. require_parameters dan max_price nol tetap diberlakukan. Groq tetap memakai JSON mode. Sumber: https://openrouter.ai/nvidia/nemotron-3.5-lightning:free dan https://openrouter.ai/docs/guides/routing/provider-selection.
