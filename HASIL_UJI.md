@@ -93,3 +93,9 @@ Verifikasi: 161/161 unit/API, build produksi berhasil, 27 alur browser terverifi
 Peserta yang menyelesaikan pengayaan masuk kelompok Sepuh di atas semua peringkat bernomor. Badge berada pada kolom Peringkat, tanpa angka; peserta lain mulai dari 1. Kelompok Sepuh tetap diurutkan dengan metrik inti, tanpa tambahan XP. XP pengayaan bernilai 0 dan layar penyelesaian pengayaan menampilkan badge. Data jawaban dan penilaian guru tidak diubah.
 
 Verifikasi: 170/170 unit/API sebelum penambahan satu uji perlindungan rapor; 11/11 uji indikator termasuk uji tambahan tersebut lolos. Tiga alur browser (perjalanan lengkap/koreksi guru, pemulihan peringkat, badge pada HP) lolos; build produksi berhasil. Uji membandingkan seluruh hasil indikator inti sebelum dan sesudah pengayaan: tetap sama.
+
+## Kartu penghargaan pada leaderboard
+
+Leaderboard memakai daftar kartu dengan ikon dan angka peringkat: mahkota emas (1), medali perak (2), medali perunggu (3), kompas berbingkai (4–10), dan kompas sederhana (11 dan seterusnya). Sepuh memiliki ikon dan kelompok terpisah di atas peringkat utama, tanpa nomor. Ikon vektor lokal tidak memerlukan gambar eksternal. Aturan pengurutan, XP, dan keputusan asesmen tetap.
+
+Verifikasi: 17/17 uji unit peringkat dan rapor, build produksi, serta 4/4 alur browser. Tampilan seluruh jenis penghargaan diperiksa pada 390 px dan 1440 px, termasuk nama panjang dan tidak adanya pelebaran horizontal. Perjalanan 15 misi, pengayaan, koreksi guru, dan pemisahan XP dari kemampuan tetap lulus.

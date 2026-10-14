@@ -16,6 +16,6 @@ test('all missions, teacher correction, boss and XP remain separate from capabil
  await form.locator('[name=comment]').fill('Pengayaan perlu dilengkapi; XP inti tetap.');await form.getByRole('button',{name:'Simpan',exact:true}).click();
  await expect(teacher.locator('main')).toContainText('XP inti: 1500');
  await page.reload();await page.getByRole('button',{name:'Rapor',exact:true}).click();await expect(page.locator('main')).toContainText('XP inti: 1500');
- await page.getByRole('button',{name:'Peringkat',exact:true}).click();await expect(page.getByRole('row').filter({hasText:alias})).toContainText('1500');await expect(page.locator('main')).not.toContainText('Siswa Lengkap');
+ await page.getByRole('button',{name:'Peringkat',exact:true}).click();await expect(page.locator('.rank-card').filter({hasText:alias})).toContainText('1500');await expect(page.locator('main')).not.toContainText('Siswa Lengkap');
  expect(errors).toEqual([]);await tc.close();
 });
