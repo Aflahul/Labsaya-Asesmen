@@ -17,9 +17,9 @@ test("leaderboard recovers from a failed request instead of staying on loading",
   await expect(page.getByRole("alert")).toContainText("Failed to fetch");
   await page.getByRole("button", { name: "Coba lagi" }).click();
   await expect(page.getByText("Memuat peringkat…")).toHaveCount(0);
-  await page.getByText("Cara menghitung",{exact:true}).click();
+  await page.getByText("Bagaimana urutannya?",{exact:true}).click();
   await expect(
-    page.getByText("Hanya nama samaran yang ditampilkan di sini", {
+    page.getByText("Nama samaranmu tampil di sini", {
       exact: false,
     }),
   ).toBeVisible();
