@@ -860,7 +860,7 @@ app.addEventListener("click", async (e) => {
       case "hint": {
         const s = current(),
           m = getMission(s.missionId);
-        hint = s.assessmentPolicy === "indicator-v1" ? (s.masteryCheck ? "Lies lagi aturan pada kasus baru. Pisahkan data yang masuk, langkah menghitung, dan hasil yang diminta. Mulai dari satu bagian yang kamu pahami, lalu jelaskan alasanmu. Karena kamu memakai petunjuk, jawaban ini akan dicatat sebagai latihan dengan bantuan; kamu boleh mencoba Uji Mandiri lagi.".replace("Lies", "Baca") : fallbackNara(getIndicatorRubric(m.id),buildAssessmentEvidence(m,s))) : m.guidance?.hint || m.hints[Math.min(s.hints, m.hints.length - 1)];
+        hint = s.assessmentPolicy === "indicator-v1" ? (s.masteryCheck ? "Baca aturan kasus baru. Pilih satu data, lalu jelaskan langkahmu. Bantuan ini dicatat sebagai latihan." : fallbackNara(getIndicatorRubric(m.id),buildAssessmentEvidence(m,s))) : m.guidance?.hint || m.hints[Math.min(s.hints, m.hints.length - 1)];
         emit("hint");
         break;
       }

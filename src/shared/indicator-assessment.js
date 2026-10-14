@@ -22,12 +22,13 @@ export function buildAssessmentEvidence(mission,session) {
 }
 export function fallbackNara(rubric,evidence,priorityId) {
  const i=rubric.indicators.find(i=>i.id===priorityId)||rubric.indicators.find(i=>i.fields.some(k=>isUnknown(evidence.answers[k])))||rubric.indicators.find(i=>i.fields.some(k=>evidence.fieldResults?.[k]===false))||rubric.indicators[0];
- if(evidence.check) return limitNaraFeedback(`Kita mulai dari satu bagian pada kasus baru ini. Pilih satu data yang masuk, lalu tulis aturan yang perlu diperiksa sebelum menghasilkan jawaban. Kamu boleh memakai kalimat biasa. Setelah itu, coba satu contoh dari soal dan jelaskan mengapa hasilnya sesuai aturan. Jika belum yakin, tulis bagian yang membuatmu bingung agar guru dapat membantumu.`);
+ if(evidence.check) return 'Pilih satu bagian dari kasus baru ini. Tulis aturan yang kamu pakai dan alasanmu.';
  const allUnknown=Object.values(evidence.answers).every(isUnknown);
- if(i.id==='v2p05m04.reason'&&!allUnknown) return 'Kita periksa satu batas dulu. Aturannya, berat kargo paling banyak 10 kg. Jika berat tepat 10 kg dan syarat lain terpenuhi, apakah pesawat boleh berangkat? Bandingkan dengan berat 11 kg. Coba jelaskan perbedaannya dengan kalimatmu sendiri. Dari contoh itu, kamu bisa mulai menulis alasan mengapa langkah programmu sesuai aturan.';
- if(i.id==='v2p05m04.tests'&&!allUnknown) return 'Mulai dari data A saja: 6 paket, berat 10 kg, energi 12 unit, dan disetujui. Setiap paket memerlukan 2 unit energi. Coba hitung kebutuhan energinya dahulu, lalu bandingkan dengan energi yang tersedia. Setelah itu, periksa berat dan persetujuannya. Menurutmu, apakah semua syarat terpenuhi? Tulis keputusan dan satu alasannya.';
- if(rubric.indicators[0].id.startsWith('v2p05m04')) return 'Kita mulai dari contoh kecil. Kalau berat kargo diisi −2 kg, apakah berat itu masuk akal? Sebelum menghitung energi, program perlu memastikan datanya bisa digunakan. Coba tulis: jika berat kurang dari 0, program harus menampilkan pesan apa? Kamu boleh menjawab dengan kalimat biasa, lalu kita lanjutkan langkah berikutnya.';
- return limitNaraFeedback(`Kita periksa satu bagian dulu: ${i.label.toLowerCase()}. ${missionMasteryCheck(i.id.split('.')[0]).prompt} Tulis satu langkah yang kamu pahami; kamu boleh memakai kalimat sendiri.`);
+ if(i.id==='v2p05m04.reason'&&!allUnknown) return 'Jika berat tepat 10 kg dan syarat lain terpenuhi, bolehkah pesawat berangkat? Jelaskan alasanmu.';
+ if(i.id==='v2p05m04.tests'&&!allUnknown) return 'Enam paket butuh 2 unit energi per paket. Jika tersedia 12 unit, apakah energinya cukup?';
+ if(rubric.indicators[0].id.startsWith('v2p05m04')) return 'Jika berat kargo −2 kg, bolehkah program langsung menghitung energi? Tulis apa yang perlu diperiksa lebih dulu.';
+ if(i.id==='v2p01m01.types')return evidence.fieldResults?.phone===false?'Nomor telepon bisa diawali angka 0. Pilih Ulang, lalu periksa tipe data yang menjaga angka itu.':'Berat kargo bisa berupa angka pecahan. Pilih Ulang, lalu periksa tipe datanya.';
+ return limitNaraFeedback(`Coba satu bagian dulu: ${i.label.toLowerCase()}. Tulis langkah yang kamu pahami.`);
 }
 export function validateIndicatorGrade(rubric,evidence,proposal) {
  if(!Array.isArray(proposal?.indicators)||proposal.indicators.length!==rubric.indicators.length)throw Error('Rubrik indikator tidak lengkap');
@@ -65,7 +66,7 @@ export function validateIndicatorGrade(rubric,evidence,proposal) {
  if(allChoicesCorrect){
    const missionId=rubric.indicators[0].id.split('.')[0];
    const lead=missionId==='v2p01m01'?'Nomor teleponmu String, berat Float, jumlah paket 3, dan persetujuan True: semuanya sesuai.':'Jawabanmu sesuai pada kasus misi ini.';
-   feedback=limitNaraFeedback(`${lead} Sekarang tekan Uji Mandiri untuk mencoba kasus baru. ${missionMasteryCheck(missionId).prompt} Jelaskan pilihanmu dengan kalimat sendiri; kamu boleh mencoba lagi tanpa kehilangan XP.`);
+   feedback=limitNaraFeedback(`${lead} Coba Uji Mandiri untuk kasus baru.`);
  }
  return {indicators,feedback};
 }

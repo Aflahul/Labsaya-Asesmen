@@ -13,7 +13,7 @@ test('learner sees concise final capabilities, free replay and independent trans
  await expect(page.locator('.indicator-rubric li')).toHaveCount(2);
  await expect(page.locator('.indicator-rubric ol')).toHaveCount(0);
  await expect.poll(()=>page.locator('.nara-toast-message').innerText()).toContain('Uji Mandiri');
- const msg=await page.locator('.nara-toast-message').innerText();expect(Array.from(msg).length).toBeGreaterThan(0);expect(Array.from(msg).length).toBeLessThanOrEqual(400);
+ const msg=await page.locator('.nara-toast-message').innerText();expect(Array.from(msg).length).toBeGreaterThan(0);expect(Array.from(msg).length).toBeLessThanOrEqual(180);
  await page.setViewportSize({width:390,height:844});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  await page.locator('#mastery-check').click();await page.locator('[data-answer=response]').fill('Nomor kontak String karena nol awal dipertahankan, berat Float, paket 4 dan belum disetujui False.');await page.locator('#submit').click();await waitForSaved(page);
  await expect(page.locator('.indicator-results')).toContainText('Bisa menerapkan pada kasus baru');await expect(page.locator('.score-breakdown')).toContainText('Total XP inti: 100');
