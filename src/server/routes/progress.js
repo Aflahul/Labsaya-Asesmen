@@ -12,6 +12,7 @@ import { summarizeProgress, unlocked } from "../../shared/progress.js";
 import { validateEvent, canonicalJson } from "../../shared/contracts.js";
 import { fail } from "../auth.js";
 import { gradeIndicatorSession } from "../assessment-submissions.js";
+import {gradeEnrichmentSession} from "../enrichment-reward.js";
 import { gradePendingSession } from "../ai-review.js";
 export async function loadProgress(db, id) {
   const { rows } = await db.query(
@@ -25,7 +26,13 @@ export async function loadProgress(db, id) {
     sessions: rows.map((r) => upgradeScoring(r.document)),
   };
 }
-export async function progressRoutes(app, aiGrader, indicatorGrader) {
+export async function progressRoutes(app, aiGrader, indicatorGrader, enrichmentGrader) {
+  const gradeSession=async s=>{
+    const gradeAbility=()=>s.assessmentPolicy === "indicator-v1" ? gradeIndicatorSession(app.db,s.id,indicatorGrader) : gradePendingSession(app.db,s.id,aiGrader);
+    if(!getMission(s.missionId).enrichment||s.masteryCheck)return gradeAbility();
+    await Promise.all([gradeAbility(),gradeEnrichmentSession(app.db,s.id,enrichmentGrader)]);
+    return (await app.db.query("SELECT document FROM mission_sessions WHERE id=$1",[s.id])).rows[0]?.document||null;
+  };
   app.get("/api/progress", async (req) => {
     const a = app.requireRole(req, "participant");
     return { data: await loadProgress(app.db, a.user_id) };
@@ -127,7 +134,7 @@ export async function progressRoutes(app, aiGrader, indicatorGrader) {
     } finally {
       client.release();
     }
-    if (gradeAfterCommit) s = s.assessmentPolicy === "indicator-v1" ? await gradeIndicatorSession(app.db, s.id, indicatorGrader) : await gradePendingSession(app.db, s.id, aiGrader);
+    if (gradeAfterCommit) s = await gradeSession(s);
     return { data: { session: s, accepted: events.map((e) => e.id) } };
   });
   app.post("/api/sessions/:id/grade", {
@@ -138,7 +145,7 @@ export async function progressRoutes(app, aiGrader, indicatorGrader) {
     if (!rows[0]) fail(404, "Sesi tidak ditemukan");
     if (rows[0].participant_id !== a.user_id) fail(403, "Sesi bukan milik Anda");
     if (rows[0].document.status === "active") fail(409, "Karya belum dikirim");
-    const session = rows[0].document.assessmentPolicy === "indicator-v1" ? await gradeIndicatorSession(app.db, req.params.id, indicatorGrader) : await gradePendingSession(app.db, req.params.id, aiGrader);
+    const session = await gradeSession(rows[0].document);
     return { data: session };
   });
 }

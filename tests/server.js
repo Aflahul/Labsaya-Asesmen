@@ -33,5 +33,6 @@ const indicatorGrader=async(m,e,options)=>gradeWithConsensus(m,e,{...options,pro
   return {id:i.id,level:e.check?4:3,evidenceStatus:'present',references:[{key,quote:e.answers[key]||''}],reason:'Bukti jawaban diperiksa pada fixture pengujian.'};
  }),feedback:'Kamu sudah menuliskan jawaban untuk kasus ini. Coba satu kasus baru agar kita bisa memeriksa apakah langkah yang sama tetap sesuai. Mulai dari data yang dibutuhkan, lanjutkan dengan aturan yang harus dipenuhi, lalu jelaskan keputusanmu. Kamu boleh memakai kalimat sendiri. Jika belum yakin, pilih satu bagian dahulu dan perbaiki setelah membandingkan hasilnya.'};
 }});
-const app = await buildApp({ db, aiGrader, indicatorGrader, authRateLimitMax: 1000 });
+const enrichmentGrader=async m=>({marks:Object.fromEntries(m.rubric.map(([k,,max])=>[k,max])),reasons:Object.fromEntries(m.rubric.map(([k])=>[k,"Bukti fixture sesuai."])),feedback:"Langkahmu sesuai dengan aturan.",model:"gemini-test"});
+const app = await buildApp({ db, aiGrader, indicatorGrader, enrichmentGrader, authRateLimitMax: 1000 });
 await app.listen({ host: "127.0.0.1", port: 3000 });

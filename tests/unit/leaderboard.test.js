@@ -51,3 +51,22 @@ test('fewer attempts break time and hint ties before completion time, without ch
  const data=sessions();delete data[0].attempts;
  expect(leaderboardStats(data).attempts).toBeNull();
 });
+
+test('Gemini enrichment XP orders only Sepuh and leaves numbered ranks and core XP unchanged',()=>{
+ const rows=rankLeaderboard([
+  {alias:'Sepuh fast',sepuh:true,enrichmentXp:20,activeSeconds:10,hints:0,attempts:15,finishedAt:1,score:1500},
+  {alias:'Sepuh strong',sepuh:true,enrichmentXp:90,activeSeconds:200,hints:2,attempts:20,finishedAt:2,score:1500},
+  {alias:'Sepuh waiting',sepuh:true,enrichmentXp:null,activeSeconds:1,hints:0,attempts:15,finishedAt:1,score:1500},
+  {alias:'Regular fast',enrichmentXp:10,activeSeconds:5,hints:0,attempts:15,finishedAt:1,score:1500},
+  {alias:'Regular slow',enrichmentXp:100,activeSeconds:6,hints:0,attempts:15,finishedAt:1,score:1500}
+ ]);
+ expect(rows.map(r=>[r.alias,r.rank])).toEqual([['Sepuh strong',null],['Sepuh fast',null],['Sepuh waiting',null],['Regular fast',1],['Regular slow',2]]);
+ expect(rows.every(r=>r.score===1500)).toBe(true);
+});
+test('first enrichment reward is frozen and later practice or mastery checks cannot farm XP',()=>{
+ const first={id:'boss',missionId:BOSS.id,status:'complete',submittedAt:'2026-10-14T02:00:00Z',enrichmentReward:{status:'complete',provider:'google',xp:45}};
+ const replay={...first,id:'again',submittedAt:'2026-10-14T03:00:00Z',enrichmentReward:{status:'complete',provider:'google',xp:100}};
+ const check={...replay,id:'check',masteryCheck:{answer:'new'},submittedAt:'2026-10-14T01:00:00Z'};
+ expect(leaderboardStats([...sessions(),first,replay,check]).enrichmentXp).toBe(45);
+ for(const xp of [0,9,101,NaN])expect(leaderboardStats([...sessions(),{...first,enrichmentReward:{status:'complete',provider:'google',xp}}]).enrichmentXp).toBeNull();
+});

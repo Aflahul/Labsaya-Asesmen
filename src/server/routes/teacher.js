@@ -1,4 +1,5 @@
-import {leaderboardStats,rankLeaderboard} from '../../shared/leaderboard.js';
+import {gradeEnrichmentSession,enrichmentCandidates} from '../enrichment-reward.js';
+import {enrichmentXp,leaderboardStats,rankLeaderboard} from '../../shared/leaderboard.js';
 import { getIndicatorRubric } from "../../shared/indicator-rubrics.js";
 import { buildAssessmentEvidence,limitNaraFeedback } from "../../shared/indicator-assessment.js";
 import { randomUUID, randomBytes } from "node:crypto";
@@ -57,7 +58,17 @@ async function roster(db, query = {}, includeMissionDetails = false) {
         (query.complete !== "true" || p.summary.score !== null),
     );
 }
-export async function teacherRoutes(app) {
+export async function teacherRoutes(app, enrichmentGrader) {
+  app.get("/api/teacher/enrichment",async req=>{
+    app.requireRole(req,"teacher");return {data:await enrichmentCandidates(app.db)};
+  });
+  app.post("/api/teacher/enrichment/:id/grade",async req=>{
+    app.requireRole(req,"teacher");
+    const candidates=await enrichmentCandidates(app.db);
+    if(!candidates.some(s=>s.id===req.params.id))fail(404,"Pengayaan tidak ditemukan");
+    const session=await gradeEnrichmentSession(app.db,req.params.id,enrichmentGrader);
+    return {data:{id:session?.id,status:session?.enrichmentReward?.status||"pending",xp:enrichmentXp(session)}};
+  });
   app.get("/api/teacher/indicators", async req=>{
     app.requireRole(req,"teacher");
     const cfg=(await app.db.query("SELECT value FROM settings WHERE name='indicator-threshold'")).rows[0]?.value||{threshold:3,version:1};

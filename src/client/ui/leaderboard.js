@@ -16,15 +16,15 @@ function rankCard(row) {
  return `<li class="rank-card rank-${kind}" ${row.sepuh?'':`value="${esc(row.rank)}"`}>
   <div class="rank-award" aria-label="${row.sepuh?'Gelar Sepuh':`Peringkat ${esc(row.rank)}`}">${awardIcon(kind)}${row.sepuh?'<span class="sepuh-badge">Sepuh</span>':`<span class="rank-number">${esc(row.rank)}</span>`}</div>
   <div class="rank-player"><h3>${esc(row.alias)}</h3><dl class="rank-stats"><div data-stat="time"><dt>Waktu bermain</dt><dd>${esc(time(row.activeSeconds))}</dd></div><div data-stat="hints"><dt>Petunjuk</dt><dd>${esc(row.hints??'Belum tercatat')}</dd></div><div data-stat="attempts"><dt>Percobaan</dt><dd>${esc(row.attempts??'Belum tercatat')}</dd></div></dl></div>
-  <div class="rank-xp"><strong>${esc(row.score)}</strong><span>XP inti</span></div>
+  <div class="rank-xp">${row.sepuh?`<strong class="rank-bonus">${row.enrichmentXp==null?'Menyusul':'+'+esc(row.enrichmentXp)}</strong><span>XP pengayaan</span><small>${esc(row.score)} XP inti</small>`:`<strong>${esc(row.score)}</strong><span>XP inti</span>`}</div>
  </li>`;
 }
 export function leaderboardHtml(rows) {
  const sepuh=rows.filter(row=>row.sepuh),regular=rows.filter(row=>!row.sepuh);
  return `<section class="panel leaderboard"><div class="leaderboard-banner"><div><div class="eyebrow">Jejak para penjelajah</div><h1>Peringkat penjelajah</h1><p>Lihat pencapaianmu di antara para penjelajah.</p></div><span class="leaderboard-count">${rows.length} penjelajah</span></div>
  <p class="leaderboard-invitation">Tuntaskan pengayaan untuk meraih gelar <strong>Sepuh</strong>.</p>
- <details><summary>Bagaimana urutannya?</summary><p><strong>Sepuh di puncak!</strong> Badge ini menggantikan nomor di atas peringkat 1, tanpa tambahan XP.</p><p>Peserta lain diurutkan dari waktu bermain paling singkat, petunjuk paling sedikit, percobaan paling sedikit, lalu siapa yang selesai lebih dulu.</p><p>Yang dicatat adalah penyelesaian pertama tiap misi. Berlatih ulang setelah selesai bebas; menunggu hasil dan meninggalkan tab tidak dihitung.</p><p>Nama samaranmu tampil di sini. Hasil kemampuanmu tetap ada di Rapor; peringkat ini tidak mengubah nilainya.</p></details>
- ${sepuh.length?`<section class="leaderboard-group sepuh-group" aria-label="Penjelajah Sepuh"><h2>Gelar Sepuh <span>Pengayaan tuntas</span></h2><ul class="rank-list">${sepuh.map(rankCard).join('')}</ul></section>`:''}
+ <details><summary>Bagaimana urutannya?</summary><p><strong>Sepuh di puncak!</strong> XP pengayaan tertinggi berada paling atas. Bonus 10–100 XP dinilai dari jawaban pengayaan pertama. Jika sama, waktu, petunjuk, dan percobaan menjadi pembeda.</p><p>Peserta lain diurutkan dari waktu bermain paling singkat, petunjuk paling sedikit, percobaan paling sedikit, lalu siapa yang selesai lebih dulu.</p><p>Yang dicatat adalah penyelesaian pertama tiap misi. Berlatih ulang setelah selesai bebas; menunggu hasil dan meninggalkan tab tidak dihitung.</p><p>Nama samaranmu tampil di sini. Hasil kemampuanmu tetap ada di Rapor; peringkat ini tidak mengubah nilainya.</p></details>
+ ${sepuh.length?`<section class="leaderboard-group sepuh-group" aria-label="Penjelajah Sepuh"><h2>Gelar Sepuh <span>XP pengayaan tertinggi</span></h2><ul class="rank-list">${sepuh.map(rankCard).join('')}</ul></section>`:''}
  ${regular.length?`<section class="leaderboard-group" aria-label="Peringkat utama"><h2>Peringkat utama</h2><ol class="rank-list">${regular.map(rankCard).join('')}</ol></section>`:''}
  ${rows.length?'':'<div class="empty">Belum ada ekspedisi inti yang tuntas. Jadilah penjelajah pertama!</div>'}<div class="actions"><button data-nav="home">Kembali</button></div></section>`;
 }

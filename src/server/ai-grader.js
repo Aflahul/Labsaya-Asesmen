@@ -66,6 +66,7 @@ export async function gradeWithGemini(mission, answers, {
   model = process.env.GOOGLE_AI_MODEL || DEFAULT_MODEL,
   fetchImpl = fetch,
   retry503 = true,
+  timeoutMs = 120000,
 } = {}) {
   if (!apiKey) throw Error("Kunci Google AI belum dikonfigurasi");
   if (!/^[a-zA-Z0-9._-]+$/.test(model)) throw Error("Model Google AI tidak valid");
@@ -92,7 +93,7 @@ export async function gradeWithGemini(mission, answers, {
         },
       },
     }),
-    signal: AbortSignal.timeout(120000),
+    signal: AbortSignal.timeout(timeoutMs),
   };
   let response = await fetchImpl(url, options);
   if (retry503 && response.status === 503 && !options.signal.aborted) {

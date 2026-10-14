@@ -57,3 +57,7 @@ body[data-route="map"] .map-nara .nara-toast-message { max-height: none; }
  .rank-xp { grid-column: 2; display: flex; align-items: baseline; gap: .35rem; }
  .rank-xp strong { font-size: .9rem; }
 }
+
+.rank-xp small { font-size: .7rem; color: var(--muted); }
+.rank-bonus { color: #eed3ff; }
+@media (max-width: 640px) { .rank-sepuh .rank-xp { flex-wrap: wrap; } .rank-sepuh .rank-xp small { flex-basis: 100%; } }

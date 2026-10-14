@@ -30,7 +30,7 @@ for(const width of [390,1440]) {
  test(`game leaderboard displays every award tier without overflow at ${width}px`,async({page})=>{
   await page.setViewportSize({width,height:844});
   const regular=[1,2,3,4,10,11,35].map(rank=>({alias:rank===1?'Penjelajah Sangat Panjang 1234567890':`Teman ${rank}`,rank,score:1500,activeSeconds:1000,hints:0,attempts:15,sepuh:false}));
-  await page.route('**/api/leaderboard',route=>route.fulfill({contentType:'application/json',body:JSON.stringify({data:[{alias:'Sepuh pertama',rank:null,score:1500,activeSeconds:905,hints:2,attempts:17,sepuh:true},...regular]})}));
+  await page.route('**/api/leaderboard',route=>route.fulfill({contentType:'application/json',body:JSON.stringify({data:[{alias:'Sepuh pertama',rank:null,score:1500,activeSeconds:905,hints:2,attempts:17,sepuh:true,enrichmentXp:75},...regular]})}));
   await page.goto('/');await page.getByRole('button',{name:'Peringkat',exact:true}).click();
   await expect(page.getByRole('heading',{level:1,name:'Peringkat penjelajah'})).toBeVisible();
   await expect(page.getByText('Lihat pencapaianmu di antara para penjelajah.',{exact:true})).toBeVisible();
@@ -38,6 +38,8 @@ for(const width of [390,1440]) {
   await expect(page.locator('.leaderboard table')).toHaveCount(0);
   await expect(cards.first()).toHaveClass(/rank-sepuh/);
   await expect(cards.first().locator('.sepuh-badge')).toHaveText('Sepuh');
+  await expect(cards.first().locator('.rank-bonus')).toHaveText('+75');
+  await expect(cards.first()).toContainText('1500 XP inti');
   await expect(cards.first().locator('.rank-number')).toHaveCount(0);
   await expect(cards.first().locator('[data-stat="attempts"] dd')).toHaveText('17');
   await expect(page.locator('.rank-gold .rank-number')).toHaveText('1');

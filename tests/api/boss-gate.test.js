@@ -71,6 +71,6 @@ test("server rejects below90 and pending review, allows exactly90, ignores boss 
   expect(before[0].sepuh).toBe(false);expect(after[0].sepuh).toBe(true);expect(after[0].rank).toBeNull();expect(before[0].rank).toBe(1);
   expect(after[0].score).toBe(1500);
   expect(after[0].alias).toBe("Bos");
-  expect(Object.keys(after[0]).sort()).toEqual(["activeSeconds", "alias", "hints", "rank", "score", "sepuh"]);
+  expect(Object.keys(after[0]).sort()).toEqual(["activeSeconds", "alias", "attempts", "enrichmentXp", "hints", "rank", "score", "sepuh"]);
   await app.close();
 });
