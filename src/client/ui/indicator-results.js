@@ -2,16 +2,16 @@ import {esc} from './activities.js';
 import {getIndicatorRubric} from '../../shared/indicator-rubrics.js';
 import {v2ActivityHtml} from './v2-activities.js';
 import {draftState} from '../drafts.js';
-export const assessmentStatus={pending:'Jawabanmu sedang diperiksa',grading:'Jawabanmu sedang diperiksa',unavailable:'Jawaban tersimpan. Hasil kemampuan menyusul.',partial:'Hasil sementara',provisional:'Hasil sementara',needs_review:'Hasil akan ditinjau guru',single:'Hasil kemampuanmu',agreed:'Hasil kemampuanmu',teacher:'Ditinjau guru'};
-export const levelLabel={1:'Perlu latihan',2:'Mulai berkembang',3:'Sudah memahami',4:'Bisa menerapkan pada kasus baru'};
+export const assessmentStatus={pending:'Jawabanmu sedang diperiksa',grading:'Jawabanmu sedang diperiksa',unavailable:'Jawaban tersimpan. Hasil kemampuan menyusul.',partial:'Hasil sementara',provisional:'Hasil sementara',needs_review:'Hasil akan ditinjau guru',single:'Penilaian selesai',agreed:'Penilaian selesai',teacher:'Ditinjau guru'};
+export const levelLabel={1:'Perlu latihan',2:'Mulai berkembang',3:'Sudah memahami pada misi ini',4:'Bisa menerapkan pada kasus baru'};
 const goalLabel=i=>({'v2p01m01.types':'Memilih tipe data untuk nomor telepon dan berat kargo','v2p01m01.values':'Mengisi jumlah paket dan status persetujuan'})[i.id]||i.label;
 export function rubricHtml(m) {
  return `<details class="indicator-rubric"><summary>Yang dinilai</summary><ul>${getIndicatorRubric(m.id).indicators.map(i=>`<li>${esc(goalLabel(i))}</li>`).join('')}</ul></details>`;
 }
 export function indicatorResultsHtml(m,assessment={}) {
- return `<section class="indicator-results" aria-label="Hasil kemampuan"><h3>Kemampuanmu</h3><p role="status">${esc(assessmentStatus[assessment.status]||'Jawabanmu sedang diperiksa')}</p>${getIndicatorRubric(m.id).indicators.map(i=>{
+ return `<section class="indicator-results" aria-label="Hasil kemampuan"><h3>Kemampuanmu</h3>${['agreed','single','teacher'].includes(assessment.status)?'':`<p role="status">${esc(assessmentStatus[assessment.status]||'Jawabanmu sedang diperiksa')}</p>`}${getIndicatorRubric(m.id).indicators.map(i=>{
   const r=assessment.indicators?.find(x=>x.id===i.id);
-  return `<article class="indicator-card"><h4>${esc(i.label)}</h4><strong>${r?.level?`${r.level}/4 · ${levelLabel[r.level]}`:'Belum cukup bukti'}</strong><p>${esc(r?.reason||'Jawabanmu tersimpan. Hasil kemampuan menyusul.')}</p></article>`;
+  return `<article class="indicator-card"><h4>${esc(i.label)}</h4><strong>${r?.level?levelLabel[r.level]:'Belum cukup bukti'}</strong><p>${esc(r?.reason||'Jawabanmu tersimpan. Hasil kemampuan menyusul.')}</p></article>`;
  }).join('')}</section>`;
 }
 export function indicatorMissionHtml(m,s,summary,naraHtml) {
