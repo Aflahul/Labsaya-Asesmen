@@ -20,6 +20,7 @@ export async function loadProgress(db, id) {
   );
   return {
     participantId: id,
+    removedSessionIds: (await db.query("SELECT value FROM settings WHERE name=$1",[`removed-session-ids:${id}`])).rows[0]?.value || [],
     indicatorThreshold: (await db.query("SELECT value FROM settings WHERE name='indicator-threshold'")).rows[0]?.value || {threshold:3,version:1},
     sessions: rows.map((r) => upgradeScoring(r.document)),
   };
@@ -50,6 +51,7 @@ export async function progressRoutes(app, aiGrader, indicatorGrader) {
       return { data: upgradeScoring(existing.rows[0].document) };
     }
     const progress = await loadProgress(app.db, a.user_id);
+    if(progress.removedSessionIds.includes(b.id))fail(410,"Percobaan ini sudah dibersihkan. Muat ulang progres.");
     if (
       !(m.missionVersion === 1
         ? legacyUnlocked(m, legacySummary(progress))

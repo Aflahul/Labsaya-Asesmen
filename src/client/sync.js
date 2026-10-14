@@ -9,6 +9,11 @@ function adopt(local, remote) {
 export async function syncProgress({ progress, api, onStatus = () => {} }) {
   onStatus("Menyinkronkan…");
   const remote = await api("/progress");
+  const removed=new Set(Array.isArray(remote.removedSessionIds)?remote.removedSessionIds:[]);
+  if(removed.size){
+    progress.sessions=progress.sessions.filter(s=>!removed.has(s.id));
+    if(progress.conflicts)progress.conflicts=progress.conflicts.filter(c=>!removed.has(c.session?.id));
+  }
   if(remote.indicatorThreshold) progress.indicatorThreshold=remote.indicatorThreshold;
   for (const server of remote.sessions) {
     const local = progress.sessions.find((s) => s.id === server.id);

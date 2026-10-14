@@ -58,3 +58,11 @@ test("latest score independent of shuffled session array", () => {
     summarizeProgress({ sessions: [b, a] }).latestByMission.v2p01m01.id,
   ).toBe("b");
 });
+
+test('server cleanup removes cached attempts before any upload and preserves other sessions',async()=>{
+ const removed={id:'removed',events:[],serverCreated:false};const retained={id:'retained',events:[],serverCreated:true,syncedCount:0};
+ const progress={sessions:[removed,retained],conflicts:[{session:removed},{session:retained}]};const calls=[];
+ await syncProgress({progress,api:async(path,body)=>{calls.push({path,body});return {sessions:[],removedSessionIds:['removed']};}});
+ expect(progress.sessions.map(s=>s.id)).toEqual(['retained']);expect(progress.conflicts.map(c=>c.session.id)).toEqual(['retained']);
+ expect(calls.every(c=>!c.body)).toBe(true);
+});

@@ -266,8 +266,10 @@ export async function teacherRoutes(app) {
   });
   app.get("/api/leaderboard", async () => {
     const rows = await roster(app.db);
+    const excludedValue=(await app.db.query("SELECT value FROM settings WHERE name='leaderboard-excluded-participants'")).rows[0]?.value;
+    const excluded=new Set(Array.isArray(excludedValue)?excludedValue:[]);
     const entries = rows
-      .filter((p) => p.summary.completed === CORE_MISSIONS.length)
+      .filter((p) => !excluded.has(p.id)&&p.summary.completed === CORE_MISSIONS.length)
       .map((p) => ({ alias: p.alias, score: p.summary.xp }))
       .sort((a, b) => b.score - a.score || a.alias.localeCompare(b.alias));
     let rank = 0,
