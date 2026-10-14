@@ -19,7 +19,7 @@ async function gradeClaimed(db,id,grader) {
   current=(await client.query('SELECT document FROM mission_sessions WHERE id=$1 FOR UPDATE',[id])).rows[0]?.document;
   if(!current){await client.query('ROLLBACK');return null;}
   const old=current.indicatorAssessment;
-  if(current.assessmentPolicy!=='indicator-v1'||!current.activityCompletedAt||old?.source==='teacher'||['agreed','provisional','needs_review'].includes(old?.status)||old?.leaseUntil>Date.now()){
+  if(current.assessmentPolicy!=='indicator-v1'||!current.activityCompletedAt||old?.source==='teacher'||['agreed','provisional','single','needs_review'].includes(old?.status)||old?.leaseUntil>Date.now()){
    await client.query('ROLLBACK');return current;
   }
   mission=getMission(current.missionId);

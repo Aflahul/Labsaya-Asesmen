@@ -128,3 +128,18 @@ test('OpenRouter uses its supported function interface and reads validated grade
   expect(validateIndicatorGrade(rubric,evidence,result).indicators).toHaveLength(4);
  }finally{vi.unstubAllEnvs();}
 });
+
+test('Groq rate limit lets Gemini finish alone without claiming multiple reviewers agree',async()=>{
+ const result=await gradeWithConsensus(m,evidence,{providerGrader:async provider=>{if(provider==='groq')throw Error('HTTP_429');return {...proposal(3),model:'gemini-test'};}});
+ expect(result.status).toBe('single');expect(result.gradingMode).toBe('gemini_only');expect(result.fallbackReason).toBe('groq_rate_limit');
+ expect(result.indicators.every(i=>i.status==='single'&&i.reviewerCount===1&&i.level===3)).toBe(true);
+ expect(result.providerReviews.find(r=>r.provider==='groq').error).toBe('HTTP_429');
+});
+test('single-reviewer completion applies only to valid Gemini after Groq rate limit',async()=>{
+ for(const groqError of ['HTTP_503','TIMEOUT','JSON_INVALID']){
+  const result=await gradeWithConsensus(m,evidence,{providerGrader:async provider=>{if(provider==='groq')throw Error(groqError);return {...proposal(3),model:'gemini-test'};}});
+  expect(result.status).toBe('partial');expect(result.gradingMode).toBeUndefined();
+ }
+ const failed=await gradeWithConsensus(m,evidence,{providerGrader:async provider=>{throw Error(provider==='groq'?'HTTP_429':'HTTP_429');}});
+ expect(failed.status).toBe('unavailable');expect(failed.indicators.every(i=>i.level===null)).toBe(true);
+});

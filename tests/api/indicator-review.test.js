@@ -44,3 +44,21 @@ test('student session never exposes transfer answer guide',async()=>{
  const r=await app.inject({method:'POST',url:'/api/sessions',headers,payload:{id:crypto.randomUUID(),missionId:'v2p01m01',masteryCheck:true}});
  expect(r.statusCode).toBe(201);expect(r.body).not.toContain('expectedEvidence');expect(r.json().data.masteryCheck.prompt).toContain('00721');await app.close();
 });
+
+test('Gemini-only rate-limit result persists, counts in the report, and does not retry Groq',async()=>{
+ let calls=0;
+ const app=await setup({indicatorGrader:async(m,e,options)=>{calls++;return gradeWithConsensus(m,e,{...options,providerGrader:async provider=>{
+  if(provider==='groq')throw Error('HTTP_429');
+  return {model:'gemini-test',indicators:getIndicatorRubric(m.id).indicators.map(i=>({id:i.id,level:3,evidenceStatus:'present',references:[{key:i.fields[0],quote:e.answers[i.fields[0]]}],reason:'Pilihan sesuai.'})),feedback:'Coba Uji Mandiri.'};
+ }});}});
+ try{
+  const {s,headers}=await seed(app);
+  const r=await app.inject({method:'POST',url:`/api/sessions/${s.id}/grade`,headers});
+  expect(r.statusCode).toBe(200);const a=r.json().data.indicatorAssessment;
+  expect(a.status).toBe('single');expect(a.gradingMode).toBe('gemini_only');expect(a.indicators.every(i=>i.level===3&&i.reviewerCount===1)).toBe(true);
+  await app.inject({method:'POST',url:`/api/sessions/${s.id}/grade`,headers});expect(calls).toBe(1);
+  const {summarizeIndicators}=await import('../../src/shared/indicator-assessment.js');
+  const rows=summarizeIndicators([r.json().data]).filter(i=>i.missionId===s.missionId);
+  expect(rows.every(i=>i.level===3&&i.group!=='pending')).toBe(true);
+ }finally{await app.close();}
+});
