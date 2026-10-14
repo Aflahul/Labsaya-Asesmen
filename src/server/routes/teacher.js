@@ -1,3 +1,4 @@
+import {leaderboardStats,rankLeaderboard} from '../../shared/leaderboard.js';
 import { getIndicatorRubric } from "../../shared/indicator-rubrics.js";
 import { buildAssessmentEvidence,limitNaraFeedback } from "../../shared/indicator-assessment.js";
 import { randomUUID, randomBytes } from "node:crypto";
@@ -41,6 +42,7 @@ async function roster(db, query = {}, includeMissionDetails = false) {
       return {
         ...publicParticipant,
         hasPassword: Boolean(password_hash),
+        ...(query.leaderboard?{leaderboard:leaderboardStats(sessions)}:{}),
         summary,
         ...(includeMissionDetails ? { missionRows } : {}),
       };
@@ -265,21 +267,12 @@ export async function teacherRoutes(app) {
     return { data: { baselineMultiplier: x } };
   });
   app.get("/api/leaderboard", async () => {
-    const rows = await roster(app.db);
+    const rows = await roster(app.db,{leaderboard:true});
     const excludedValue=(await app.db.query("SELECT value FROM settings WHERE name='leaderboard-excluded-participants'")).rows[0]?.value;
     const excluded=new Set(Array.isArray(excludedValue)?excludedValue:[]);
     const entries = rows
       .filter((p) => !excluded.has(p.id)&&p.summary.completed === CORE_MISSIONS.length)
-      .map((p) => ({ alias: p.alias, score: p.summary.xp }))
-      .sort((a, b) => b.score - a.score || a.alias.localeCompare(b.alias));
-    let rank = 0,
-      prev;
-    return {
-      data: entries.map((x, i) => {
-        if (x.score !== prev) rank = i + 1;
-        prev = x.score;
-        return { ...x, rank };
-      }),
-    };
+      .map((p) => ({ alias: p.alias, score: p.summary.xp,...p.leaderboard }));
+    return {data:rankLeaderboard(entries)};
   });
 }

@@ -66,3 +66,9 @@ Koreksi indikator melalui form Tinjauan indikator. Pilih tingkat atau Belum cuku
 Setiap misi selesai memberi 100 XP sekali. Ulang, petunjuk, kesalahan dan waktu tidak memotong XP. Bos dibuka setelah 15 aktivitas inti selesai; XP pengayaan terpisah. XP bukan nilai kemampuan. Jawaban setelah Coba/petunjuk atau mengulang kasus yang telah dilihat menjadi latihan; Uji Mandiri memakai kasus baru. Petunjuk selama Uji Mandiri mengubah hasilnya menjadi latihan berbantuan. Bukti mandiri terbaru yang valid dipakai, bukan rata-rata semua percobaan; riwayat tetap dapat diperiksa. Awasi pemeriksaan mandiri di kelas karena aplikasi tidak dapat membuktikan tidak adanya bantuan di luar aplikasi.
 
 Kasus transfer saat ini satu versi terkurasi per misi. Mengulangi kasus transfer yang sudah dicoba atau diberi petunjuk dicatat sebagai latihan, bukan bukti mandiri baru. Guru dapat memberi kasus lain dan mencatat hasil observasi mandiri lewat koreksi. Ini mencegah penguasaan semu dari menyalin jawaban pada kasus yang sama.
+
+## Peringkat permainan saat asesmen indikator
+
+Peringkat peserta yang menyelesaikan 15 misi inti diurutkan berdasarkan total waktu aktif paling singkat, petunjuk tercatat paling sedikit, lalu waktu selesai lebih awal. Jika ketiganya sama, peringkat seri; nama samaran hanya mengatur urutan tampilan pada seri. Waktu dan petunjuk dihitung dari penyelesaian pertama setiap misi inti. Latihan ulang sesudahnya dan pengayaan tidak mengubah urutan. Data waktu yang tidak tersedia tidak dianggap nol.
+
+Badge **Sepuh** diberikan setelah aktivitas pengayaan selesai. Badge ini menunjukkan penyelesaian aktivitas, bukan keputusan ketuntasan kompetensi. XP, jawaban, nilai indikator, dan keputusan guru tidak diubah oleh pengurutan peringkat.

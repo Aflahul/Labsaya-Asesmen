@@ -17,10 +17,20 @@ test("leaderboard recovers from a failed request instead of staying on loading",
   await expect(page.getByRole("alert")).toContainText("Failed to fetch");
   await page.getByRole("button", { name: "Coba lagi" }).click();
   await expect(page.getByText("Memuat peringkat…")).toHaveCount(0);
+  await page.getByText("Cara menghitung",{exact:true}).click();
   await expect(
     page.getByText("Hanya nama samaran yang ditampilkan di sini", {
       exact: false,
     }),
   ).toBeVisible();
   await expect(page.getByRole("button", { name: "Kembali" })).toBeVisible();
+});
+
+test('leaderboard shows time, hints and Sepuh without overflowing a phone screen',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.route('**/api/leaderboard',route=>route.fulfill({contentType:'application/json',body:JSON.stringify({data:[{alias:'Penjelajah Sangat Panjang 1234567890',rank:1,score:1500,activeSeconds:905,hints:2,sepuh:true},{alias:'Teman',rank:2,score:1500,activeSeconds:1000,hints:0,sepuh:false}]})}));
+ await page.goto('/');await page.getByRole('button',{name:'Peringkat',exact:true}).click();
+ await expect(page.getByRole('heading',{level:1,name:'Peringkat penjelajah'})).toBeVisible();
+ await expect(page.locator('.sepuh-badge')).toHaveCount(1);await expect(page.locator('.leaderboard')).toContainText('15 m 5 dtk');
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });

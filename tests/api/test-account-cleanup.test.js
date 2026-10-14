@@ -14,7 +14,7 @@ test('test-account leaderboard exclusion preserves assessment records and ranks 
   }
   await app.db.query('INSERT INTO settings(name,value) VALUES($1,$2)',['leaderboard-excluded-participants',JSON.stringify(['test-account'])]);
   const r=await app.inject({method:'GET',url:'/api/leaderboard'});
-  expect(r.json().data).toEqual([{alias:'real-pupil',score:1500,rank:1}]);
+  expect(r.json().data).toMatchObject([{alias:'real-pupil',score:1500,rank:1}]);
   expect((await app.db.query('SELECT id FROM mission_sessions WHERE participant_id=$1',['test-account'])).rows).toHaveLength(15);
  }finally{await app.close();}
 });

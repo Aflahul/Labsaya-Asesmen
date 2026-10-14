@@ -1,3 +1,4 @@
+import {leaderboardHtml} from './ui/leaderboard.js';
 import { indicatorClassHtml, indicatorStudentReportHtml } from "./ui/indicator-report.js";
 import { buildIndicatorClassReport, indicatorExportRows } from "../shared/reports.js";
 import { indicatorMissionHtml } from "./ui/indicator-results.js";
@@ -553,9 +554,7 @@ async function leaderboard() {
   try {
     const rows = await api("/leaderboard");
     if (route !== "leaderboard") return;
-    shell(
-      `<section class="panel"><div class="eyebrow">Penjelajah Menara Awan</div><h2 style="margin-top:12px">Peringkat penjelajah</h2><p>Hanya nama samaran yang ditampilkan di sini; nama lengkap digunakan pada rapor asesmen yang dapat dilihat murid terkait dan guru. Peringkat memakai XP dari misi inti yang selesai. XP yang sama memperoleh peringkat sama; pengayaan tidak memengaruhi peringkat.</p>${table(rows.map((r) => ({ Peringkat: r.rank, "Nama samaran": r.alias, "XP inti": r.score })))}${rows.length ? "" : '<div class="empty">Belum ada ekspedisi inti yang tuntas. Jadilah penjelajah pertama!</div>'}<div class="actions"><button data-nav="home">Kembali</button></div></section>`,
-    );
+    shell(leaderboardHtml(rows));
   } catch (e) {
     if (route !== "leaderboard") return;
     shell(

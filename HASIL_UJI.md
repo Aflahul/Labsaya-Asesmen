@@ -83,3 +83,7 @@ Pulau selesai membuka hasil tersimpan, bukan percobaan baru. Tombol Lihat Hasil 
 Dasar penilaian dapat dibuka pada kartu hasil: kutipan jawaban, alasan, acuan tiap tahap, status dan catatan tinjauan guru. Tampilan utama tetap singkat tanpa nama model. Nara pada peta dimulai tertutup dan tampil mengikuti alur halaman saat dibuka. Peta/rapor memiliki h1, status sinkronisasi diumumkan secara sopan oleh pembaca layar, dan validasi formulir menggunakan bahasa Indonesia.
 
 Verifikasi: 161/161 unit/API, build produksi berhasil, 27 alur browser terverifikasi melalui suite dan pengulangan kasus dengan ekspektasi teks lama, serta 1/1 offline. Uji integritas membandingkan ID, jumlah event, dan status sesi sebelum/sesudah membuka hasil; tidak ada perubahan. Uji Nara memeriksa tidak ada perpotongan panel dengan pulau pada 390 px dan 1440 px. Perjalanan 15 misi, bos, koreksi guru, dan peringkat XP lolos.
+
+## Peringkat waktu/petunjuk dan badge Sepuh
+
+169/169 uji unit/API, build produksi berhasil, 3/3 browser untuk peringkat HP, pemulihan permintaan peringkat, serta perjalanan 15 misi/bos/koreksi guru. Pengujian mencakup pengurutan waktu, petunjuk, waktu selesai, seri, data waktu kosong, pengulangan setelah selesai, dan badge hanya untuk pengayaan yang selesai. API publik tidak menyertakan nama lengkap, ID akun, atau detail jawaban. Implementasi menghitung peringkat dari data yang sudah tersimpan dan tidak menulis ulang data asesmen kelas.
