@@ -14,8 +14,8 @@ test('all missions, teacher correction, boss and XP remain separate from capabil
  const form=teacher.locator(`.indicator-review-form[data-review]`).last();await form.locator('..').locator(':scope > summary').click();
  for(const i of getIndicatorRubric(BOSS.id).indicators){await form.locator(`[name="${i.id}"]`).selectOption('2');await form.locator(`[name="reason:${i.id}"]`).fill('Bagian aturan ini masih perlu diperjelas berdasarkan jawaban.');}
  await form.locator('[name=comment]').fill('Pengayaan perlu dilengkapi; XP inti tetap.');await form.getByRole('button',{name:'Simpan',exact:true}).click();
- await expect(teacher.locator('.summary-card').nth(1)).toContainText('1500');
- await page.reload();await page.getByRole('button',{name:'Rapor',exact:true}).click();await expect(page.locator('.summary-card').nth(1)).toContainText('1500');
+ await expect(teacher.locator('main')).toContainText('XP inti: 1500');
+ await page.reload();await page.getByRole('button',{name:'Rapor',exact:true}).click();await expect(page.locator('main')).toContainText('XP inti: 1500');
  await page.getByRole('button',{name:'Peringkat',exact:true}).click();await expect(page.getByRole('row').filter({hasText:alias})).toContainText('1500');await expect(page.locator('main')).not.toContainText('Siswa Lengkap');
  expect(errors).toEqual([]);await tc.close();
 });

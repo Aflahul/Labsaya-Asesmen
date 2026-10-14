@@ -64,7 +64,7 @@ test("Gemini request sends only task evidence and rejects invalid rubric output"
   const prompt = JSON.parse(request.options.body).contents[0].parts[0].text;
   expect(prompt).toContain("guru bijak");
   expect(prompt).toContain("growth mindset");
-  expect(prompt).toContain("maksimal 400 karakter");
+  expect(prompt).toContain("maksimal 180 karakter");
   expect(request.options.headers["x-goog-api-key"]).toBe("test-key");
   expect(request.options.body).not.toContain("DewiAI");
   expect(() => validateAiGrade(mission, { ...result, marks: { ...result.marks, decision: 300 } })).toThrow();

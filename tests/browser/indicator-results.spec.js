@@ -6,7 +6,7 @@ test('learner sees concise final capabilities, free replay and independent trans
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await register(page);await enterMission(page,MISSIONS[0]);await fillMission(page,MISSIONS[0]);await page.locator('#submit').click();await waitForSaved(page);
  await expect(page.locator('.indicator-results')).toContainText('Sudah memahami pada misi ini');await expect(page.locator('.score-breakdown')).toContainText('100 XP');
- await expect(page.locator('.indicator-results')).not.toContainText(/penilai|model|Groq|OpenRouter|Gemini|HTTP_/);
+ await expect(page.locator('.indicator-results')).not.toContainText(/\bpenilai\b|model|Groq|OpenRouter|Gemini|HTTP_/);
  await expect(page.locator('.instruction')).not.toContainText('Mengulang gratis');
  await expect(page.locator('.indicator-results')).not.toContainText('Hasil kemampuanmu');
  await expect(page.locator('.indicator-results')).not.toContainText(/[1-4]\/4/);

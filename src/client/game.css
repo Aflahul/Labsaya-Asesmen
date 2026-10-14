@@ -1649,13 +1649,11 @@ body[data-route="mission"] .side-panel {
   font-weight: normal;
   color: var(--muted);
 }
-body[data-route="home"].nara-is-open main,
-body[data-route="map"].nara-is-open main {
+body[data-route="home"].nara-is-open main {
   padding-bottom: 320px;
 }
 @media (max-width: 540px) {
-  body[data-route="home"].nara-is-open main,
-  body[data-route="map"].nara-is-open main {
+  body[data-route="home"].nara-is-open main {
     padding-bottom: calc(45dvh + 100px);
   }
 }

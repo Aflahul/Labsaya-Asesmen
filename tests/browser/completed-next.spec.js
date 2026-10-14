@@ -8,7 +8,7 @@ test("all Ulang attempts are free and the island opens the next unfinished missi
   await fillMission(page, MISSIONS[0]);
   await page.locator("#submit").click();
   await waitForSaved(page);
-  await expect(page.locator("#next")).toHaveText("Next");
+  await expect(page.locator("#next")).toHaveText("Lanjut");
   const count = () => page.evaluate(() => {
     const a = JSON.parse(localStorage.getItem("pulau:last-account"));
     return JSON.parse(localStorage.getItem(`pulau:progress:v1:${a.user.id}`)).sessions.length;

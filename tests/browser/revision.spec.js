@@ -23,7 +23,13 @@ for (const width of [390, 1440]) {
       /prop-cargo-crate/,
     );
     await page.getByRole("button", { name: "Peta", exact: true }).click();
+    await page.locator("#nara-open").click();
     await expect(nara).toContainText("Pilih pulau yang terbuka untuk masuk ke misi berikutnya.");
+    expect(await page.evaluate(()=>{
+      const n=document.querySelector('#nara-toast').getBoundingClientRect();
+      return [...document.querySelectorAll('.island-art')].every(el=>{const r=el.getBoundingClientRect();return n.right<=r.left||n.left>=r.right||n.bottom<=r.top||n.top>=r.bottom;});
+    })).toBe(true);
+    await expect(page.getByRole('heading',{level:1,name:'Peta perjalanan'})).toBeVisible();
     await page.locator("#nara-close").click();
     await expect
       .poll(() => page.locator(".map-links path").getAttribute("d"))

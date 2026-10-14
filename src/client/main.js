@@ -60,7 +60,7 @@ let auth = null,
   disconnectMap = () => {};
 const pageNara = {
   home: { open: true, page: 0, mode: "guide" },
-  map: { open: true, page: 0, mode: "guide" },
+  map: { open: false, page: 0, mode: "guide" },
 };
 function pageGuide(page) {
   return naraToast(
@@ -136,11 +136,12 @@ function save() {
   }
 }
 function showError(message) {
-  const box = $("#error") || $('[role="status"]');
+  const box = $("#error") || $('[role="status"]:not([data-sync])');
   if (box) box.textContent = message;
   else {
     const p = document.createElement("p");
     p.id = "error";
+    p.setAttribute("role","alert");
     p.className = "error panel";
     p.textContent = message;
     app.querySelector("main")?.prepend(p);
@@ -259,7 +260,7 @@ function shell(content) {
     "nara-is-open",
     ["home", "map", "mission"].includes(route) && activeNaraState().open,
   );
-  app.innerHTML = `<header><button class="brand" data-nav="home"><span class="brand-mark">✧</span><span>Pulau Logika</span></button><nav>${auth?.role === "participant" ? '<button class="navbtn" data-nav="map">Peta</button><button class="navbtn" data-nav="report">Rapor</button>' : ""}${auth?.role === "teacher" ? '<button class="navbtn" data-nav="teacher">Guru</button>' : ""}<button class="navbtn" data-nav="leaderboard">Peringkat</button><button class="navbtn" data-nav="${auth?.role === "teacher" ? "teacher" : "teacher-login"}">Guru</button><button class="small ghost" id="mute" aria-label="${audio.muted ? "Aktifkan suara" : "Matikan suara"}">${audio.muted ? "♪ Off" : "♪ On"}</button><button class="small ghost" data-nav="settings" aria-label="Pengaturan">⚙</button>${auth ? '<button class="small ghost" id="logout">Keluar</button>' : ""}</nav></header><main>${cacheWarning ? `<p class="panel error" role="alert">${esc(cacheWarning)}</p>` : ""}${content}</main><footer class="footer"><span>ASESMEN INFORMATIKA · FASE E</span><span class="footer-credit">Created by <a href="https://aflahul.vercel.app/" target="_blank" rel="noopener noreferrer">Aflahul Mukmin</a></span>${route === "mission" || route === "travel" ? "" : `<span class="footer-sync" data-sync>${esc(syncStatus)}</span>`}</footer>`;
+  app.innerHTML = `<header><button class="brand" data-nav="home"><span class="brand-mark">✧</span><span>Pulau Logika</span></button><nav>${auth?.role === "participant" ? '<button class="navbtn" data-nav="map">Peta</button><button class="navbtn" data-nav="report">Rapor</button>' : ""}${auth?.role === "teacher" ? '<button class="navbtn" data-nav="teacher">Guru</button>' : ""}<button class="navbtn" data-nav="leaderboard">Peringkat</button><button class="navbtn" data-nav="${auth?.role === "teacher" ? "teacher" : "teacher-login"}">Guru</button><button class="small ghost" id="mute" aria-label="${audio.muted ? "Aktifkan suara" : "Matikan suara"}">${audio.muted ? "♪ Off" : "♪ On"}</button><button class="small ghost" data-nav="settings" aria-label="Pengaturan">⚙</button>${auth ? '<button class="small ghost" id="logout">Keluar</button>' : ""}</nav></header><main>${cacheWarning ? `<p class="panel error" role="alert">${esc(cacheWarning)}</p>` : ""}${content}</main><footer class="footer"><span>ASESMEN INFORMATIKA · FASE E</span><span class="footer-credit">Created by <a href="https://aflahul.vercel.app/" target="_blank" rel="noopener noreferrer">Aflahul Mukmin</a></span>${route === "mission" || route === "travel" ? `<span class="sr-only" data-sync role="status" aria-live="polite" aria-atomic="true">${esc(syncStatus)}</span>` : `<span class="footer-sync" data-sync role="status" aria-live="polite" aria-atomic="true">${esc(syncStatus)}</span>`}</footer>`;
 }
 function home() {
   world.reset();
@@ -324,19 +325,36 @@ function map() {
   const selected =
     ISLANDS.find((i) => i.id === (selectedIsland || next.island)) || ISLANDS[0];
   shell(
-    `<div class="topline map-heading"><div><div class="eyebrow">EKSPEDISI ${esc(auth.user.alias)}</div><h2>Pulihkan jalur antarpulau.</h2><p>${summary.completed}/15 misi inti selesai${summary.pendingReview ? " · " + summary.pendingReview + " karya menunggu guru" : ""}</p></div><button class="ghost" data-nav="report">Rapor</button></div><div class="map-stage"><div class="island-grid constellation"><svg class="map-links" viewBox="0 0 1000 620" preserveAspectRatio="none" aria-hidden="true"><path/></svg>${ISLANDS.map(
+    `<div class="topline map-heading"><div><div class="eyebrow">EKSPEDISI ${esc(auth.user.alias)}</div><h1>Peta perjalanan</h1><p>${summary.completed}/15 misi inti selesai${summary.pendingReview ? " · " + summary.pendingReview + " karya menunggu guru" : ""}</p></div><button class="ghost" data-nav="report">Rapor</button></div><div class="map-nara">${pageGuide("map")}</div><div class="map-stage"><div class="island-grid constellation"><svg class="map-links" viewBox="0 0 1000 620" preserveAspectRatio="none" aria-hidden="true"><path/></svg>${ISLANDS.map(
       (i) => {
         const ms = CORE_MISSIONS.filter((m) => m.island === i.id),
           done = ms.filter((m) => summary.activityCompletedByMission[m.id]).length,
           open = unlocked(ms[0], summary);
-        return `<section class="island-card ${open ? "" : "locked"} ${selected.id === i.id ? "selected" : ""}"><button class="island-art" data-island="${i.id}" aria-label="${open ? "Masuk ke" : "Lihat syarat membuka"} ${esc(i.name)}"><img src="/game-assets/island-${i.slug}.webp" alt=""></button><div class="island-label"><small>${done === 3 ? "✓ PULIH" : open ? "JALUR TERBUKA" : "TERKUNCI"} · ${done}/3</small><button class="island-name" data-island="${i.id}">${esc(i.name)}</button>${i.id === 5 ? "<small>Lokasi Menara Awan</small>" : ""}</div>${selectedIsland === i.id && !open ? `<div class="island-entry" role="status"><p>Selesaikan tiga misi pulau sebelumnya untuk membuka ${esc(i.name)}.</p></div>` : ""}</section>`;
+        return `<section class="island-card ${open ? "" : "locked"} ${selected.id === i.id ? "selected" : ""}"><button class="island-art" data-island="${i.id}" aria-label="${open ? "Masuk ke" : "Lihat syarat membuka"} ${esc(i.name)}"><img src="/game-assets/island-${i.slug}.webp" alt=""></button><div class="island-label"><small>${done === 3 ? "✓ PULIH" : open ? "JALUR TERBUKA" : "TERKUNCI"} · ${done}/3</small><button class="island-name" data-island="${i.id}">${esc(i.name)}</button>${i.id === 5 ? "<small>Lokasi Menara Awan</small>" : ""}${done?`<button class="small ghost" data-history-island="${i.id}">Lihat Hasil</button>`:""}</div>${selectedIsland === i.id && !open ? `<div class="island-entry" role="status"><p>Selesaikan tiga misi pulau sebelumnya untuk membuka ${esc(i.name)}.</p></div>` : ""}</section>`;
       },
     ).join(
       "",
     )}</div></div>${summary.completed === 15 ? `<section class="panel ending-card"><img src="/game-assets/ending-network-restored.webp" alt="Jaringan antarpulau kembali bercahaya"><div><div class="eyebrow">EKSPEDISI INTI SELESAI</div><h2>Menara Awan kembali menyala.</h2><p>XP inti: <strong>${summary.xp}</strong>. Lihat hasil kemampuan per indikator di Rapor.</p>${summary.bossUnlocked ? `<p>Portal Ruang Arsitek di dalam Menara Awan terbuka. Di sana, kamu dapat mencoba tantangan pengayaan dengan merancang solusi sendiri.</p><button class="primary" data-mission="${BOSS.id}">Tantang</button><p class="notice">Tantangan ini boleh dilewati. Hasilnya tidak mengurangi nilai kompetensimu.</p>` : '<p class="notice">Ingin mencoba lagi? Kamu bisa mengulang misi. Riwayat perkembanganmu tetap disimpan.</p>'}</div></section>` : ""}`,
   );
-  app.querySelector("main").insertAdjacentHTML("beforeend", pageGuide("map"));
   disconnectMap = connectIslands($(".constellation"));
+}
+function islandHistory(islandId) {
+  timer.pause(); world.reset(); route="island-history";
+  const missions=CORE_MISSIONS.filter(m=>m.island===islandId&&progress.sessions.some(s=>s.missionId===m.id&&(s.activityCompletedAt||s.status==='complete')));
+  if(!missions.length)return;
+  shell(`<section class="panel mission-history"><div class="topline"><h1>Hasil ${esc(missions[0].islandName)}</h1><button data-nav="map">Peta</button></div><p>Pilih hasil misi yang ingin kamu lihat.</p>${missions.map(m=>{
+    const sessions=progress.sessions.filter(s=>s.missionId===m.id&&(s.activityCompletedAt||s.status==='complete')).sort((a,b)=>(b.submittedAt||b.completedAt||'').localeCompare(a.submittedAt||a.completedAt||''));
+    return `<article class="indicator-card"><h2>${esc(m.title)}</h2><button data-view-session="${esc(sessions[0].id)}">Lihat Hasil</button><details><summary>Riwayat · ${sessions.length} percobaan</summary>${sessions.map((s,index)=>`<p>${s.masteryCheck?'Uji Mandiri':'Misi'} · ${esc(new Date(s.submittedAt||s.completedAt||s.activityCompletedAt).toLocaleString('id-ID',{timeZone:'Asia/Jakarta',dateStyle:'short',timeStyle:'short'}))} <button class="small" data-view-session="${esc(s.id)}" aria-label="Lihat percobaan ${sessions.length-index} ${esc(m.title)}">Lihat</button></p>`).join('')}</details></article>`;
+  }).join('')}</section>`);
+}
+function openSavedSession(id) {
+  const s=progress.sessions.find(s=>s.id===id&&(s.activityCompletedAt||s.status==='complete'));
+  if(!s)return;
+  timer.pause();active=s.id;route="mission";hint="";
+  naraState={open:false,page:0,mode:'feedback'};
+  timer.set(s.activeMs);renderMission();
+  document.getElementById('mission-heading')?.focus({preventScroll:true});
+  window.scrollTo({top:0,behavior:'instant'});
 }
 async function travel(m) {
   if (!unlocked(m, summarizeProgress(progress))) return;
@@ -745,6 +763,14 @@ app.addEventListener("click", async (e) => {
       });
       return;
     }
+    if (b.dataset.historyIsland) {
+      islandHistory(Number(b.dataset.historyIsland));
+      return;
+    }
+    if (b.dataset.viewSession) {
+      openSavedSession(b.dataset.viewSession);
+      return;
+    }
     if (b.dataset.mission) {
       travel(getMission(b.dataset.mission));
       return;
@@ -754,6 +780,7 @@ app.addEventListener("click", async (e) => {
       const ms = CORE_MISSIONS.filter((m) => m.island === islandId);
       const summary = summarizeProgress(progress);
       if (unlocked(ms[0], summary)) {
+        if(ms.every(m=>summary.activityCompletedByMission[m.id])){islandHistory(islandId);return;}
         travel(ms.find(m=>summary.activeByMission[m.id]) || ms.find((m) => !summary.activityCompletedByMission[m.id]) || ms[0]);
       } else {
         selectedIsland = islandId;
@@ -860,7 +887,7 @@ app.addEventListener("click", async (e) => {
       case "hint": {
         const s = current(),
           m = getMission(s.missionId);
-        hint = s.assessmentPolicy === "indicator-v1" ? (s.masteryCheck ? "Baca aturan kasus baru. Pilih satu data, lalu jelaskan langkahmu. Bantuan ini dicatat sebagai latihan." : fallbackNara(getIndicatorRubric(m.id),buildAssessmentEvidence(m,s))) : m.guidance?.hint || m.hints[Math.min(s.hints, m.hints.length - 1)];
+        hint = s.assessmentPolicy === "indicator-v1" ? (s.masteryCheck ? "Baca aturan kasus baru. Pilih satu data, lalu jelaskan langkahmu. Bantuan ini dicatat sebagai latihan." : fallbackNara(getIndicatorRubric(m.id),buildAssessmentEvidence(m,s)).replace("Pilih Ulang, lalu periksa","Periksa")) : m.guidance?.hint || m.hints[Math.min(s.hints, m.hints.length - 1)];
         emit("hint");
         break;
       }
@@ -983,6 +1010,7 @@ app.addEventListener("click", async (e) => {
   }
 });
 app.addEventListener("change", async (e) => {
+  e.target.setCustomValidity?.("");
   const el = e.target;
   try {
     if (el.matches("textarea[data-answer]")) {
@@ -1036,7 +1064,12 @@ app.addEventListener("change", async (e) => {
     showError(err.message);
   }
 });
+app.addEventListener("invalid", e=>{
+  const input=e.target,v=input.validity;
+  input.setCustomValidity(v.valueMissing?"Isi bagian ini terlebih dahulu.":v.badInput?"Masukkan angka yang valid.":v.rangeUnderflow?`Gunakan angka minimal ${input.min}.`:v.rangeOverflow?`Gunakan angka maksimal ${input.max}.`:v.tooShort?`Gunakan sedikitnya ${input.minLength} karakter.`:v.typeMismatch||v.patternMismatch?"Periksa kembali format isian ini.":"Periksa kembali isian ini.");
+},true);
 app.addEventListener("input", (e) => {
+  e.target.setCustomValidity?.("");
   if (e.target.matches("textarea[data-answer]")) {
     try {
       const s = current();

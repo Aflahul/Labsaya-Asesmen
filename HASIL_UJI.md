@@ -75,3 +75,11 @@ Verifikasi patch terakhir: npm test 155/155; build berhasil; tiga browser flow N
 OpenRouter dinonaktifkan pada penilaian baru serta fallback lama. Groq dan Gemini menilai dua kali secara independen; Gemini kemudian menyusun satu pesan akhir dan penjelasan pendek per indikator tanpa mengubah tingkat atau bukti. Rincian teknis tetap tersedia untuk guru. Daftar deskriptor 1–4, kutipan mentah, nama model, dan pesan kegagalan tidak ditampilkan kepada murid. Teks pengulangan di instruksi misi dihapus; aturan XP tetap sama.
 
 Verifikasi: 158/158 uji unit/API, build berhasil, 3/3 browser alur hasil kemampuan/Nara/draft. Dua uji tampilan misi ringkas juga lolos. Uji ini mencakup penyusunan pesan yang gagal tanpa menghapus nilai, koreksi guru saat proses berjalan, dan tidak ada panggilan OpenRouter pada penilaian baru.
+
+## Perbaikan UI/UX rapor dan akses hasil
+
+Pulau selesai membuka hasil tersimpan, bukan percobaan baru. Tombol Lihat Hasil juga tersedia untuk misi selesai pada pulau yang belum seluruhnya selesai. Riwayat menampilkan percobaan dan waktu WIB. Rapor memisahkan aktivitas selesai, indikator memenuhi, bukti belum cukup, menunggu penilaian, serta kebutuhan latihan; bukti sebagian tidak diklaim sebagai ketuntasan seluruh TP.
+
+Dasar penilaian dapat dibuka pada kartu hasil: kutipan jawaban, alasan, acuan tiap tahap, status dan catatan tinjauan guru. Tampilan utama tetap singkat tanpa nama model. Nara pada peta dimulai tertutup dan tampil mengikuti alur halaman saat dibuka. Peta/rapor memiliki h1, status sinkronisasi diumumkan secara sopan oleh pembaca layar, dan validasi formulir menggunakan bahasa Indonesia.
+
+Verifikasi: 161/161 unit/API, build produksi berhasil, 27 alur browser terverifikasi melalui suite dan pengulangan kasus dengan ekspektasi teks lama, serta 1/1 offline. Uji integritas membandingkan ID, jumlah event, dan status sesi sebelum/sesudah membuka hasil; tidak ada perubahan. Uji Nara memeriksa tidak ada perpotongan panel dengan pulau pada 390 px dan 1440 px. Perjalanan 15 misi, bos, koreksi guru, dan peringkat XP lolos.

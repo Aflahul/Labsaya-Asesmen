@@ -21,11 +21,12 @@ test("mission stays compact, tips live in Nara and the plane remains in the scen
   await page.locator("#nara-close").click();
   await page.getByRole("button", { name: "Petunjuk", exact: true }).click();
   await expect(page.locator("#nara-toast")).toContainText(
-    "Kita periksa satu bagian",
+    "Nomor telepon bisa diawali angka 0",
   );
   await expect(page.locator(".mission-panel")).not.toContainText(
-    "Kita periksa satu bagian",
+    "Nomor telepon bisa diawali angka 0",
   );
+  await expect(page.locator("#nara-toast")).not.toContainText("Pilih Ulang");
   await page.locator("#nara-close").click();
   await page.locator("[data-answer=phone]").selectOption("String");
   await expect(page.locator(".resident-plane")).toBeVisible();
