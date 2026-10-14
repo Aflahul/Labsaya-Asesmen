@@ -34,3 +34,9 @@ Master PNG tetap dipertahankan di sumber. Runtime menggunakan WebP dengan nama d
 | `world-sky.webp` | 1672×941 | Latar peta dan beranda |
 
 Aset cadangan tetap tersedia untuk pengembangan efek berikutnya; tidak semua efek dipasang sekaligus agar perintah dan jawaban tetap mudah dibaca. Tidak ada gambar baru yang dibuat oleh implementasi ini.
+
+## Musik latar
+
+“Contemplative Fantasy Vol. 2 — Loop B” oleh YannZ (Yanni Ziangos), CC-BY 4.0. Sumber: https://opengameart.org/content/contemplative-fantasy-vol-2. Lisensi: https://creativecommons.org/licenses/by/4.0/. Pemutaran menggunakan URL audio resmi OpenGameArt dan memerlukan internet. Kredit juga tersedia di Pengaturan dan public/game-assets/MUSIC-LICENSE.txt.
+
+Volume awal 12%, batas slider 30%. Mulai setelah interaksi pertama, berulang, dan jeda saat tab tersembunyi. Tombol suara mematikan musik dan efek; slider 0 mematikan musik saja. Musik tidak mengubah nilai atau aktivitas misi.
