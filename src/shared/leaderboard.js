@@ -7,13 +7,13 @@ const finishTime=s=>{
 export function leaderboardStats(sessions) {
  const first=CORE_MISSIONS.map(m=>sessions.filter(s=>s.missionId===m.id&&finished(s)).sort((a,b)=>(finishTime(a)??Infinity)-(finishTime(b)??Infinity))[0]);
  const total=key=>first.every(s=>s&&Number.isFinite(s[key])&&s[key]>=0)?first.reduce((n,s)=>n+s[key],0):null;
- const ms=total('activeMs'),hints=total('hints'),times=first.map(s=>s&&finishTime(s));
- return {activeSeconds:ms===null?null:Math.round(ms/1000),hints,
+ const ms=total('activeMs'),hints=total('hints'),attempts=total('attempts'),times=first.map(s=>s&&finishTime(s));
+ return {activeSeconds:ms===null?null:Math.round(ms/1000),hints,attempts,
   finishedAt:times.every(t=>Number.isFinite(t))?Math.max(...times):null,
   sepuh:sessions.some(s=>finished(s)&&MISSIONS.some(m=>m.id===s.missionId&&m.enrichment))};
 }
 const compare=(a,b)=>{
- for(const key of ['activeSeconds','hints','finishedAt']){
+ for(const key of ['activeSeconds','hints','attempts','finishedAt']){
   const x=a[key]??Infinity,y=b[key]??Infinity;
   if(x!==y)return x<y?-1:1;
  }
