@@ -87,3 +87,9 @@ Verifikasi: 161/161 unit/API, build produksi berhasil, 27 alur browser terverifi
 ## Peringkat waktu/petunjuk dan badge Sepuh
 
 169/169 uji unit/API, build produksi berhasil, 3/3 browser untuk peringkat HP, pemulihan permintaan peringkat, serta perjalanan 15 misi/bos/koreksi guru. Pengujian mencakup pengurutan waktu, petunjuk, waktu selesai, seri, data waktu kosong, pengulangan setelah selesai, dan badge hanya untuk pengayaan yang selesai. API publik tidak menyertakan nama lengkap, ID akun, atau detail jawaban. Implementasi menghitung peringkat dari data yang sudah tersimpan dan tidak menulis ulang data asesmen kelas.
+
+## Sepuh menggantikan nomor peringkat
+
+Peserta yang menyelesaikan pengayaan masuk kelompok Sepuh di atas semua peringkat bernomor. Badge berada pada kolom Peringkat, tanpa angka; peserta lain mulai dari 1. Kelompok Sepuh tetap diurutkan dengan metrik inti, tanpa tambahan XP. XP pengayaan bernilai 0 dan layar penyelesaian pengayaan menampilkan badge. Data jawaban dan penilaian guru tidak diubah.
+
+Verifikasi: 170/170 unit/API sebelum penambahan satu uji perlindungan rapor; 11/11 uji indikator termasuk uji tambahan tersebut lolos. Tiga alur browser (perjalanan lengkap/koreksi guru, pemulihan peringkat, badge pada HP) lolos; build produksi berhasil. Uji membandingkan seluruh hasil indikator inti sebelum dan sesudah pengayaan: tetap sama.

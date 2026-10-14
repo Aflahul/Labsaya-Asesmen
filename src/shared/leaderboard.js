@@ -20,11 +20,13 @@ const compare=(a,b)=>{
  return 0;
 };
 export function rankLeaderboard(entries) {
- const sorted=[...entries].sort((a,b)=>compare(a,b)||a.alias.localeCompare(b.alias));
+ const sorted=[...entries].sort((a,b)=>Number(Boolean(b.sepuh))-Number(Boolean(a.sepuh))||compare(a,b)||a.alias.localeCompare(b.alias));
+ const sepuhCount=sorted.filter(entry=>entry.sepuh).length;
  let rank=0;
  return sorted.map((entry,index)=>{
-  if(!index||compare(entry,sorted[index-1])!==0)rank=index+1;
+  const numberedIndex=index-sepuhCount;
+  if(!entry.sepuh&&(!numberedIndex||compare(entry,sorted[index-1])!==0))rank=numberedIndex+1;
   const {finishedAt,...publicEntry}=entry;
-  return {...publicEntry,rank};
+  return {...publicEntry,rank:entry.sepuh?null:rank};
  });
 }

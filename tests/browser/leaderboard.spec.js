@@ -28,9 +28,12 @@ test("leaderboard recovers from a failed request instead of staying on loading",
 
 test('leaderboard shows time, hints and Sepuh without overflowing a phone screen',async({page})=>{
  await page.setViewportSize({width:390,height:844});
- await page.route('**/api/leaderboard',route=>route.fulfill({contentType:'application/json',body:JSON.stringify({data:[{alias:'Penjelajah Sangat Panjang 1234567890',rank:1,score:1500,activeSeconds:905,hints:2,sepuh:true},{alias:'Teman',rank:2,score:1500,activeSeconds:1000,hints:0,sepuh:false}]})}));
+ await page.route('**/api/leaderboard',route=>route.fulfill({contentType:'application/json',body:JSON.stringify({data:[{alias:'Penjelajah Sangat Panjang 1234567890',rank:null,score:1500,activeSeconds:905,hints:2,sepuh:true},{alias:'Teman',rank:1,score:1500,activeSeconds:1000,hints:0,sepuh:false}]})}));
  await page.goto('/');await page.getByRole('button',{name:'Peringkat',exact:true}).click();
  await expect(page.getByRole('heading',{level:1,name:'Peringkat penjelajah'})).toBeVisible();
- await expect(page.locator('.sepuh-badge')).toHaveCount(1);await expect(page.locator('.leaderboard')).toContainText('15 m 5 dtk');
+ await expect(page.locator('.sepuh-badge')).toHaveCount(1);
+ await expect(page.locator('.leaderboard tbody tr').first().locator('td').first()).toHaveText('Sepuh');
+ await expect(page.locator('.leaderboard tbody tr').first().locator('td').nth(1)).not.toContainText('Sepuh');
+ await expect(page.locator('.leaderboard tbody tr').nth(1).locator('td').first()).toHaveText('1');await expect(page.locator('.leaderboard')).toContainText('15 m 5 dtk');
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });

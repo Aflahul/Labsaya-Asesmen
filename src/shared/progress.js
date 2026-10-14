@@ -113,7 +113,7 @@ export function summarizeProgress({ sessions = [], indicatorThreshold = {thresho
   if (hasIndicators) for (const id of achievements) gameMissionGrades[id] = {bestScore: 100, score: 100, replayCount: Math.max(0,(starts[id]?.size||1)-1), replayPenalty: 0};
   return {
     xp: activityDone.length * 100,
-    enrichmentXp: achievements.filter(id=>MISSIONS.find(m=>m.id===id)?.enrichment).length*100,
+    enrichmentXp: 0,
     achievements,
     activityCompletedByMission,
     activeByMission,

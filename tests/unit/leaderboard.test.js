@@ -11,7 +11,7 @@ test('first completion freezes core time and hints; later practice and enrichmen
 });
 test('time, then fewer hints, then earlier finish determine rank; equal criteria share rank',()=>{
  const rows=rankLeaderboard([
-  {alias:'slow',activeSeconds:200,hints:0,finishedAt:1,sepuh:true},
+  {alias:'slow',activeSeconds:200,hints:0,finishedAt:1,sepuh:false},
   {alias:'fast-help',activeSeconds:100,hints:4,finishedAt:1},
   {alias:'first',activeSeconds:100,hints:0,finishedAt:2},
   {alias:'second',activeSeconds:100,hints:0,finishedAt:3},
@@ -26,4 +26,15 @@ test('missing telemetry stays unknown instead of becoming the fastest time',()=>
 });
 test('opening or leaving enrichment unfinished does not award Sepuh',()=>{
  expect(leaderboardStats([...sessions(),{missionId:BOSS.id,status:'active'}]).sepuh).toBe(false);
+});
+
+test('Sepuh stays above numbered ranks, retains XP, and does not occupy a rank number',()=>{
+ const rows=rankLeaderboard([
+  {alias:'Sepuh kedua',score:1500,sepuh:true,activeSeconds:200,hints:2,finishedAt:2},
+  {alias:'Nomor satu',score:1500,sepuh:false,activeSeconds:10,hints:0,finishedAt:1},
+  {alias:'Sepuh pertama',score:1500,sepuh:true,activeSeconds:100,hints:4,finishedAt:1},
+  {alias:'Nomor dua',score:1500,sepuh:false,activeSeconds:20,hints:0,finishedAt:2}
+ ]);
+ expect(rows.map(r=>[r.alias,r.rank])).toEqual([['Sepuh pertama',null],['Sepuh kedua',null],['Nomor satu',1],['Nomor dua',2]]);
+ expect(rows.every(r=>r.score===1500)).toBe(true);
 });

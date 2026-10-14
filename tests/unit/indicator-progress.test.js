@@ -54,3 +54,12 @@ test('repeating the same exposed transfer case does not create fresh independent
  const {buildAssessmentEvidence}=await import('../../src/shared/indicator-assessment.js');const s=newSession(m,'p',{assessmentPolicy:'indicator-v1',masteryCheck:true,previousCheckExposure:true});s.masteryCheck.answer='String Float 4 False';
  expect(buildAssessmentEvidence(m,s).mode).toBe('practice');
 });
+
+test('enrichment grants no bonus XP and leaves core report evidence unchanged',()=>{
+ const core=CORE_MISSIONS.map((mm,index)=>({...sent(`2026-10-14T01:${String(index).padStart(2,'0')}:00Z`,'independent_check'),missionId:mm.id,indicatorAssessment:{status:'agreed',evidenceMode:'independent_check',indicators:getIndicatorRubric(mm.id).indicators.map(i=>({id:i.id,level:3,evidenceStatus:'present',status:'agreed'}))}}));
+ const before=summarizeProgress({sessions:core});
+ const boss={...sent('2026-10-14T03:00:00Z'),id:'boss',missionId:'v2p05m04'};
+ const after=summarizeProgress({sessions:[...core,boss]});
+ expect(after.xp).toBe(1500);expect(after.enrichmentXp).toBe(0);
+ expect(after.indicatorResults.filter(i=>!i.enrichment)).toEqual(before.indicatorResults.filter(i=>!i.enrichment));
+});
