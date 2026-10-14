@@ -1,20 +1,17 @@
 import {esc} from './activities.js';
 const time=seconds=>seconds===null||seconds===undefined?'Belum tercatat':`${Math.floor(seconds/60)} m ${seconds%60} dtk`;
 const tier=row=>row.sepuh?'sepuh':row.rank===1?'gold':row.rank===2?'silver':row.rank===3?'bronze':row.rank<=10?'elite':'explorer';
-function awardIcon(kind) {
- const shape=kind==='gold'
-  ? '<path d="m7 13 9 7 8-13 8 13 9-7-4 23H11Z" fill="currentColor" fill-opacity=".3"/><path d="m7 13 9 7 8-13 8 13 9-7-4 23H11Z"/><path d="M12 41h24M18 29h12"/>'
-  : kind==='sepuh'
-  ? '<path d="m17 23-13-9 3 13 11 5m13-9 13-9-3 13-11 5"/><path d="M14 34h21a7 7 0 0 0 0-14 11 11 0 0 0-21-1 8 8 0 0 0 0 15Z" fill="currentColor" fill-opacity=".2"/><path d="m24 12 3 7-3 7-3-7Z"/>'
-  : kind==='silver'||kind==='bronze'
-  ? '<path d="m14 7 10 9L34 7l4 11-14 10-14-10Z" fill="currentColor" fill-opacity=".25"/><circle cx="24" cy="30" r="12"/><path d="m24 22 2.5 5 5.5.8-4 4 1 5.5-5-2.5-5 2.5 1-5.5-4-4 5.5-.8Z" fill="currentColor" stroke="none"/>'
-  : `${kind==='elite'?'<path d="m24 3 17 10v22L24 45 7 35V13Z" fill="currentColor" fill-opacity=".15"/>':''}<circle cx="24" cy="24" r="15"/><path d="m30 18-4 10-8 2 4-10Z" fill="currentColor" fill-opacity=".4"/><path d="M24 6V3m0 42v-3M6 24H3m42 0h-3"/>`;
- return `<svg viewBox="0 0 48 48" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${shape}</svg>`;
+function awardIcon(kind,rank) {
+ const index={gold:0,silver:1,bronze:2,elite:3,explorer:4,sepuh:5}[kind];
+ const symbol=kind==='sepuh'?'S':String(rank);
+ const centerY=kind==='gold'?276:kind==='sepuh'?282:256;
+ const fontSize=Math.min(108,234/symbol.length);
+ return `<svg class="award-art" viewBox="64 40 384 432" role="img" aria-label="${kind==='sepuh'?'Gelar Sepuh':`Peringkat ${esc(rank)}`}" focusable="false"><image href="/game-assets/leaderboard-awards.png" x="${-512*index}" y="0" width="3072" height="512"/><text class="${kind==='sepuh'?'sepuh-letter':'rank-number'}" x="256" y="${centerY}" text-anchor="middle" dominant-baseline="central" font-size="${fontSize}" aria-hidden="true">${esc(symbol)}</text></svg>`;
 }
 function rankCard(row) {
  const kind=tier(row);
  return `<li class="rank-card rank-${kind}" ${row.sepuh?'':`value="${esc(row.rank)}"`}>
-  <div class="rank-award" aria-label="${row.sepuh?'Gelar Sepuh':`Peringkat ${esc(row.rank)}`}">${awardIcon(kind)}${row.sepuh?'<span class="sepuh-badge">Sepuh</span>':`<span class="rank-number">${esc(row.rank)}</span>`}</div>
+  <div class="rank-award">${awardIcon(kind,row.rank)}${row.sepuh?'<span class="sepuh-badge">Sepuh</span>':''}</div>
   <div class="rank-player"><h3>${esc(row.alias)}</h3><dl class="rank-stats"><div data-stat="time"><dt>Waktu bermain</dt><dd>${esc(time(row.activeSeconds))}</dd></div><div data-stat="hints"><dt>Petunjuk</dt><dd>${esc(row.hints??'Belum tercatat')}</dd></div><div data-stat="attempts"><dt>Percobaan</dt><dd>${esc(row.attempts??'Belum tercatat')}</dd></div></dl></div>
   <div class="rank-xp">${row.sepuh?`<strong class="rank-bonus">${row.enrichmentXp==null?'Menyusul':'+'+esc(row.enrichmentXp)}</strong><span>XP pengayaan</span><small>${esc(row.score)} XP inti</small>`:`<strong>${esc(row.score)}</strong><span>XP inti</span>`}</div>
  </li>`;

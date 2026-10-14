@@ -105,3 +105,9 @@ Verifikasi: 17/17 uji unit peringkat dan rapor, build produksi, serta 4/4 alur b
 Gemini menilai jawaban pertama pengayaan dengan rubrik rancangan 30, langkah 35, pengujian 25, alasan 10. Skor dibulatkan dengan minimum 10 dan maksimum 100 XP, disimpan dalam enrichmentReward, dan hanya dipakai pada urutan Sepuh. XP inti, hasil kemampuan, dan rapor tidak menerima bonus ini. Latihan ulang dan Uji Mandiri tidak mengakumulasi bonus. Penilaian gagal tetap menyusul tanpa XP buatan. Penyelesaian baru dinilai otomatis; guru dapat memproses jawaban lama lewat tombol Nilai XP pengayaan.
 
 Verifikasi: 185/185 unit/API dan 5/5 alur browser, serta build produksi. Uji mencakup panggilan hanya ke Gemini, batas 10/100, respons tidak valid, penilaian sekali, lease mencegah panggilan ganda, koreksi guru yang berlangsung bersamaan, kontrol akses/CSRF, XP Sepuh terpisah, dan rapor tetap. Layar 390 px dan 1440 px tetap tidak melebar horizontal.
+
+## PNG penghargaan dari pengguna
+
+Atlas asli 3072 × 512 dengan kanal alpha transparan disimpan lokal sebagai leaderboard-awards.png tanpa perubahan piksel. Tampilan menggunakan enam bagian atlas: 1 emas, 2 perak, 3 perunggu, 4–10 kompas emas, 11 dan seterusnya kompas perak, Sepuh bersayap. Angka peringkat dan huruf S ditambahkan di bidang tengah; label Sepuh tetap ditampilkan. Nomor mengecil proporsional untuk beberapa digit, dan setiap ikon memiliki nama aksesibel.
+
+Verifikasi: build dan 3/3 browser lulus. PNG berhasil dimuat dari aset lokal dengan ukuran asli. Tampilan diperiksa pada 390 px dan 1440 px, termasuk angka 100, nama panjang, posisi teks di bidang tengah, dan tidak adanya pelebaran horizontal. Perubahan hanya tampilan, tanpa perubahan aturan XP atau penilaian kemampuan.
