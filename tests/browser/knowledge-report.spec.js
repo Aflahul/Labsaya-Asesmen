@@ -1,0 +1,20 @@
+import {test,expect} from '@playwright/test';
+import {buildKnowledgeReport} from '../../src/shared/knowledge-report.js';
+import {getMission} from '../../src/shared/missions.js';
+for(const width of [390,1440])test(`teacher knowledge gradebook sorts, filters, explains and exports at ${width}px`,async({page})=>{
+ await page.setViewportSize({width,height:844});
+ const m=getMission('v2p01m01');const p=(id,attendance,cls,answers)=>({id,attendance,real_name:`Nama Murid ${attendance}`,alias:`Alias${id}`,class_name:cls,hasPassword:true,summary:{completed:answers?15:0,xp:answers?1500:0,indicatorResults:[]},knowledge:buildKnowledgeReport(answers?[{id:'s'+id,missionId:m.id,status:'complete',submittedAt:'2026-10-15T01:00:00Z',state:{answers},hints:50}]:[])});
+ const rows=[p('ten',10,'X A',{...m.rules.answers,phone:'Integer'}),p('two',2,'X A',m.rules.answers),p('one',1,'X B',null)];
+ await page.route('**/api/teacher/participants',route=>route.fulfill({contentType:'application/json',body:JSON.stringify({data:rows})}));
+ await page.goto('/');await page.getByRole('button',{name:'Guru',exact:true}).click();await page.getByLabel('Username guru').fill('guru');await page.getByLabel('Kata sandi',{exact:true}).fill('test-password-only');await page.locator('#auth-form button[type=submit]').click();
+ await expect(page.getByRole('heading',{name:'Nilai pengetahuan per materi'})).toBeVisible();
+ const table=page.locator('#knowledge-table');await expect(table.locator('tbody tr td:first-child')).toHaveText(['1','2','10']);
+ await expect(table.locator('tbody tr').nth(1).locator('[data-material="1"] strong')).toHaveText('90');
+ await expect(table.locator('tbody tr').nth(2).locator('[data-material="1"] strong')).toHaveText('70');
+ await expect(table.locator('tbody tr').first().locator('[data-material="1"] strong')).toHaveText('—');
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ await page.locator('#teacher-class').selectOption('X A');await expect(table.locator('tbody tr')).toHaveCount(2);
+ await table.locator('[data-knowledge="two"]').click();await expect(page.locator('#knowledge-detail')).toContainText('Memilih tipe data sesuai kebutuhan');await expect(page.locator('#knowledge-detail .knowledge-indicator-score').first()).toHaveText('90');
+ const download=page.waitForEvent('download');await page.getByRole('button',{name:'Unduh nilai',exact:true}).click();expect((await download).suggestedFilename()).toBe('nilai-pengetahuan.csv');
+ await page.screenshot({path:`work/teacher-knowledge-${width}.png`,fullPage:true});
+});

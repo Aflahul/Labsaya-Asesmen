@@ -1,0 +1,16 @@
+import {esc} from './activities.js';
+import {ISLANDS} from '../../shared/missions.js';
+import {knowledgeRows} from '../../shared/knowledge-report.js';
+const score=value=>Number.isInteger(value)?String(value):'—';
+export function knowledgeTableHtml(participants) {
+ const rows=knowledgeRows(participants);
+ return `<section class="knowledge-report" aria-labelledby="knowledge-heading"><div class="knowledge-heading"><div><h2 id="knowledge-heading">Nilai pengetahuan per materi</h2><p>Nilai bulat 10–90 dari rata-rata indikator yang sudah dinilai. Nilai yang belum tersedia ditampilkan —.</p></div><button id="knowledge-csv" class="small">Unduh nilai</button></div>
+ <details class="knowledge-method"><summary>Cara menghitung nilai</summary><p>Jawaban pilihan dan program dihitung dari bagian yang benar. Uraian memakai hasil penilaian indikator yang tersedia. Memahami materi mendapat 90; mulai memahami mendapat 50; masih keliru mendapat 10. Penerapan pada kasus baru tetap bernilai maksimal 90.</p><p>Untuk setiap indikator digunakan jawaban terkirim terbaru yang sudah bisa dinilai. Indikator memiliki bobot sama. Nilai materi dibulatkan setelah dirata-ratakan. Latihan berbantuan tetap dinilai, tanpa pengurangan karena waktu atau petunjuk. Pengayaan tidak masuk nilai materi.</p></details>
+ <p class="knowledge-scroll-hint">Geser tabel untuk melihat semua materi.</p><div class="table-wrap knowledge-scroll" role="region" aria-label="Tabel nilai pengetahuan, geser untuk melihat semua materi" tabindex="0"><table id="knowledge-table" class="knowledge-table"><caption class="sr-only">Nilai pengetahuan murid diurutkan menurut nomor absen. Rentang nilai 10 sampai 90.</caption><thead><tr><th scope="col">Absen</th><th scope="col">Nama lengkap</th>${ISLANDS.map(m=>`<th scope="col">Materi ${m.id}<small>${esc(m.topic)}</small></th>`).join('')}<th scope="col">Rincian</th></tr></thead><tbody>${rows.map(p=>`<tr><td>${esc(p.attendance)}</td><th scope="row">${esc(p.real_name)}<small>${esc(p.class_name)}</small></th>${ISLANDS.map(m=>{
+  const material=p.knowledge?.materials.find(row=>row.id===m.id);
+  return `<td data-material="${m.id}"><strong>${score(material?.score)}</strong><small>${material?.assessed||0} dari ${material?.total||0} indikator</small></td>`;
+ }).join('')}<td><div class="knowledge-actions"><button class="small" data-knowledge="${esc(p.id)}">Indikator</button><button class="small ghost" data-report="${esc(p.id)}">Rapor</button></div></td></tr>`).join('')||'<tr><td colspan="8">Belum ada murid sesuai filter.</td></tr>'}</tbody></table></div><div id="knowledge-detail"></div></section>`;
+}
+export function knowledgeDetailHtml(p) {
+ return `<section class="knowledge-detail" aria-labelledby="knowledge-detail-heading"><h3 id="knowledge-detail-heading" tabindex="-1">Indikator pengetahuan · ${esc(p.real_name)}</h3><p>Absen ${esc(p.attendance)} · ${esc(p.class_name)}</p>${(p.knowledge?.materials||[]).map(m=>`<section><h4>${esc(m.title)} · ${esc(m.topic)} <span>${score(m.score)}</span></h4><ul>${m.indicators.map(i=>`<li><div><strong>${esc(i.label)}</strong><small>${esc(i.missionTitle)}</small><p>${esc(i.reason)}</p></div><span class="knowledge-indicator-score" aria-label="${i.score===null?'Belum dinilai':`Nilai ${score(i.score)}`}">${score(i.score)}</span></li>`).join('')}</ul></section>`).join('')}</section>`;
+}

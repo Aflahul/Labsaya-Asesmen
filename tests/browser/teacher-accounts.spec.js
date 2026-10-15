@@ -45,6 +45,7 @@ test("teacher creates a student and resets access without exposing stored hashes
     .innerText();
   const password = first.split("Kata sandi: ")[1];
   expect(password?.length).toBeGreaterThanOrEqual(20);
+  await page.getByText("Akun murid dan progres permainan",{exact:true}).click();
   const row = page.locator("#teacher-table tr").filter({ hasText: "AmanUji" });
   await expect(row).toContainText("X RPL 1");
   await row.locator("[data-reset-password]").click();

@@ -10,7 +10,7 @@ test('all missions, teacher correction, boss and XP remain separate from capabil
  await page.setViewportSize({width:390,height:844});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  await fillMission(page,BOSS);await page.locator('#submit').click();await waitForSaved(page);
  const tc=await browser.newContext(),teacher=await tc.newPage();await teacher.goto('/');await teacher.getByRole('button',{name:'Guru',exact:true}).click();await teacher.getByLabel('Username guru').fill('guru');await teacher.getByLabel('Kata sandi',{exact:true}).fill('test-password-only');await teacher.locator('#auth-form button[type=submit]').click();
- await teacher.getByPlaceholder('Nama lengkap / samaran').fill(alias);await teacher.locator('#teacher-table [data-report]').click();
+ await teacher.getByPlaceholder('Nama lengkap / samaran').fill(alias);await teacher.locator('#knowledge-table [data-report]').click();
  const form=teacher.locator(`.indicator-review-form[data-review]`).last();await form.locator('..').locator(':scope > summary').click();
  for(const i of getIndicatorRubric(BOSS.id).indicators){await form.locator(`[name="${i.id}"]`).selectOption('2');await form.locator(`[name="reason:${i.id}"]`).fill('Bagian aturan ini masih perlu diperjelas berdasarkan jawaban.');}
  await form.locator('[name=comment]').fill('Pengayaan perlu dilengkapi; XP inti tetap.');await form.getByRole('button',{name:'Simpan',exact:true}).click();

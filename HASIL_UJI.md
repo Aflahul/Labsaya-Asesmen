@@ -111,3 +111,10 @@ Verifikasi: 185/185 unit/API dan 5/5 alur browser, serta build produksi. Uji men
 Atlas asli 3072 × 512 dengan kanal alpha transparan disimpan lokal sebagai leaderboard-awards.png tanpa perubahan piksel. Tampilan menggunakan enam bagian atlas: 1 emas, 2 perak, 3 perunggu, 4–10 kompas emas, 11 dan seterusnya kompas perak, Sepuh bersayap. Angka peringkat dan huruf S ditambahkan di bidang tengah; label Sepuh tetap ditampilkan. Nomor mengecil proporsional untuk beberapa digit, dan setiap ikon memiliki nama aksesibel.
 
 Verifikasi: build dan 3/3 browser lulus. PNG berhasil dimuat dari aset lokal dengan ukuran asli. Tampilan diperiksa pada 390 px dan 1440 px, termasuk angka 100, nama panjang, posisi teks di bidang tengah, dan tidak adanya pelebaran horizontal. Perubahan hanya tampilan, tanpa perubahan aturan XP atau penilaian kemampuan.
+
+
+## Tabel nilai pengetahuan guru
+
+Tabel guru menampilkan absen, nama lengkap, Materi 1–5, rincian indikator, dan ekspor nilai CSV. Perhitungan 10–90 memakai ketepatan jawaban/pengujian untuk indikator objektif, penilaian indikator yang tersedia untuk uraian, dan prioritas tinjauan guru. Latihan berbantuan tetap dinilai. Tidak ada syarat Uji Mandiri, kutipan baru, atau semua penilai harus selesai. Nilai materi merata-ratakan indikator yang tersedia; bagian belum dinilai tampil —. Pengayaan dan seluruh metrik permainan tidak masuk perhitungan.
+
+Verifikasi: 192/192 unit/API serta 5 alur browser unik (matriks pada HP/desktop, akun guru, perjalanan penuh/koreksi guru, kontrol XP pengayaan) lulus. Uji mencakup urutan absen numerik 1/2/10, rataan per indikator, jawaban sebagian benar, tidak tahu, jawaban belum tersedia, bantuan tanpa penalti, prioritas guru, nilai tersimpan lama saat pemeriksaan baru belum tersedia, hasil uji kode, CSV sesuai filter, dan data sesi tetap utuh. Seluruh tes berjalan pada fixture lokal pg-mem dengan localhost; tidak memakai database kelas.

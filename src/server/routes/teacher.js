@@ -1,3 +1,4 @@
+import {buildKnowledgeReport} from '../../shared/knowledge-report.js';
 import {gradeEnrichmentSession,enrichmentCandidates} from '../enrichment-reward.js';
 import {enrichmentXp,leaderboardStats,rankLeaderboard} from '../../shared/leaderboard.js';
 import { getIndicatorRubric } from "../../shared/indicator-rubrics.js";
@@ -43,6 +44,7 @@ async function roster(db, query = {}, includeMissionDetails = false) {
       return {
         ...publicParticipant,
         hasPassword: Boolean(password_hash),
+        ...(query.knowledge?{knowledge:buildKnowledgeReport(sessions)}:{}),
         ...(query.leaderboard?{leaderboard:leaderboardStats(sessions)}:{}),
         summary,
         ...(includeMissionDetails ? { missionRows } : {}),
@@ -211,7 +213,7 @@ export async function teacherRoutes(app, enrichmentGrader) {
   });
   app.get("/api/teacher/participants", async (req) => {
     app.requireRole(req, "teacher");
-    const rows = await roster(app.db, req.query);
+    const rows = await roster(app.db, {...req.query,knowledge:true});
     if (req.query.page) {
       const page = Number(req.query.page);
       if (!Number.isInteger(page) || page < 1) fail(400, "Halaman tidak valid");

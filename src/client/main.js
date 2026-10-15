@@ -1,3 +1,5 @@
+import {knowledgeTableHtml,knowledgeDetailHtml} from "./ui/knowledge-report.js";
+import {knowledgeRows,knowledgeExportRows} from "../shared/knowledge-report.js";
 import {leaderboardHtml} from './ui/leaderboard.js';
 import { indicatorClassHtml, indicatorStudentReportHtml } from "./ui/indicator-report.js";
 import { buildIndicatorClassReport, indicatorExportRows } from "../shared/reports.js";
@@ -519,7 +521,8 @@ function filteredTeachers() {
   );
 }
 function teacherTable() {
-  const rows = filteredTeachers();
+  const rows = knowledgeRows(filteredTeachers());
+  $("#teacher-knowledge").innerHTML=knowledgeTableHtml(rows);
   const cls=$("#teacher-class")?.value||"";
   const container=$("#teacher-indicators");
   if(container)container.innerHTML=indicatorClassHtml(buildIndicatorClassReport(teacherRows,{className:cls,threshold:indicatorThreshold.threshold,thresholdVersion:indicatorThreshold.version}));
@@ -541,9 +544,8 @@ function showStudentCredential(result, title) {
   box.append(heading, info, note);
 }
 function renderTeacher() {
-  const scores = teacherRows.filter((p) => p.summary.completed === 15);
   shell(
-    `<section class="panel"><div class="eyebrow">Ruang pendidik</div><h2 style="margin-top:12px">Perkembangan belajar murid</h2><p>Lihat hasil misi dan jawaban murid. Cocokkan nama lengkap, kelas, dan nomor absen akun yang didaftarkan mandiri sebelum memakai rapor sebagai nilai sumatif. Jawaban yang belum terkirim dari perangkat murid belum muncul di halaman ini.</p><div class="summary-grid"><div class="summary-card"><small>Peserta terdaftar</small><strong>${teacherRows.length}</strong></div><div class="summary-card"><small>Inti tuntas</small><strong>${scores.length}</strong></div><div class="summary-card"><small>Kelas</small><strong>${new Set(teacherRows.map((p) => p.class_name)).size}</strong></div><div class="summary-card"><small>Murid perlu penguatan</small><strong>${teacherRows.filter(p=>p.summary.indicatorResults.some(i=>!i.enrichment&&i.group === "needs_support")).length}</strong></div></div><div class="inline-form"><label>Kelas<select id="teacher-class"><option value="">Semua kelas</option>${[...new Set(teacherRows.map((p) => p.class_name))].map((c) => `<option>${esc(c)}</option>`).join("")}</select></label><label>Cari peserta<input id="teacher-query" placeholder="Nama lengkap / samaran"></label><label><input id="teacher-complete" type="checkbox" style="width:auto"> Inti tuntas saja</label></div><div class="actions"><button id="teacher-csv">Unduh</button><button id="teacher-refresh">Segarkan</button></div><details><summary>XP pengayaan</summary><p>Nilai bonus permainan dari jawaban pengayaan yang sudah terkirim. XP ini hanya mengurutkan Sepuh dan tidak mengubah rapor.</p><button id="grade-enrichment">Nilai XP pengayaan</button><p id="enrichment-grading-status" role="status" aria-live="polite"></p></details><details class="report-question"><summary>Buat akun murid</summary><p class="notice">Isi nama lengkap untuk rapor asesmen. Nama samaran digunakan untuk masuk dan tampil di papan peringkat publik. Sistem membuat kata sandi acak; berikan kepada murid secara pribadi.</p><form id="student-create-form"><label>Nama lengkap murid<input name="realName" required maxlength="100" autocomplete="name"></label><label>Nama samaran untuk peringkat<input name="alias" required maxlength="100"></label><label>Kelas<input name="className" required maxlength="50"></label><label>Nomor absen<input name="attendance" type="number" min="1" max="999" required></label><p role="alert" class="error"></p><button class="primary" type="submit">Buat akun</button></form></details><div id="student-credentials" class="hint" role="status" hidden></div><div id="teacher-table"></div><div class="actions"><label>Ambang indikator<select id="indicator-threshold">${[1,2,3,4].map(n=>`<option value="${n}" ${n===indicatorThreshold.threshold?"selected":""}>Tingkat ${n}</option>`).join("")}</select></label><button id="save-threshold">Simpan Ambang</button><button id="indicator-csv">Ekspor Indikator</button></div><div id="teacher-indicators"></div><details style="margin-top:25px"><summary>Kalibrasi waktu versi lama</summary><p class="notice">Pengaturan ini hanya untuk misi versi lama. Ekspedisi lima pulau memakai acuan waktu per misi dengan bobot 10%.</p><div class="inline-form"><label>Pengali waktu<input id="baseline" type="number" min="0.5" max="3" step="0.1" value="1"></label><button id="calibrate">Simpan</button></div><p id="error" role="alert"></p></details></section>`,
+    `<section class="panel"><div class="eyebrow">Ruang pendidik</div><h2 style="margin-top:12px">Perkembangan belajar murid</h2><p>Lihat nilai pengetahuan murid per materi. Buka Indikator untuk melihat rincian nilainya. Nilai ini terpisah dari skor dan peringkat permainan.</p><div class="summary-grid"><div class="summary-card"><small>Peserta terdaftar</small><strong>${teacherRows.length}</strong></div><div class="summary-card"><small>Murid sudah dinilai</small><strong>${teacherRows.filter(p=>p.knowledge?.materials.some(m=>m.score!==null)).length}</strong></div><div class="summary-card"><small>Kelas</small><strong>${new Set(teacherRows.map((p) => p.class_name)).size}</strong></div><div class="summary-card"><small>Indikator dinilai</small><strong>${teacherRows.reduce((n,p)=>n+(p.knowledge?.materials.reduce((sum,m)=>sum+m.assessed,0)||0),0)}</strong></div></div><div class="inline-form"><label>Kelas<select id="teacher-class"><option value="">Semua kelas</option>${[...new Set(teacherRows.map((p) => p.class_name))].map((c) => `<option>${esc(c)}</option>`).join("")}</select></label><label>Cari peserta<input id="teacher-query" placeholder="Nama lengkap / samaran"></label><label><input id="teacher-complete" type="checkbox" style="width:auto"> Inti tuntas saja</label></div><div class="actions"><button id="teacher-refresh">Segarkan</button></div><div id="teacher-knowledge"></div><details><summary>XP pengayaan</summary><p>Nilai bonus permainan dari jawaban pengayaan yang sudah terkirim. XP ini hanya mengurutkan Sepuh dan tidak mengubah rapor.</p><button id="grade-enrichment">Nilai XP pengayaan</button><p id="enrichment-grading-status" role="status" aria-live="polite"></p></details><details class="report-question"><summary>Buat akun murid</summary><p class="notice">Isi nama lengkap untuk rapor asesmen. Nama samaran digunakan untuk masuk dan tampil di papan peringkat publik. Sistem membuat kata sandi acak; berikan kepada murid secara pribadi.</p><form id="student-create-form"><label>Nama lengkap murid<input name="realName" required maxlength="100" autocomplete="name"></label><label>Nama samaran untuk peringkat<input name="alias" required maxlength="100"></label><label>Kelas<input name="className" required maxlength="50"></label><label>Nomor absen<input name="attendance" type="number" min="1" max="999" required></label><p role="alert" class="error"></p><button class="primary" type="submit">Buat akun</button></form></details><div id="student-credentials" class="hint" role="status" hidden></div><details class="teacher-account-details"><summary>Akun murid dan progres permainan</summary><div class="actions"><button id="teacher-csv">Unduh arsip</button></div><div id="teacher-table"></div></details><details class="teacher-indicator-details"><summary>Rekap indikator TP dan pengaturan</summary><div class="actions"><label>Ambang indikator<select id="indicator-threshold">${[1,2,3,4].map(n=>`<option value="${n}" ${n===indicatorThreshold.threshold?"selected":""}>Tingkat ${n}</option>`).join("")}</select></label><button id="save-threshold">Simpan Ambang</button><button id="indicator-csv">Ekspor Indikator</button></div><div id="teacher-indicators"></div></details><details style="margin-top:25px"><summary>Kalibrasi waktu versi lama</summary><p class="notice">Pengaturan ini hanya untuk misi versi lama. Ekspedisi lima pulau memakai acuan waktu per misi dengan bobot 10%.</p><div class="inline-form"><label>Pengali waktu<input id="baseline" type="number" min="0.5" max="3" step="0.1" value="1"></label><button id="calibrate">Simpan</button></div><p id="error" role="alert"></p></details></section>`,
   );
   teacherTable();
 }
@@ -762,6 +764,11 @@ app.addEventListener("click", async (e) => {
       });
       return;
     }
+    if (b.dataset.knowledge) {
+      const p=teacherRows.find(p=>p.id===b.dataset.knowledge);
+      if(p){$("#knowledge-detail").innerHTML=knowledgeDetailHtml(p);$("#knowledge-detail-heading").focus();}
+      return;
+    }
     if (b.dataset.historyIsland) {
       islandHistory(Number(b.dataset.historyIsland));
       return;
@@ -941,6 +948,9 @@ app.addEventListener("click", async (e) => {
         }catch(error){if(status)status.textContent=error.message;}
         finally{b.disabled=false;}
         break;
+      }
+      case "knowledge-csv": {
+        download("nilai-pengetahuan.csv",toCsv(knowledgeExportRows(filteredTeachers())),"text/csv;charset=utf-8");break;
       }
       case "indicator-csv": {
         const r=buildIndicatorClassReport(teacherRows,{className:$("#teacher-class")?.value||'',threshold:indicatorThreshold.threshold,thresholdVersion:indicatorThreshold.version});download('indikator-kelas.csv',toCsv(indicatorExportRows(r)),'text/csv;charset=utf-8');break;
